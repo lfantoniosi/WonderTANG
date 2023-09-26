@@ -1,0 +1,75 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="src/clockdiv.v" type="file.verilog" enable="1"/>
+        <File path="src/crc16.v" type="file.verilog" enable="1"/>
+        <File path="src/dpram.v" type="file.verilog" enable="1"/>
+        <File path="src/expslot.v" type="file.verilog" enable="1"/>
+        <File path="src/flash.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_rpll/clk135.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_rpll/clkp_108.v" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/audio_clock_regeneration_packet.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/audio_info_frame.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/audio_sample_packet.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/auxiliary_video_information_info_frame.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/hdmi.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/packet_assembler.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/packet_picker.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/serializer.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/source_product_description_info_frame.sv" type="file.verilog" enable="1"/>
+        <File path="src/hdmi/tmds_channel.sv" type="file.verilog" enable="1"/>
+        <File path="src/megaram.v" type="file.verilog" enable="1"/>
+        <File path="src/megarom.v" type="file.verilog" enable="1"/>
+        <File path="src/memory_controller.v" type="file.verilog" enable="1"/>
+        <File path="src/mmapper.v" type="file.verilog" enable="1"/>
+        <File path="src/pinfilter.v" type="file.verilog" enable="1"/>
+        <File path="src/ram.v" type="file.verilog" enable="1"/>
+        <File path="src/rom.v" type="file.verilog" enable="1"/>
+        <File path="src/sd_reader.sv" type="file.verilog" enable="1"/>
+        <File path="src/sdcmd_ctrl.sv" type="file.verilog" enable="1"/>
+        <File path="src/sdpram.v" type="file.verilog" enable="1"/>
+        <File path="src/sdram.v" type="file.verilog" enable="1"/>
+        <File path="src/top.v" type="file.verilog" enable="1"/>
+        <File path="src/OCM/ese_mixer.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/dac/esepwm.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/filter/esefir5.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/filter/tapram.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/lpf/lpf.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/scc/megaram.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/scc/scc_wave.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/OCM/sound/scc/tb/ram.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/PSG_YM2149/YM2149.vhdl" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp_background.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp_cram.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp_main.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp_sprite_shifter.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/vdp_sprites.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/video.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/attacktable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/controller.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/envelopegenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/envelopememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/feedbackmemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/lineartable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/operator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/opll.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/outputgenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/outputmemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/phasegenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/phasememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/registermemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/sinetable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/slotcounter.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/temporalmixer.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/vm2413.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/voicememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/vm2413/voicerom.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/top.cst" type="file.cst" enable="1"/>
+        <File path="src/top.sdc" type="file.sdc" enable="1"/>
+    </FileList>
+</Project>
