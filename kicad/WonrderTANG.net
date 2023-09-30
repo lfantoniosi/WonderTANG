@@ -1,0 +1,2047 @@
+(export 
+  (version "E") 
+  (design 
+    (source "D:\\datos\\KiCad\\05_Cartucho_MSX_Tang_Nano_9k_Mapper\\05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch") 
+    (date "4/30/2023 8:52:22 PM") 
+    (tool "Eeschema (6.0.9)") 
+    (sheet 
+      (number "1") 
+      (name "/") 
+      (tstamps "/") 
+      (title_block 
+        (title "MSX-Tang Nano 9K Breakout") 
+        (company) 
+        (rev) 
+        (date "2023-03-01") 
+        (source "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch") 
+        (comment 
+          (number "1") 
+          (value "")) 
+        (comment 
+          (number "2") 
+          (value "")) 
+        (comment 
+          (number "3") 
+          (value "")) 
+        (comment 
+          (number "4") 
+          (value "")) 
+        (comment 
+          (number "5") 
+          (value "")) 
+        (comment 
+          (number "6") 
+          (value "")) 
+        (comment 
+          (number "7") 
+          (value "")) 
+        (comment 
+          (number "8") 
+          (value "")) 
+        (comment 
+          (number "9") 
+          (value ""))))) 
+  (components 
+    (comp 
+      (ref "C1") 
+      (value "100n") 
+      (footprint "Mis_huellas:C_Disc_D4.3mm_W1.9mm_P5.00mm") 
+      (libsource 
+        (lib "Device") 
+        (part "C") 
+        (description "Unpolarized capacitor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "85855820-e1b9-4db5-853a-31332b8307ef")) 
+    (comp 
+      (ref "C2") 
+      (value "100n") 
+      (footprint "Mis_huellas:C_Disc_D4.3mm_W1.9mm_P5.00mm") 
+      (libsource 
+        (lib "Device") 
+        (part "C") 
+        (description "Unpolarized capacitor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "953daf70-d4d7-43b5-9fd6-56ae8e33a758")) 
+    (comp 
+      (ref "C3") 
+      (value "100n") 
+      (footprint "Mis_huellas:C_Disc_D4.3mm_W1.9mm_P5.00mm") 
+      (libsource 
+        (lib "Device") 
+        (part "C") 
+        (description "Unpolarized capacitor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "797a7c2c-2816-4404-a969-5dc7cb9ec4d0")) 
+    (comp 
+      (ref "C4") 
+      (value "100n") 
+      (footprint "Mis_huellas:C_Disc_D4.3mm_W1.9mm_P5.00mm") 
+      (libsource 
+        (lib "Device") 
+        (part "C") 
+        (description "Unpolarized capacitor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "0b4b10dd-867e-4306-a71b-2165380dca64")) 
+    (comp 
+      (ref "C6") 
+      (value "100n") 
+      (footprint "Mis_huellas:C_Disc_D4.3mm_W1.9mm_P5.00mm") 
+      (libsource 
+        (lib "Device") 
+        (part "C") 
+        (description "Unpolarized capacitor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "ee153024-974a-453d-888b-c70bce2d6045")) 
+    (comp 
+      (ref "CON1") 
+      (value "MSX-CONNECTOR") 
+      (footprint "Mis_huellas:CARTRIDGE_MSX") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "MSX-CONNECTOR") 
+        (description "")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "f6ca9f30-3208-4f6e-ac16-efafdf2c82ed")) 
+    (comp 
+      (ref "R1") 
+      (value "10k") 
+      (footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal") 
+      (libsource 
+        (lib "Device") 
+        (part "R") 
+        (description "Resistor")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "eff7d176-cee2-4e8a-b6b7-f1c09854f726")) 
+    (comp 
+      (ref "U1") 
+      (value "SN74LVC245AN") 
+      (footprint "Package_DIP:DIP-20_W7.62mm_LongPads") 
+      (datasheet "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "SN74LVC245AN") 
+        (description "Octal BUS Transceivers, 3-State outputs")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "c16e04b4-be5c-4d51-a451-6545e2231215")) 
+    (comp 
+      (ref "U2") 
+      (value "SN74LVC245AN") 
+      (footprint "Package_DIP:DIP-20_W7.62mm_LongPads") 
+      (datasheet "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "SN74LVC245AN") 
+        (description "Octal BUS Transceivers, 3-State outputs")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "2e0069e5-bc84-420c-b1e7-ad7079397ce4")) 
+    (comp 
+      (ref "U3") 
+      (value "SN74LVC245AN") 
+      (footprint "Package_DIP:DIP-20_W7.62mm_LongPads") 
+      (datasheet "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "SN74LVC245AN") 
+        (description "Octal BUS Transceivers, 3-State outputs")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "84b63230-a70d-4332-a0e1-11d8769313a9")) 
+    (comp 
+      (ref "U4") 
+      (value "SN74LVC245AN") 
+      (footprint "Package_DIP:DIP-20_W7.62mm_LongPads") 
+      (datasheet "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "SN74LVC245AN") 
+        (description "Octal BUS Transceivers, 3-State outputs")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "648f0ced-858e-4013-97ea-743f639d47dc")) 
+    (comp 
+      (ref "U6") 
+      (value "Tang_Nano_9k") 
+      (footprint "Mis_huellas:Tang_Nano_9k") 
+      (libsource 
+        (lib "Mi_libreria") 
+        (part "Tang_Nano_9k") 
+        (description "")) 
+      (property 
+        (name "Sheetname") 
+        (value "")) 
+      (property 
+        (name "Sheetfile") 
+        (value "05_Cartucho_MSX_Tang_Nano_9k_Mapper.kicad_sch")) 
+      (sheetpath 
+        (names "/") 
+        (tstamps "/")) 
+      (tstamps "ab785e35-1bd1-469a-939b-e0a2bef5c274"))) 
+  (libparts 
+    (libpart 
+      (lib "Device") 
+      (part "C") 
+      (description "Unpolarized capacitor") 
+      (docs "~") 
+      (footprints 
+        (fp "C_*")) 
+      (fields 
+        (field 
+          (name "Reference") "C") 
+        (field 
+          (name "Value") "C") 
+        (field 
+          (name "Datasheet") "~")) 
+      (pins 
+        (pin 
+          (num "1") 
+          (name "") 
+          (type "passive")) 
+        (pin 
+          (num "2") 
+          (name "") 
+          (type "passive")))) 
+    (libpart 
+      (lib "Device") 
+      (part "R") 
+      (description "Resistor") 
+      (docs "~") 
+      (footprints 
+        (fp "R_*")) 
+      (fields 
+        (field 
+          (name "Reference") "R") 
+        (field 
+          (name "Value") "R") 
+        (field 
+          (name "Datasheet") "~")) 
+      (pins 
+        (pin 
+          (num "1") 
+          (name "") 
+          (type "passive")) 
+        (pin 
+          (num "2") 
+          (name "") 
+          (type "passive")))) 
+    (libpart 
+      (lib "Mi_libreria") 
+      (part "MSX-CONNECTOR") 
+      (fields 
+        (field 
+          (name "Reference") "CON1") 
+        (field 
+          (name "Value") "MSX-CONNECTOR") 
+        (field 
+          (name "Footprint") "Mis_huellas:CARTRIDGE_MSX")) 
+      (pins 
+        (pin 
+          (num "1") 
+          (name "~{CS1}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "2") 
+          (name "~{CS2}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "3") 
+          (name "~{CS12}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "4") 
+          (name "~{SLTSL}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "5") 
+          (name "RSV@1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "6") 
+          (name "~{RFSH}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "7") 
+          (name "/WAIT") 
+          (type "bidirectional")) 
+        (pin 
+          (num "8") 
+          (name "~{INT}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "9") 
+          (name "M1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "10") 
+          (name "~{BUSDIR}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "11") 
+          (name "~{IORQ}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "12") 
+          (name "~{MERQ}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "13") 
+          (name "~{WR}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "14") 
+          (name "~{RD}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "15") 
+          (name "~{RESET}") 
+          (type "bidirectional")) 
+        (pin 
+          (num "16") 
+          (name "RSV@2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "17") 
+          (name "A9") 
+          (type "bidirectional")) 
+        (pin 
+          (num "18") 
+          (name "A15") 
+          (type "bidirectional")) 
+        (pin 
+          (num "19") 
+          (name "A11") 
+          (type "bidirectional")) 
+        (pin 
+          (num "20") 
+          (name "A10") 
+          (type "bidirectional")) 
+        (pin 
+          (num "21") 
+          (name "A7") 
+          (type "bidirectional")) 
+        (pin 
+          (num "22") 
+          (name "A6") 
+          (type "bidirectional")) 
+        (pin 
+          (num "23") 
+          (name "A12") 
+          (type "bidirectional")) 
+        (pin 
+          (num "24") 
+          (name "A8") 
+          (type "bidirectional")) 
+        (pin 
+          (num "25") 
+          (name "A14") 
+          (type "bidirectional")) 
+        (pin 
+          (num "26") 
+          (name "A13") 
+          (type "bidirectional")) 
+        (pin 
+          (num "27") 
+          (name "A1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "28") 
+          (name "A0") 
+          (type "bidirectional")) 
+        (pin 
+          (num "29") 
+          (name "A3") 
+          (type "bidirectional")) 
+        (pin 
+          (num "30") 
+          (name "A2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "31") 
+          (name "A5") 
+          (type "bidirectional")) 
+        (pin 
+          (num "32") 
+          (name "A4") 
+          (type "bidirectional")) 
+        (pin 
+          (num "33") 
+          (name "D1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "34") 
+          (name "D0") 
+          (type "bidirectional")) 
+        (pin 
+          (num "35") 
+          (name "D3") 
+          (type "bidirectional")) 
+        (pin 
+          (num "36") 
+          (name "D2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "37") 
+          (name "D5") 
+          (type "bidirectional")) 
+        (pin 
+          (num "38") 
+          (name "D4") 
+          (type "bidirectional")) 
+        (pin 
+          (num "39") 
+          (name "D7") 
+          (type "bidirectional")) 
+        (pin 
+          (num "40") 
+          (name "D6") 
+          (type "bidirectional")) 
+        (pin 
+          (num "41") 
+          (name "GND@1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "42") 
+          (name "CLOCK") 
+          (type "bidirectional")) 
+        (pin 
+          (num "43") 
+          (name "GND@2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "44") 
+          (name "SW1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "45") 
+          (name "5V@1") 
+          (type "bidirectional")) 
+        (pin 
+          (num "46") 
+          (name "SW2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "47") 
+          (name "5V@2") 
+          (type "bidirectional")) 
+        (pin 
+          (num "48") 
+          (name "+12") 
+          (type "bidirectional")) 
+        (pin 
+          (num "49") 
+          (name "SOUNDIN") 
+          (type "bidirectional")) 
+        (pin 
+          (num "50") 
+          (name "-12") 
+          (type "bidirectional")))) 
+    (libpart 
+      (lib "Mi_libreria") 
+      (part "SN74LVC245AN") 
+      (description "Octal BUS Transceivers, 3-State outputs") 
+      (docs "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf") 
+      (footprints 
+        (fp "DIP?20*")) 
+      (fields 
+        (field 
+          (name "Reference") "U") 
+        (field 
+          (name "Value") "SN74LVC245AN") 
+        (field 
+          (name "Footprint") "Package_DIP:DIP-20_W7.62mm") 
+        (field 
+          (name "Datasheet") "https://www.ti.com/lit/ds/symlink/sn74lvc245a.pdf")) 
+      (pins 
+        (pin 
+          (num "1") 
+          (name "A->B") 
+          (type "input")) 
+        (pin 
+          (num "2") 
+          (name "A0") 
+          (type "tri_state")) 
+        (pin 
+          (num "3") 
+          (name "A1") 
+          (type "tri_state")) 
+        (pin 
+          (num "4") 
+          (name "A2") 
+          (type "tri_state")) 
+        (pin 
+          (num "5") 
+          (name "A3") 
+          (type "tri_state")) 
+        (pin 
+          (num "6") 
+          (name "A4") 
+          (type "tri_state")) 
+        (pin 
+          (num "7") 
+          (name "A5") 
+          (type "tri_state")) 
+        (pin 
+          (num "8") 
+          (name "A6") 
+          (type "tri_state")) 
+        (pin 
+          (num "9") 
+          (name "A7") 
+          (type "tri_state")) 
+        (pin 
+          (num "10") 
+          (name "GND") 
+          (type "power_in")) 
+        (pin 
+          (num "11") 
+          (name "B7") 
+          (type "tri_state")) 
+        (pin 
+          (num "12") 
+          (name "B6") 
+          (type "tri_state")) 
+        (pin 
+          (num "13") 
+          (name "B5") 
+          (type "tri_state")) 
+        (pin 
+          (num "14") 
+          (name "B4") 
+          (type "tri_state")) 
+        (pin 
+          (num "15") 
+          (name "B3") 
+          (type "tri_state")) 
+        (pin 
+          (num "16") 
+          (name "B2") 
+          (type "tri_state")) 
+        (pin 
+          (num "17") 
+          (name "B1") 
+          (type "tri_state")) 
+        (pin 
+          (num "18") 
+          (name "B0") 
+          (type "tri_state")) 
+        (pin 
+          (num "19") 
+          (name "CE") 
+          (type "input")) 
+        (pin 
+          (num "20") 
+          (name "VCC") 
+          (type "power_in")))) 
+    (libpart 
+      (lib "Mi_libreria") 
+      (part "Tang_Nano_9k") 
+      (fields 
+        (field 
+          (name "Reference") "U") 
+        (field 
+          (name "Value") "Tang_Nano_9k") 
+        (field 
+          (name "Footprint") "Mis_huellas:Tang_Nano_9k")) 
+      (pins 
+        (pin 
+          (num "1") 
+          (name "38_IOB31B_TF_CS") 
+          (type "bidirectional")) 
+        (pin 
+          (num "2") 
+          (name "37_IOB31A_TF_MOSI") 
+          (type "bidirectional")) 
+        (pin 
+          (num "3") 
+          (name "36_IOB29B_TF_SCLK_GCLKC_4") 
+          (type "bidirectional")) 
+        (pin 
+          (num "4") 
+          (name "39_IOB33A_TF_MISO") 
+          (type "bidirectional")) 
+        (pin 
+          (num "5") 
+          (name "25_IOB8A") 
+          (type "bidirectional")) 
+        (pin 
+          (num "6") 
+          (name "26_IOB8B") 
+          (type "bidirectional")) 
+        (pin 
+          (num "7") 
+          (name "27_IOB11A") 
+          (type "bidirectional")) 
+        (pin 
+          (num "8") 
+          (name "28_IOB11B") 
+          (type "bidirectional")) 
+        (pin 
+          (num "9") 
+          (name "29_IOB13A") 
+          (type "bidirectional")) 
+        (pin 
+          (num "10") 
+          (name "30_IOB13B") 
+          (type "bidirectional")) 
+        (pin 
+          (num "11") 
+          (name "33_IOB23A_RGB_DE") 
+          (type "bidirectional")) 
+        (pin 
+          (num "12") 
+          (name "34_IOB23B_RGB_VS") 
+          (type "bidirectional")) 
+        (pin 
+          (num "13") 
+          (name "40_IOB33B_RGB_HS") 
+          (type "bidirectional")) 
+        (pin 
+          (num "14") 
+          (name "35_IOB29A_RGB_CK_GCLKT_4") 
+          (type "bidirectional")) 
+        (pin 
+          (num "15") 
+          (name "41_IOB41A_RGB_B7") 
+          (type "bidirectional")) 
+        (pin 
+          (num "16") 
+          (name "42_IOB41B_RGB_B6") 
+          (type "bidirectional")) 
+        (pin 
+          (num "17") 
+          (name "51_IOR17B_RGB_B5_GCLKC_3") 
+          (type "bidirectional")) 
+        (pin 
+          (num "18") 
+          (name "53_IOB15B_RGB_B4") 
+          (type "bidirectional")) 
+        (pin 
+          (num "19") 
+          (name "54_IOB15A_RGB_B3") 
+          (type "bidirectional")) 
+        (pin 
+          (num "20") 
+          (name "55_IOR14B_RGB_G7") 
+          (type "bidirectional")) 
+        (pin 
+          (num "21") 
+          (name "56_IOR14A_RGB_G6") 
+          (type "bidirectional")) 
+        (pin 
+          (num "22") 
+          (name "57_IOR13A_RGB_G5") 
+          (type "bidirectional")) 
+        (pin 
+          (num "23") 
+          (name "68_IOT42B_RGB_G4_HDMI_CKN") 
+          (type "bidirectional")) 
+        (pin 
+          (num "24") 
+          (name "69_IOT42A_RGB_G3_HDMI_CKP") 
+          (type "bidirectional")) 
+        (pin 
+          (num "25") 
+          (name "3V3") 
+          (type "bidirectional")) 
+        (pin 
+          (num "26") 
+          (name "GND") 
+          (type "bidirectional")) 
+        (pin 
+          (num "27") 
+          (name "RGB_INIT_IOB15B_32") 
+          (type "bidirectional")) 
+        (pin 
+          (num "28") 
+          (name "RGB_INIT_IOB15A_31") 
+          (type "bidirectional")) 
+        (pin 
+          (num "29") 
+          (name "SPILCD_RS_IOR24A_49") 
+          (type "bidirectional")) 
+        (pin 
+          (num "30") 
+          (name "SPILCD_CS_IOR24B_48") 
+          (type "bidirectional")) 
+        (pin 
+          (num "31") 
+          (name "5V") 
+          (type "bidirectional")) 
+        (pin 
+          (num "32") 
+          (name "HDMI_D0N_RGB_G2_IOT41B_70") 
+          (type "bidirectional")) 
+        (pin 
+          (num "33") 
+          (name "HDMI_D0P_RGB_R7_IOT41A_71") 
+          (type "bidirectional")) 
+        (pin 
+          (num "34") 
+          (name "HDMI_D1N_RGB_R6_IOT39B_72") 
+          (type "bidirectional")) 
+        (pin 
+          (num "35") 
+          (name "HDMI_D1P_RGB_R5_IOT39A_73") 
+          (type "bidirectional")) 
+        (pin 
+          (num "36") 
+          (name "HDMI_D2N_RGB_R4_IOT38B_74") 
+          (type "bidirectional")) 
+        (pin 
+          (num "37") 
+          (name "HDMI_D2P_RGB_R3_IOT38A_75") 
+          (type "bidirectional")) 
+        (pin 
+          (num "38") 
+          (name "SPILCD_CK_IOT37B_76") 
+          (type "bidirectional")) 
+        (pin 
+          (num "39") 
+          (name "SPILCD_MO_IOT37A_77") 
+          (type "bidirectional")) 
+        (pin 
+          (num "40") 
+          (name "IOT12B_79") 
+          (type "bidirectional")) 
+        (pin 
+          (num "41") 
+          (name "IOT12A_80") 
+          (type "bidirectional")) 
+        (pin 
+          (num "42") 
+          (name "IOT11B_81") 
+          (type "bidirectional")) 
+        (pin 
+          (num "43") 
+          (name "IOT11A_82") 
+          (type "bidirectional")) 
+        (pin 
+          (num "44") 
+          (name "IOT10B_83") 
+          (type "bidirectional")) 
+        (pin 
+          (num "45") 
+          (name "IOT10A_84") 
+          (type "bidirectional")) 
+        (pin 
+          (num "46") 
+          (name "IOT8B_85") 
+          (type "bidirectional")) 
+        (pin 
+          (num "47") 
+          (name "RGB_BL_IOT8A_86") 
+          (type "bidirectional")) 
+        (pin 
+          (num "48") 
+          (name "RGB_INIT_IOR5A_63") 
+          (type "bidirectional"))))) 
+  (libraries 
+    (library 
+      (logical "Device") 
+      (uri "C:\\Program Files\\KiCad\\6.0\\share\\kicad\\symbols\\/Device.kicad_sym")) 
+    (library 
+      (logical "Mi_libreria") 
+      (uri "D:/datos/KiCad/00_librerias/Mi_libreria.kicad_sym"))) 
+  (nets 
+    (net 
+      (code "1") 
+      (name "+3.3V") 
+      (node 
+        (ref "C1") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "C2") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "C3") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "C4") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "R1") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "U1") 
+        (pin "1") 
+        (pinfunction "A->B") 
+        (pintype "input")) 
+      (node 
+        (ref "U1") 
+        (pin "20") 
+        (pinfunction "VCC") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U2") 
+        (pin "1") 
+        (pinfunction "A->B") 
+        (pintype "input")) 
+      (node 
+        (ref "U2") 
+        (pin "20") 
+        (pinfunction "VCC") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U3") 
+        (pin "20") 
+        (pinfunction "VCC") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U4") 
+        (pin "1") 
+        (pinfunction "A->B") 
+        (pintype "input")) 
+      (node 
+        (ref "U4") 
+        (pin "20") 
+        (pinfunction "VCC") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U6") 
+        (pin "25") 
+        (pinfunction "3V3") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "2") 
+      (name "+5V") 
+      (node 
+        (ref "C6") 
+        (pin "1") 
+        (pintype "passive")) 
+      (node 
+        (ref "CON1") 
+        (pin "45") 
+        (pinfunction "5V@1") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "CON1") 
+        (pin "47") 
+        (pinfunction "5V@2") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U6") 
+        (pin "31") 
+        (pinfunction "5V") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "3") 
+      (name "A0") 
+      (node 
+        (ref "CON1") 
+        (pin "28") 
+        (pinfunction "A0") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "2") 
+        (pinfunction "A0") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "4") 
+      (name "A0_33") 
+      (node 
+        (ref "U1") 
+        (pin "18") 
+        (pinfunction "B0") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "1") 
+        (pinfunction "38_IOB31B_TF_CS") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "5") 
+      (name "A1") 
+      (node 
+        (ref "CON1") 
+        (pin "27") 
+        (pinfunction "A1") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "3") 
+        (pinfunction "A1") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "6") 
+      (name "A1_33") 
+      (node 
+        (ref "U1") 
+        (pin "17") 
+        (pinfunction "B1") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "2") 
+        (pinfunction "37_IOB31A_TF_MOSI") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "7") 
+      (name "A2") 
+      (node 
+        (ref "CON1") 
+        (pin "30") 
+        (pinfunction "A2") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "4") 
+        (pinfunction "A2") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "8") 
+      (name "A2_33") 
+      (node 
+        (ref "U1") 
+        (pin "16") 
+        (pinfunction "B2") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "3") 
+        (pinfunction "36_IOB29B_TF_SCLK_GCLKC_4") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "9") 
+      (name "A3") 
+      (node 
+        (ref "CON1") 
+        (pin "29") 
+        (pinfunction "A3") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "5") 
+        (pinfunction "A3") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "10") 
+      (name "A3_33") 
+      (node 
+        (ref "U1") 
+        (pin "15") 
+        (pinfunction "B3") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "4") 
+        (pinfunction "39_IOB33A_TF_MISO") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "11") 
+      (name "A4") 
+      (node 
+        (ref "CON1") 
+        (pin "32") 
+        (pinfunction "A4") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "6") 
+        (pinfunction "A4") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "12") 
+      (name "A4_33") 
+      (node 
+        (ref "U1") 
+        (pin "14") 
+        (pinfunction "B4") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "5") 
+        (pinfunction "25_IOB8A") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "13") 
+      (name "A5") 
+      (node 
+        (ref "CON1") 
+        (pin "31") 
+        (pinfunction "A5") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "7") 
+        (pinfunction "A5") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "14") 
+      (name "A5_33") 
+      (node 
+        (ref "U1") 
+        (pin "13") 
+        (pinfunction "B5") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "6") 
+        (pinfunction "26_IOB8B") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "15") 
+      (name "A6") 
+      (node 
+        (ref "CON1") 
+        (pin "22") 
+        (pinfunction "A6") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "8") 
+        (pinfunction "A6") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "16") 
+      (name "A6_33") 
+      (node 
+        (ref "U1") 
+        (pin "12") 
+        (pinfunction "B6") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "7") 
+        (pinfunction "27_IOB11A") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "17") 
+      (name "A7") 
+      (node 
+        (ref "CON1") 
+        (pin "21") 
+        (pinfunction "A7") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "9") 
+        (pinfunction "A7") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "18") 
+      (name "A7_33") 
+      (node 
+        (ref "U1") 
+        (pin "11") 
+        (pinfunction "B7") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "8") 
+        (pinfunction "28_IOB11B") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "19") 
+      (name "A8") 
+      (node 
+        (ref "CON1") 
+        (pin "24") 
+        (pinfunction "A8") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "2") 
+        (pinfunction "A0") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "20") 
+      (name "A8_33") 
+      (node 
+        (ref "U2") 
+        (pin "18") 
+        (pinfunction "B0") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "39") 
+        (pinfunction "SPILCD_MO_IOT37A_77") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "21") 
+      (name "A9") 
+      (node 
+        (ref "CON1") 
+        (pin "17") 
+        (pinfunction "A9") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "3") 
+        (pinfunction "A1") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "22") 
+      (name "A9_33") 
+      (node 
+        (ref "U2") 
+        (pin "17") 
+        (pinfunction "B1") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "38") 
+        (pinfunction "SPILCD_CK_IOT37B_76") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "23") 
+      (name "A10") 
+      (node 
+        (ref "CON1") 
+        (pin "20") 
+        (pinfunction "A10") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "4") 
+        (pinfunction "A2") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "24") 
+      (name "A10_33") 
+      (node 
+        (ref "U2") 
+        (pin "16") 
+        (pinfunction "B2") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "37") 
+        (pinfunction "HDMI_D2P_RGB_R3_IOT38A_75") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "25") 
+      (name "A11") 
+      (node 
+        (ref "CON1") 
+        (pin "19") 
+        (pinfunction "A11") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "5") 
+        (pinfunction "A3") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "26") 
+      (name "A11_33") 
+      (node 
+        (ref "U2") 
+        (pin "15") 
+        (pinfunction "B3") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "36") 
+        (pinfunction "HDMI_D2N_RGB_R4_IOT38B_74") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "27") 
+      (name "A12") 
+      (node 
+        (ref "CON1") 
+        (pin "23") 
+        (pinfunction "A12") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "6") 
+        (pinfunction "A4") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "28") 
+      (name "A12_33") 
+      (node 
+        (ref "U2") 
+        (pin "14") 
+        (pinfunction "B4") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "35") 
+        (pinfunction "HDMI_D1P_RGB_R5_IOT39A_73") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "29") 
+      (name "A13") 
+      (node 
+        (ref "CON1") 
+        (pin "26") 
+        (pinfunction "A13") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "7") 
+        (pinfunction "A5") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "30") 
+      (name "A13_33") 
+      (node 
+        (ref "U2") 
+        (pin "13") 
+        (pinfunction "B5") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "34") 
+        (pinfunction "HDMI_D1N_RGB_R6_IOT39B_72") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "31") 
+      (name "A14") 
+      (node 
+        (ref "CON1") 
+        (pin "25") 
+        (pinfunction "A14") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "8") 
+        (pinfunction "A6") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "32") 
+      (name "A14_33") 
+      (node 
+        (ref "U2") 
+        (pin "12") 
+        (pinfunction "B6") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "33") 
+        (pinfunction "HDMI_D0P_RGB_R7_IOT41A_71") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "33") 
+      (name "A15") 
+      (node 
+        (ref "CON1") 
+        (pin "18") 
+        (pinfunction "A15") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U2") 
+        (pin "9") 
+        (pinfunction "A7") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "34") 
+      (name "A15_33") 
+      (node 
+        (ref "U2") 
+        (pin "11") 
+        (pinfunction "B7") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "32") 
+        (pinfunction "HDMI_D0N_RGB_G2_IOT41B_70") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "35") 
+      (name "BUSDIR") 
+      (node 
+        (ref "CON1") 
+        (pin "10") 
+        (pinfunction "~{BUSDIR}") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "36") 
+      (name "CLOCK") 
+      (node 
+        (ref "CON1") 
+        (pin "42") 
+        (pinfunction "CLOCK") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "7") 
+        (pinfunction "A5") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "37") 
+      (name "CLOCK_33") 
+      (node 
+        (ref "U4") 
+        (pin "13") 
+        (pinfunction "B5") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "22") 
+        (pinfunction "57_IOR13A_RGB_G5") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "38") 
+      (name "CS1") 
+      (node 
+        (ref "CON1") 
+        (pin "1") 
+        (pinfunction "~{CS1}") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "39") 
+      (name "CS2") 
+      (node 
+        (ref "CON1") 
+        (pin "2") 
+        (pinfunction "~{CS2}") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "40") 
+      (name "CS12") 
+      (node 
+        (ref "CON1") 
+        (pin "3") 
+        (pinfunction "~{CS12}") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "41") 
+      (name "D0") 
+      (node 
+        (ref "CON1") 
+        (pin "34") 
+        (pinfunction "D0") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "2") 
+        (pinfunction "A0") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "42") 
+      (name "D0_33") 
+      (node 
+        (ref "U3") 
+        (pin "18") 
+        (pinfunction "B0") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "9") 
+        (pinfunction "29_IOB13A") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "43") 
+      (name "D1") 
+      (node 
+        (ref "CON1") 
+        (pin "33") 
+        (pinfunction "D1") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "3") 
+        (pinfunction "A1") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "44") 
+      (name "D1_33") 
+      (node 
+        (ref "U3") 
+        (pin "17") 
+        (pinfunction "B1") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "10") 
+        (pinfunction "30_IOB13B") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "45") 
+      (name "D2") 
+      (node 
+        (ref "CON1") 
+        (pin "36") 
+        (pinfunction "D2") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "4") 
+        (pinfunction "A2") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "46") 
+      (name "D2_33") 
+      (node 
+        (ref "U3") 
+        (pin "16") 
+        (pinfunction "B2") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "11") 
+        (pinfunction "33_IOB23A_RGB_DE") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "47") 
+      (name "D3") 
+      (node 
+        (ref "CON1") 
+        (pin "35") 
+        (pinfunction "D3") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "5") 
+        (pinfunction "A3") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "48") 
+      (name "D3_33") 
+      (node 
+        (ref "U3") 
+        (pin "15") 
+        (pinfunction "B3") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "12") 
+        (pinfunction "34_IOB23B_RGB_VS") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "49") 
+      (name "D4") 
+      (node 
+        (ref "CON1") 
+        (pin "38") 
+        (pinfunction "D4") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "6") 
+        (pinfunction "A4") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "50") 
+      (name "D4_33") 
+      (node 
+        (ref "U3") 
+        (pin "14") 
+        (pinfunction "B4") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "13") 
+        (pinfunction "40_IOB33B_RGB_HS") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "51") 
+      (name "D5") 
+      (node 
+        (ref "CON1") 
+        (pin "37") 
+        (pinfunction "D5") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "7") 
+        (pinfunction "A5") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "52") 
+      (name "D5_33") 
+      (node 
+        (ref "U3") 
+        (pin "13") 
+        (pinfunction "B5") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "14") 
+        (pinfunction "35_IOB29A_RGB_CK_GCLKT_4") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "53") 
+      (name "D6") 
+      (node 
+        (ref "CON1") 
+        (pin "40") 
+        (pinfunction "D6") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "8") 
+        (pinfunction "A6") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "54") 
+      (name "D6_33") 
+      (node 
+        (ref "U3") 
+        (pin "12") 
+        (pinfunction "B6") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "15") 
+        (pinfunction "41_IOB41A_RGB_B7") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "55") 
+      (name "D7") 
+      (node 
+        (ref "CON1") 
+        (pin "39") 
+        (pinfunction "D7") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U3") 
+        (pin "9") 
+        (pinfunction "A7") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "56") 
+      (name "D7_33") 
+      (node 
+        (ref "U3") 
+        (pin "11") 
+        (pinfunction "B7") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "16") 
+        (pinfunction "42_IOB41B_RGB_B6") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "57") 
+      (name "DATADIR_33") 
+      (node 
+        (ref "R1") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "U3") 
+        (pin "1") 
+        (pinfunction "A->B") 
+        (pintype "input")) 
+      (node 
+        (ref "U6") 
+        (pin "48") 
+        (pinfunction "RGB_INIT_IOR5A_63") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "58") 
+      (name "GND") 
+      (node 
+        (ref "C1") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "C2") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "C3") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "C4") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "C6") 
+        (pin "2") 
+        (pintype "passive")) 
+      (node 
+        (ref "CON1") 
+        (pin "41") 
+        (pinfunction "GND@1") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "CON1") 
+        (pin "43") 
+        (pinfunction "GND@2") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U1") 
+        (pin "10") 
+        (pinfunction "GND") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U1") 
+        (pin "19") 
+        (pinfunction "CE") 
+        (pintype "input")) 
+      (node 
+        (ref "U2") 
+        (pin "10") 
+        (pinfunction "GND") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U2") 
+        (pin "19") 
+        (pinfunction "CE") 
+        (pintype "input")) 
+      (node 
+        (ref "U3") 
+        (pin "10") 
+        (pinfunction "GND") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U3") 
+        (pin "19") 
+        (pinfunction "CE") 
+        (pintype "input")) 
+      (node 
+        (ref "U4") 
+        (pin "10") 
+        (pinfunction "GND") 
+        (pintype "power_in")) 
+      (node 
+        (ref "U4") 
+        (pin "19") 
+        (pinfunction "CE") 
+        (pintype "input")) 
+      (node 
+        (ref "U6") 
+        (pin "26") 
+        (pinfunction "GND") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "59") 
+      (name "INT") 
+      (node 
+        (ref "CON1") 
+        (pin "8") 
+        (pinfunction "~{INT}") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "60") 
+      (name "IORQ") 
+      (node 
+        (ref "CON1") 
+        (pin "11") 
+        (pinfunction "~{IORQ}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "3") 
+        (pinfunction "A1") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "61") 
+      (name "IORQ_33") 
+      (node 
+        (ref "U4") 
+        (pin "17") 
+        (pinfunction "B1") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "18") 
+        (pinfunction "53_IOB15B_RGB_B4") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "62") 
+      (name "M1") 
+      (node 
+        (ref "CON1") 
+        (pin "9") 
+        (pinfunction "M1") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "63") 
+      (name "MERQ") 
+      (node 
+        (ref "CON1") 
+        (pin "12") 
+        (pinfunction "~{MERQ}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "2") 
+        (pinfunction "A0") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "64") 
+      (name "MERQ_33") 
+      (node 
+        (ref "U4") 
+        (pin "18") 
+        (pinfunction "B0") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "17") 
+        (pinfunction "51_IOR17B_RGB_B5_GCLKC_3") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "65") 
+      (name "Net-(CON1-Pad44)") 
+      (node 
+        (ref "CON1") 
+        (pin "44") 
+        (pinfunction "SW1") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "CON1") 
+        (pin "46") 
+        (pinfunction "SW2") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "66") 
+      (name "RD") 
+      (node 
+        (ref "CON1") 
+        (pin "14") 
+        (pinfunction "~{RD}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "4") 
+        (pinfunction "A2") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "67") 
+      (name "RD_33") 
+      (node 
+        (ref "U4") 
+        (pin "16") 
+        (pinfunction "B2") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "19") 
+        (pinfunction "54_IOB15A_RGB_B3") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "68") 
+      (name "RESET") 
+      (node 
+        (ref "CON1") 
+        (pin "15") 
+        (pinfunction "~{RESET}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "6") 
+        (pinfunction "A4") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "69") 
+      (name "RESET_33") 
+      (node 
+        (ref "U4") 
+        (pin "14") 
+        (pinfunction "B4") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "21") 
+        (pinfunction "56_IOR14A_RGB_G6") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "70") 
+      (name "RFSH") 
+      (node 
+        (ref "CON1") 
+        (pin "6") 
+        (pinfunction "~{RFSH}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "9") 
+        (pinfunction "A7") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "71") 
+      (name "RFSH_33") 
+      (node 
+        (ref "U4") 
+        (pin "11") 
+        (pinfunction "B7") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "24") 
+        (pinfunction "69_IOT42A_RGB_G3_HDMI_CKP") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "72") 
+      (name "SLTSL") 
+      (node 
+        (ref "CON1") 
+        (pin "4") 
+        (pinfunction "~{SLTSL}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "8") 
+        (pinfunction "A6") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "73") 
+      (name "SLTSL_33") 
+      (node 
+        (ref "U4") 
+        (pin "12") 
+        (pinfunction "B6") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "23") 
+        (pinfunction "68_IOT42B_RGB_G4_HDMI_CKN") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "74") 
+      (name "WAIT") 
+      (node 
+        (ref "CON1") 
+        (pin "7") 
+        (pinfunction "/WAIT") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "75") 
+      (name "WR") 
+      (node 
+        (ref "CON1") 
+        (pin "13") 
+        (pinfunction "~{WR}") 
+        (pintype "bidirectional")) 
+      (node 
+        (ref "U4") 
+        (pin "5") 
+        (pinfunction "A3") 
+        (pintype "tri_state"))) 
+    (net 
+      (code "76") 
+      (name "WR_33") 
+      (node 
+        (ref "U4") 
+        (pin "15") 
+        (pinfunction "B3") 
+        (pintype "tri_state")) 
+      (node 
+        (ref "U6") 
+        (pin "20") 
+        (pinfunction "55_IOR14B_RGB_G7") 
+        (pintype "bidirectional"))) 
+    (net 
+      (code "77") 
+      (name "unconnected-(CON1-Pad5)") 
+      (node 
+        (ref "CON1") 
+        (pin "5") 
+        (pinfunction "RSV@1") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "78") 
+      (name "unconnected-(CON1-Pad16)") 
+      (node 
+        (ref "CON1") 
+        (pin "16") 
+        (pinfunction "RSV@2") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "79") 
+      (name "unconnected-(CON1-Pad48)") 
+      (node 
+        (ref "CON1") 
+        (pin "48") 
+        (pinfunction "+12") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "80") 
+      (name "unconnected-(CON1-Pad49)") 
+      (node 
+        (ref "CON1") 
+        (pin "49") 
+        (pinfunction "SOUNDIN") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "81") 
+      (name "unconnected-(CON1-Pad50)") 
+      (node 
+        (ref "CON1") 
+        (pin "50") 
+        (pinfunction "-12") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "82") 
+      (name "unconnected-(U6-Pad27)") 
+      (node 
+        (ref "U6") 
+        (pin "27") 
+        (pinfunction "RGB_INIT_IOB15B_32") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "83") 
+      (name "unconnected-(U6-Pad28)") 
+      (node 
+        (ref "U6") 
+        (pin "28") 
+        (pinfunction "RGB_INIT_IOB15A_31") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "84") 
+      (name "unconnected-(U6-Pad29)") 
+      (node 
+        (ref "U6") 
+        (pin "29") 
+        (pinfunction "SPILCD_RS_IOR24A_49") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "85") 
+      (name "unconnected-(U6-Pad30)") 
+      (node 
+        (ref "U6") 
+        (pin "30") 
+        (pinfunction "SPILCD_CS_IOR24B_48") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "86") 
+      (name "unconnected-(U6-Pad40)") 
+      (node 
+        (ref "U6") 
+        (pin "40") 
+        (pinfunction "IOT12B_79") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "87") 
+      (name "unconnected-(U6-Pad41)") 
+      (node 
+        (ref "U6") 
+        (pin "41") 
+        (pinfunction "IOT12A_80") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "88") 
+      (name "unconnected-(U6-Pad42)") 
+      (node 
+        (ref "U6") 
+        (pin "42") 
+        (pinfunction "IOT11B_81") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "89") 
+      (name "unconnected-(U6-Pad43)") 
+      (node 
+        (ref "U6") 
+        (pin "43") 
+        (pinfunction "IOT11A_82") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "90") 
+      (name "unconnected-(U6-Pad44)") 
+      (node 
+        (ref "U6") 
+        (pin "44") 
+        (pinfunction "IOT10B_83") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "91") 
+      (name "unconnected-(U6-Pad45)") 
+      (node 
+        (ref "U6") 
+        (pin "45") 
+        (pinfunction "IOT10A_84") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "92") 
+      (name "unconnected-(U6-Pad46)") 
+      (node 
+        (ref "U6") 
+        (pin "46") 
+        (pinfunction "IOT8B_85") 
+        (pintype "bidirectional+no_connect"))) 
+    (net 
+      (code "93") 
+      (name "unconnected-(U6-Pad47)") 
+      (node 
+        (ref "U6") 
+        (pin "47") 
+        (pinfunction "RGB_BL_IOT8A_86") 
+        (pintype "bidirectional+no_connect")))))
