@@ -1138,8 +1138,6 @@ YM2149(
 wire opll_req_w;
 assign opll_req_w = (reset_ram_n && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
 
-//wire [9:0] opll_mo_w;
-///wire [9:0] opll_ro_w;
 wire [13:0] opll_mixout;
 
 opll(
@@ -1152,8 +1150,6 @@ opll(
     .we_n(wr_n_w),
     .ic_n(reset_ram_n),
     .mixout(opll_mixout)
-//    .mo(opll_mo_w),
-//    .ro(opll_ro_w)
 ); 
 
 reg [14:0] opll_mix;
@@ -1236,30 +1232,6 @@ rom #(
     .enable(fmrom_busreq_w)
 );
 
-
-//// SOFTBOOT ROM
-
-reg ff_bootrom_enable = 1;
-wire [7:0] bootrom_cd_w;
-wire bootrom_busreq_w = (reset_ram_n && ff_bootrom_enable && slotsel_w[FM_SSLT] && iorq_n_w && ~merq_n_w && ~rd_n_w && addr_w[15:14] == 2'b10) ? 1 : 0;
-rom #(
-.ADDR_WIDTH(6),
-.FILENAME("roms/softboot.bin.hex")    
-)(
-    .address(addr_w[5:0]),
-    .clock(clk108_w),
-    .q(bootrom_cd_w),
-    .enable(bootrom_busreq_w)
-);
-
-always @(posedge clk108_w or negedge res_n_w) begin
-    if (~res_n_w) begin
-        ff_bootrom_enable <= 1;
-    end else if (bootrom_busreq_w && addr_w == 16'h803F) begin
-        ff_bootrom_enable <= 0; // disable softboot rom
-    end
-end
-
 //// SDRAM
 wire ram_re_w;
 wire ram_we_w;
@@ -1296,7 +1268,7 @@ always @(posedge clk108_w) begin
     if (sd_busreq_w) ff_cdout <= sd_cd_w;
     if (scc_busreq_w) ff_cdout <= scc_cd_w;
     if (fmrom_busreq_w) ff_cdout <= fmrom_cd_w;
-    if (bootrom_busreq_w) ff_cdout <= bootrom_cd_w;
+    //if (bootrom_busreq_w) ff_cdout <= bootrom_cd_w;
     if (~vdp_rd_n) ff_cdout <= vdp_cdout;
     if (mmapper_busreq_w) ff_cdout <= mmapper_cd_w;
     if (expslot_busreq_w) ff_cdout <= expslot_cd_w;
@@ -1341,27 +1313,7 @@ memory_controller #(.FREQ(108_000_000) )
     .SDRAM_CLK(O_sdram_clk), .SDRAM_CKE(O_sdram_cke), .SDRAM_DQM(O_sdram_dqm)
 );
 
-//reg ff_wait = 1'b0;
-//localparam POR_RES_CNT = 27 * 1000 * 250;
-//reg [31:0] ff_por_cnt = POR_RES_CNT;
-//always @(posedge clk_w or negedge reset_n_w) begin
-//    if (~reset_n_w)
-//        ff_wait <= 1'b0;
-//    else begin
-//        if (ff_por_cnt > 0)
-//            ff_por_cnt <= ff_por_cnt - 1;
-
-//        if (ff_por_cnt == 0) ff_wait = 1'bz;
-//    end
-//end
-
-
-assign int_n = (reset_ram_n && ~vdp_irq_n) ? 1'b0 : 1'bz;
+assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'bz;
 assign wait_n = (~reset_ram_n) ? 1'b0 : 1'bz; 
-//assign reset_n = 1'bz; 
-
-//assign dead_pin = reset_ram_n ^ reset_rom_n ^ vdp_irq_n ^ clk_w ^ clk54_w ^ clk135_w ^ clk108_w ^ clk108p_w ^ sd_busy_w ^ sd_done_w ^ sd_outen_w ^ 
-//                                bootrom_busreq_w ^ fmrom_busreq_w ^ mmapper_busreq_w ^ expslot_busreq_w ^ scc_busreq_w ^ sd_busreq_w ^
-//                                (^slotsel_w) ^ (^cart_ena_w) ^ ff_cold_boot ^ ff_reset;
 
 endmodule
