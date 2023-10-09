@@ -15,10 +15,9 @@ module top(
     output     [2:0]  tmds_data_p,
     output     [2:0]  tmds_data_n,
 
-    input jp_n,
+    input jp_n[1:0],
 
     input clock,
-    output reset_n,
     input rd_n,
     input wr_n,
     input sltsl_n,
@@ -27,7 +26,7 @@ module top(
     output busdir_n,
     output wait_n,
     output lsound,
-    output rsound,
+    output led,
     output datadir,
 
     inout [7:0] cd,
@@ -1315,5 +1314,6 @@ memory_controller #(.FREQ(108_000_000) )
 
 assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'bz;
 assign wait_n = (~reset_ram_n) ? 1'b0 : 1'bz; 
+assign led = sd_busy_w;
 
 endmodule
