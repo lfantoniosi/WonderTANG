@@ -13,7 +13,7 @@ module expslot(
     output [3:0] slotsel
 );
 
-reg [7:0] ff_slotreg = 8'b01010101;
+reg [7:0] ff_slotreg = 8'b00000000;
 reg [7:0] ff_slotsel;
 reg [7:0] ff_cdout;
 reg ff_busreq;
@@ -24,7 +24,7 @@ assign ffff_w = addr == 16'hffff ? 1 : 0;
 wire [7:0]slotreg_w;
 always @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
-        ff_slotreg <= 8'b01010101;
+        ff_slotreg <= 8'b00000000;
         ff_busreq <= 1'b0;
     end else begin
         if (enable) begin

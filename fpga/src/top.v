@@ -1,3 +1,4 @@
+`define SMS
 
 module top(
     input   clk,
@@ -9,11 +10,13 @@ module top(
 
     input dead_pin,
 
+`ifdef SMS
     // hdmi output
     output            tmds_clk_p,
     output            tmds_clk_n,
     output     [2:0]  tmds_data_p,
     output     [2:0]  tmds_data_n,
+`endif
 
     input jp_n[1:0],
 
@@ -80,10 +83,12 @@ wire reset_rom_n;
     localparam BS_RES1              = 32'd13500000;
     localparam BS_WARM              = 32'd27000000;
     reg [31:0] ff_bootstate          = BS_RES0;
+    reg ff_wait = 1;
+
     always @(posedge clk_w) begin
         //ff_res1 <= 1;
         //ff_res2 <= 1;
-
+        ff_wait <= 1;
         case(ff_bootstate)
         BS_RES0: if (reset_ram_n) begin
                     ff_bootstate <= ff_bootstate + 1;
@@ -104,6 +109,7 @@ wire reset_rom_n;
         BS_WARM: begin
                     ff_res1 <= 1;
                     ff_res2 <= 1;
+                    ff_wait <= 0;
                  end
         default: begin
                     ff_bootstate <= ff_bootstate + 1;
@@ -114,8 +120,9 @@ wire reset_rom_n;
 
     reg ff_s1n = 0;
     always @(posedge clk_w) ff_s1n <= ~s1;
-    wire s1n_w = ff_s1n & ff_res1;
+    wire s1n_w = ff_s1n && ff_res1;
 
+`ifdef SMS
     clk135 (
         .clkout(clk135), //output clkout
         .lock(clk135_lock_w), //output lock
@@ -126,6 +133,12 @@ wire reset_rom_n;
     .O(clk135_w),
     .I(clk135)
     );
+
+    assign rst_w = ~clk135_lock_w & ~clk108_lock_w;
+`else
+
+    assign rst_w = ~clk108_lock_w;
+`endif
 
     clkp_108 (
         .clkout(clk108), //output clkout
@@ -143,7 +156,6 @@ wire reset_rom_n;
     .I(clk108p)
     );
 
-    assign rst_w = ~clk135_lock_w & ~clk108_lock_w;
     assign rst_n_w = ~rst_w;
 
 //    reg clk54;
@@ -162,18 +174,6 @@ wire reset_rom_n;
     .O(clk54_w),
     .I(clk54)
     );
-
-//    CLKDIV #(
-//        .DIV_MODE(2)
-//    )(
-//    .HCLKIN(clk108p_w),
-//    .RESETN(clk108_lock_w),
-//    .CLKOUT(clk54p)
-//    );
-//    BUFG(
-//    .O(clk54p_w),
-//    .I(clk54p)
-//    );
 
 /// FLASH ROM LOADER - BIOS
 
@@ -214,16 +214,13 @@ flash(
 );
 
 reg [7:0] ff_flash_state = 8'd0;
-wire [7:0] flash_state_w;
-assign flash_state_w = ff_flash_state;
 
 localparam STATE_RESET          = 8'd0;
 localparam STATE_READ_START     = 8'd1;
 localparam STATE_READ_LOOP      = 8'd2;
 localparam STATE_IDLE           = 8'd3;
 
-wire flash_idle;
-assign flash_idle_w = flash_state_w == STATE_IDLE;
+wire flash_idle_w = (ff_flash_state == STATE_IDLE) ? 1'b1 : 1'b0;
 
 always @(posedge clk_w, negedge reset_rom_n) begin
 if (reset_rom_n == 0) begin
@@ -377,15 +374,6 @@ pinfilter (
     .ena(1)
 );
 
-//wire res_n_w;
-//pinfilter (
-//    .clk(clk108_w),
-//    .reset_n(rst_n_w),
-//    .din(reset_n),
-//    .dout(res_n_w),
-//    .ena(dotena_w)
-//);
-
 wire [15:0] addrmux_w;
 wire [7:0] cdin_w;
 genvar i;
@@ -464,16 +452,13 @@ pinfilter (
 //);
 
 wire res_n_w;
-//wire res_n_neg_edge_w;
 pinfilter (
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(mp[4]),
     .dout(res_n_w),
-    //.neg_edge(res_n_neg_edge_w),
     .ena(~msel_n[2] & dotena_w)
 );
-//assign res_n_w = ~res_n_neg_edge_w;
 
 wire rfsh_n_w;
 pinfilter (
@@ -510,13 +495,15 @@ wire ram_fail_w;
 wire ram_enabled_w;
 
 
-assign reset_ram_n = ram_enabled_w & ~ram_fail_w & flash_idle_w;
-assign reset_rom_n = ram_enabled_w & ~ram_fail_w ;
+assign reset_ram_n = ram_enabled_w && ~ram_fail_w && flash_idle_w;
+assign reset_rom_n = ram_enabled_w && ~ram_fail_w ;
 
 /////////////////////////////
 
 
 ////// SMS
+
+`ifdef SMS
 
 //reg ff_sms_init = 0;
 wire sms_reset_n = reset_n_w;
@@ -775,6 +762,7 @@ dpram#(
         .OB({tmds_clk_n, tmds_data_n})
     );
 
+`endif
 /////////////////////////////////////////////////////////////////
 
 
@@ -786,7 +774,7 @@ wire expslot_busreq_w;
 wire [3:0] cart_ena_w;
 expslot(
     .clk(clk108_w),
-    .reset_n(reset_n_w),
+    .reset_n(ram_enabled_w),
     .addr(addr_w),
     .cdin(cdin_w),
     .cdout(expslot_cd_w),
@@ -808,7 +796,7 @@ localparam BIOS_SSLT = 0;
 wire [22:0] bios_addr_w;
 megaromBIOS(
     .clk(clk108_w),
-    .reset_n(reset_ram_n),
+    .reset_n(ram_enabled_w),
     .addr(addr_w),
     .cdin(cdin_w),
     .merq_n(merq_n_w),
@@ -875,7 +863,7 @@ wire sd_timeout_error_w;
 //reg ff_scc_enable;
 //wire scc_enable_w;
 //assign scc_enable_w = ff_scc_enable;
-assign sram_cs_w = reset_ram_n && ff_sd_en && iorq_n_w && m1_n_w && ~merq_n_w && slotsel_w[BIOS_SSLT] && (addr_w >= SDC_SDATA && addr_w < SDC_ENABLE) ? 1 : 0;
+assign sram_cs_w = ram_enabled_w && ff_sd_en && iorq_n_w && m1_n_w && ~merq_n_w && slotsel_w[BIOS_SSLT] && (addr_w >= SDC_SDATA && addr_w < SDC_ENABLE) ? 1 : 0;
 assign sram_busreq_w = sram_cs_w && ~rd_n_w;
 
 sram512(
@@ -897,7 +885,7 @@ sd_reader #(
     .CLK_DIV(3'd4),
     .SIMULATE(0)
 ) (
-    .rstn(reset_ram_n),
+    .rstn(ram_enabled_w),
     .clk(clk108_w),
     .sdclk(sd_sclk),
     .sdcmd(sd_cmd),
@@ -930,8 +918,8 @@ assign sd_dat2 = 1;
 assign sd_dat3 = 1; // Must set sddat1~3 to 1 to avoid SD card from entering SPI mode
 
 
-always @(posedge clk108_w or negedge reset_ram_n) begin
-    if (~reset_ram_n) begin
+always @(posedge clk108_w or negedge ram_enabled_w) begin
+    if (~ram_enabled_w) begin
         ff_sd_en <= 0;
     end else begin
         if (slotsel_w[BIOS_SSLT] && addr_w == SDC_ENABLE && ~wr_n_w && iorq_n_w && m1_n_w) 
@@ -940,15 +928,15 @@ always @(posedge clk108_w or negedge reset_ram_n) begin
 end
 
 wire sd_cs_w;
-assign sd_cs_w = reset_ram_n && ff_sd_en && iorq_n_w && m1_n_w && ~merq_n_w && slotsel_w[BIOS_SSLT] && (addr_w >= SDC_ENABLE && addr_w <= SDC_END) ? 1 : 0;
+assign sd_cs_w = ram_enabled_w && ff_sd_en && iorq_n_w && m1_n_w && ~merq_n_w && slotsel_w[BIOS_SSLT] && (addr_w >= SDC_ENABLE && addr_w <= SDC_END) ? 1 : 0;
 wire sd_busreq_w;
 assign sd_busreq_w = sd_cs_w && ~rd_n_w;
 reg [7:0] ff_sd_cd;
 wire [7:0] sd_cd_w;
 assign sd_cd_w = ff_sd_cd;
 
-always @(posedge clk108_w or negedge reset_ram_n) begin
-    if (~reset_ram_n) begin
+always @(posedge clk108_w or negedge ram_enabled_w) begin
+    if (~ram_enabled_w) begin
         ff_sd_rstart <= '0;
         ff_sd_wstart <= '0;
         ff_sd_init <= '0;
@@ -1010,7 +998,7 @@ wire mmapper_busreq_w;
 wire [22:0] mmapper_addr_w;
 mmapper(
     .clk(clk108_w),
-    .reset_n(reset_ram_n),
+    .reset_n(ram_enabled_w),
     .addr(addr_w),
     .cdin(cdin_w),
     .cdout(mmapper_cd_w),
@@ -1034,12 +1022,12 @@ wire [14:0] scc_wave_w;
 
 
 wire megaram_cs_w;
-assign megaram_cs_w = (reset_ram_n && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w && addr_w[7:0] == 8'h8F) ? 1 : 0;
+assign megaram_cs_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w && addr_w[7:0] == 8'h8F) ? 1 : 0;
 reg ff_scc_enable;
 reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
-always @(posedge clk108_w or negedge reset_ram_n) begin
-    if (~reset_ram_n) begin
+always @(posedge clk108_w or negedge ram_enabled_w) begin
+    if (~ram_enabled_w) begin
         ff_megaram_type <= 2'b00;
         ff_scc_enable <= '0;
     end else begin
@@ -1075,7 +1063,7 @@ assign megaram_type_w = ff_megaram_type;
 
 megaramSCC(
     .clk(clk108_w),
-    .reset_n(reset_ram_n),
+    .reset_n(ram_enabled_w),
     .addr(addr_w),
     .cdin(cdin_w),
     .cdout(scc_cd_w),
@@ -1098,7 +1086,7 @@ megaramSCC(
 //wire [7:0] psg_cd_w;
 wire [7:0] psg_wave_w;
 wire psg_req_w;
-assign psg_req_w = (reset_ram_n && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1] == 7'b1010000) ? 1 : 0;
+assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1] == 7'b1010000) ? 1 : 0;
 //wire psg_busreq_w;
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
@@ -1128,14 +1116,14 @@ YM2149(
   .O_IOB(psg_portb_w),
   //O_IOB_OE_L(),
   .ENA(1),
-  .RESET_L(reset_ram_n),
+  .RESET_L(ram_enabled_w),
   .CLK(hclock_w),
   .clkHigh(clk_w)
   //debug()
   );
 
 wire opll_req_w;
-assign opll_req_w = (reset_ram_n && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
+assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
 
 wire [13:0] opll_mixout;
 
@@ -1147,7 +1135,7 @@ opll(
     .a(addr_w[0]),
     .cs_n(~opll_req_w),
     .we_n(wr_n_w),
-    .ic_n(reset_ram_n),
+    .ic_n(ram_enabled_w),
     .mixout(opll_mixout)
 ); 
 
@@ -1176,7 +1164,9 @@ always@(posedge clk_w) begin
 
 end
 
+`ifdef SMS
 assign sample_w = audio_sample;
+`endif
 
 wire [13:0] lpf1_audio_w;
 
@@ -1184,7 +1174,7 @@ interpo #(
     .MSBI(13)    
 )(
     .clk21m(clk_w),
-    .reset(~(reset_ram_n)),
+    .reset(~(ram_enabled_w)),
     .clkena(1),
     .idata(audio_sample2[15:2]),
     .odata(lpf1_audio_w)
@@ -1195,7 +1185,7 @@ lpf1 #(
 	.MSBI(13)
 ) (
     .clk21m (clk_w),
-    .reset(~(reset_ram_n)),
+    .reset(~(ram_enabled_w)),
     .clkena(1),
     .idata(lpf1_audio_w),
     .odata (dacin_w)
@@ -1206,21 +1196,19 @@ esepwm#(
     .MSBI(13)
 )(
     .clk(clk_w),
-    .reset(~(reset_ram_n)),
+    .reset(~(ram_enabled_w)),
     .DACin(dacin_w),
     .DACout(audio_w)
 );
 
 assign lsound = audio_w;
-assign rsound = audio_w;
-
 
 ///// FM ROM
 
 wire [7:0] fmrom_cd_w;
 wire fmrom_busreq_w;
 
-assign fmrom_busreq_w = (reset_ram_n && slotsel_w[FM_SSLT] && iorq_n_w && ~merq_n_w && ~rd_n_w && addr_w[15:14] == 2'b01) ? 1 : 0;
+assign fmrom_busreq_w = (ram_enabled_w && slotsel_w[FM_SSLT] && iorq_n_w && ~merq_n_w && ~rd_n_w && addr_w[15:14] == 2'b01) ? 1 : 0;
 rom #(
 .ADDR_WIDTH(14),
 .FILENAME("roms/16k_fm_opl.bin.hex")    
@@ -1239,20 +1227,20 @@ wire [7:0] ram_dout_w;
 wire [22:0] ram_addr_w;
 
 assign ram_addr_w = (~flash_idle_w) ? rom_addr_w :
-                    (reset_ram_n && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? bios_addr_w :
-                    (reset_ram_n && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? mmapper_addr_w :
-                    (reset_ram_n && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? megaram_addr_w :
+                    (ram_enabled_w && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? bios_addr_w :
+                    (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? mmapper_addr_w :
+                    (ram_enabled_w && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? megaram_addr_w :
                     23'h7fffff; 
 
 assign ram_re_w = (~flash_idle_w) ? 0 : 
-                  (reset_ram_n && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? ~rd_n_w :
-                  (reset_ram_n && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~rd_n_w :
-                  (reset_ram_n && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? ~rd_n_w :
                   0; 
 
 assign ram_we_w = (~flash_idle_w) ? rom_wr_w : 
-                  (reset_ram_n && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~wr_n_w :
-                  (reset_ram_n && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT] && megaram_ena_w) ? ~wr_n_w :
+                  (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~wr_n_w :
+                  (ram_enabled_w && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT] && megaram_ena_w) ? ~wr_n_w :
                   0; 
 
 assign ram_dout_w = (ram_addr_w[0] == 1'b0) ? ram_dout16_w[7:0] : ram_dout16_w[15:8];
@@ -1267,14 +1255,22 @@ always @(posedge clk108_w) begin
     if (sd_busreq_w) ff_cdout <= sd_cd_w;
     if (scc_busreq_w) ff_cdout <= scc_cd_w;
     if (fmrom_busreq_w) ff_cdout <= fmrom_cd_w;
-    //if (bootrom_busreq_w) ff_cdout <= bootrom_cd_w;
+
+`ifdef SMS
     if (~vdp_rd_n) ff_cdout <= vdp_cdout;
+`endif
+
     if (mmapper_busreq_w) ff_cdout <= mmapper_cd_w;
     if (expslot_busreq_w) ff_cdout <= expslot_cd_w;
 end
 
 wire iord_w;
 wire busdir_cs_w;
+
+`ifndef SMS
+wire vdp_rd_n = 1'b1;
+`endif
+
 assign busdir_cs_w = (mmapper_busreq_w || ~vdp_rd_n) ? 1 : 0;
 assign iord_w = (mmapper_busreq_w || ~vdp_rd_n) ? 1 : 0;
 assign busdir_n = ~iord_w; // io port without sltsl
@@ -1312,8 +1308,13 @@ memory_controller #(.FREQ(108_000_000) )
     .SDRAM_CLK(O_sdram_clk), .SDRAM_CKE(O_sdram_cke), .SDRAM_DQM(O_sdram_dqm)
 );
 
-assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'bz;
-assign wait_n = (~reset_ram_n) ? 1'b0 : 1'bz; 
+`ifdef SMS
+assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'b1;
+`else
+assign int_n = 1'b1;
+`endif
+
+assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b0 : 1'b1; 
 assign led = sd_busy_w;
 
 endmodule
