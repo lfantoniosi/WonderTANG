@@ -18,7 +18,9 @@ module top(
     output     [2:0]  tmds_data_n,
 `endif
 
-    input jp_n[1:0],
+    output audio,
+    output sound,
+    input jp_n,
 
     input clock,
     input rd_n,
@@ -28,7 +30,6 @@ module top(
     output int_n,
     output busdir_n,
     output wait_n,
-    output lsound,
     output led,
     output datadir,
 
@@ -344,16 +345,16 @@ pinfilter (
 
 
 wire clock_w;
-pinfilter (
-    .clk(clk108_w),
-    .reset_n(rst_n_w),
-    .din(clock),
-    .dout(clock_cpu),
-    .ena(1)
-);
+//pinfilter (
+//    .clk(clk108_w),
+//    .reset_n(rst_n_w),
+//    .din(clock),
+//    .dout(clock_cpu),
+//    .ena(1)
+//);
 BUFG (
 .O(clock_w),
-.I(clock_cpu)
+.I(clock)
 );
 
 wire rd_n_w;
@@ -581,6 +582,29 @@ wire [8:0] vdp_y;
 wire [11:0] vdp_color;
 wire vdp_mask_colum;
 
+reg ff_vdp_rd_n, ff_vdp_wr_n;
+reg ff_prev_vdp_rd_n = 1;
+reg ff_prev_vdp_wr_n = 1;
+
+always @(posedge clk54_w) begin
+
+    if (ce_vdp_w) begin
+        ff_vdp_rd_n <= 1;
+        ff_vdp_wr_n <= 1;
+    end
+
+        if (ff_prev_vdp_rd_n != vdp_rd_n) begin
+            ff_vdp_rd_n <= vdp_rd_n;
+            ff_prev_vdp_rd_n <= vdp_rd_n;
+        end
+
+        if (ff_prev_vdp_wr_n != vdp_wr_n) begin
+            ff_vdp_wr_n <= vdp_wr_n;
+            ff_prev_vdp_wr_n <= vdp_wr_n;
+        end
+end
+
+
 wire vdp_smode_M1,vdp_smode_M2,vdp_smode_M3,vdp_smode_M4;
 vdp #(
         .MAX_SPPL(7)
@@ -592,8 +616,8 @@ vdp #(
         .gg(0), // game gear ?
         .sp64(0), // 64 sprites per line ?
         .HL(0), // hsync counter for gun ?
-        .RD_n(vdp_rd_n),
-        .WR_n(vdp_wr_n),
+        .RD_n(ff_vdp_rd_n),
+        .WR_n(ff_vdp_wr_n),
         .IRQ_n(vdp_irq_n),
         .A(addr_w[7:0]),
         .D_in(cdin_w),
@@ -614,7 +638,7 @@ video (
 	.clk(clk54_w),
 	.ce_pix(ce_pix_w),
 	.pal(0),
-	.border(1),
+	.border(0),
 	.mask_column(vdp_mask_column),
 	.x(vdp_x),
 	.y(vdp_y),
@@ -1150,7 +1174,7 @@ reg [15:0] audio_sample2;
 
 //wire [13:0] sample_mix_w = ff_sample4[13:0];
 
-always@(posedge clk_w) begin
+always@(posedge clk54_w) begin
 
         opll_mix <= { 1'b0, opll_mixout } + 15'b010000000000000;
         scc_wav <= { 1'b0,  scc_wave_w[14:1]} + 15'b010000000000000;
@@ -1169,25 +1193,37 @@ assign sample_w = audio_sample;
 `endif
 
 wire [13:0] lpf1_audio_w;
+wire [13:0] lpf2_audio_w;
 
 interpo #(
     .MSBI(13)    
 )(
-    .clk21m(clk_w),
+    .clk21m(clk54_w),
     .reset(~(ram_enabled_w)),
     .clkena(1),
     .idata(audio_sample2[15:2]),
     .odata(lpf1_audio_w)
 );
 
-wire [13:0] dacin_w;
 lpf1 #(
 	.MSBI(13)
 ) (
-    .clk21m (clk_w),
+    .clk21m (clk54_w),
     .reset(~(ram_enabled_w)),
     .clkena(1),
     .idata(lpf1_audio_w),
+    .odata (lpf2_audio_w)
+);
+
+
+wire [13:0] dacin_w;
+lpf2 #(
+	.MSBI(13)
+) (
+    .clk21m (clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(lpf2_audio_w),
     .odata (dacin_w)
 );
 
@@ -1195,14 +1231,14 @@ wire audio_w;
 esepwm#(
     .MSBI(13)
 )(
-    .clk(clk_w),
+    .clk(clk54_w),
     .reset(~(ram_enabled_w)),
     .DACin(dacin_w),
     .DACout(audio_w)
 );
 
-assign lsound = audio_w;
-
+assign audio = audio_w;
+assign sound = audio_w;
 ///// FM ROM
 
 wire [7:0] fmrom_cd_w;
@@ -1226,6 +1262,18 @@ wire [15:0] ram_dout16_w;
 wire [7:0] ram_dout_w;
 wire [22:0] ram_addr_w;
 
+reg ff_mem_ack = 0;
+
+always @(posedge clk108_w) begin
+
+    if (~merq_n_w) begin
+        if ((ram_re_w || ram_we_w) && ~ram_busy_w && bus_idle_w) begin
+            ff_mem_ack <= 1;
+        end
+    end else 
+        ff_mem_ack <= 0;
+end
+
 assign ram_addr_w = (~flash_idle_w) ? rom_addr_w :
                     (ram_enabled_w && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? bios_addr_w :
                     (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? mmapper_addr_w :
@@ -1233,14 +1281,14 @@ assign ram_addr_w = (~flash_idle_w) ? rom_addr_w :
                     23'h7fffff; 
 
 assign ram_re_w = (~flash_idle_w) ? 0 : 
-                  (ram_enabled_w && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? ~rd_n_w :
-                  (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~rd_n_w :
-                  (ram_enabled_w && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && ~ff_mem_ack && slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && ~ff_mem_ack && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~rd_n_w :
+                  (ram_enabled_w && ~ff_mem_ack && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ? ~rd_n_w :
                   0; 
 
 assign ram_we_w = (~flash_idle_w) ? rom_wr_w : 
-                  (ram_enabled_w && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~wr_n_w :
-                  (ram_enabled_w && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT] && megaram_ena_w) ? ~wr_n_w :
+                  (ram_enabled_w && ~ff_mem_ack && slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT]) ? ~wr_n_w :
+                  (ram_enabled_w && ~ff_mem_ack && slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT] && megaram_ena_w) ? ~wr_n_w :
                   0; 
 
 assign ram_dout_w = (ram_addr_w[0] == 1'b0) ? ram_dout16_w[7:0] : ram_dout16_w[15:8];
@@ -1290,7 +1338,7 @@ assign ram_wdm_w = {~ram_addr_w[0], ram_addr_w[0]};
 memory_controller #(.FREQ(108_000_000) )
    (.clk(clk108_w), 
     .clk_sdram(clk108p_w), 
-    .resetn(reset_n_w/* & ~ram_fail_w*/), // keeps resetting until not fail
+    .resetn(reset_n_w), // keeps resetting until not fail
     .read(ram_re_w & ~ram_busy_w & bus_idle_w),
     .write(ram_we_w & ~ram_busy_w & bus_idle_w),
     .refresh(~rfsh_n_w & ~ram_busy_w),
@@ -1314,7 +1362,7 @@ assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'b1;
 assign int_n = 1'b1;
 `endif
 
-assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b0 : 1'b1; 
+assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b1 : 1'b0; 
 assign led = sd_busy_w;
 
 endmodule

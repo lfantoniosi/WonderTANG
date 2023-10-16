@@ -307,7 +307,7 @@ void runROM_end() __naked {}
 
 bool found = FALSE;
 char* filename = NULL;
-int megaram_type = TYPE_K4;
+int megaram_type = TYPE_UNK;
 uchar curslt, cursslt, sslt, b;
 const uchar *s;
 uchar *t;
@@ -322,6 +322,8 @@ uchar slotid;
 bool presAB = FALSE;
 char path[256];
 char cpumode = 1; // defaults to Z80_ROM
+uint *romstart;
+bool page2 = FALSE;
 
 int main(void)
 {
@@ -423,16 +425,18 @@ int main(void)
 
     } else megaram_type = TYPE_UNK;
 
+    if (filename == NULL)
+    {
+        printf("\r\nUSAGE: SMRAM [/Rx /Zx] filename\r\n\r\n"
+                " /Rx: Set MegaROM type\r\n   1: ASCII16\r\n   3: ASCII8\r\n   5: Konami SCC\r\n   6: Konami\r\n\r\n"
+                " /Zx: Set cpu mode\r\n   0: current\r\n   1: Z80\r\n   2: R800 ROM\r\n   3: R800 DRAM\r\n\r\n"
+        );
+        return 0;
+    }
+
     if (megaram_type != TYPE_UNK)
     {
-        if (filename == NULL)
-        {
-            printf("\r\nUSAGE: SMROM [/Rx /Zx] filename\r\n\r\n"
-                   " /Rx: Set MegaROM type\r\n   1: ASCII16\r\n   3: ASCII8\r\n   5: Konami SCC\r\n   6: Konami\r\n\r\n"
-                   " /Zx: Set cpu mode\r\n   0: current\r\n   1: Z80\r\n   2: R800 ROM\r\n   3: R800 DRAM\r\n\r\n"
-            );
-            return 0;
-        }
+
 
         printf("\r\nMapper Type: ");
         switch(megaram_type)
@@ -490,7 +494,13 @@ int main(void)
         MEGA_PORT1 = megaram_type;
         
         enaslt(sslt, 0x4000);
-        //enaslt(sslt, 0x8000);
+
+        romstart = 0x4002;
+        if (*romstart > 0x7ffff)
+        {
+            enaslt(sslt, 0x8000);
+            page2 = TRUE;
+        }
 
         switch(megaram_type)
         {
@@ -498,18 +508,25 @@ int main(void)
             case TYPE_K5:
                 *((uchar *)0x4000) = 0;
                 *((uchar *)0x6000) = 1;
-                //*((uchar *)0x8000) = 2;
-                //*((uchar *)0xA000) = 3;
+                if (page2)
+                {
+                    *((uchar *)0x8000) = 0;
+                    *((uchar *)0xA000) = 1;
+                }
                 break;
             case TYPE_A16:
                 *((uchar *)0x6000) = 0;
-                //*((uchar *)0x8000) = 1;
+                if (page2)
+                    *((uchar *)0x8000) = 0;
                 break;
             case TYPE_A8:
                 *((uchar *)0x6000) = 0;
-                //*((uchar *)0x6800) = 1;
-                //*((uchar *)0x7000) = 2;
-                //*((uchar *)0x7800) = 3;
+                *((uchar *)0x6800) = 1;
+                if (page2)
+                {
+                    *((uchar *)0x7000) = 0;
+                    *((uchar *)0x7800) = 1;
+                }
                 break;
             default:
                 break;

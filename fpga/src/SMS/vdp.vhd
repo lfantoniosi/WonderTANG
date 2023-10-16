@@ -262,7 +262,7 @@ begin
 			mode_M1			<= '0';
 			mode_M2			<= '0';
 			mode_M3			<= '0';
-			mode_M4			<= '1';
+			mode_M4			<= '0';
 			
 		elsif rising_edge(clk_sys) then
 			data_write <= '0';
