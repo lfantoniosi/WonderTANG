@@ -1,39 +1,3 @@
---
--- Multicore 2 / Multicore 2+
---
--- Copyright (c) 2017-2020 - Victor Trucco
---
--- All rights reserved
---
--- Redistribution and use in source and synthezised forms, with or without
--- modification, are permitted provided that the following conditions are met:
---
--- Redistributions of source code must retain the above copyright notice,
--- this list of conditions and the following disclaimer.
---
--- Redistributions in synthesized form must reproduce the above copyright
--- notice, this list of conditions and the following disclaimer in the
--- documentation and/or other materials provided with the distribution.
---
--- Neither the name of the author nor the names of other contributors may
--- be used to endorse or promote products derived from this software without
--- specific prior written permission.
---
--- THIS CODE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
--- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
--- THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
--- PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE
--- LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
--- CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
--- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
--- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
--- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
--- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
--- POSSIBILITY OF SUCH DAMAGE.
---
--- You are responsible for any legal issues arising from your use of this code.
---
-		
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
@@ -55,8 +19,7 @@ entity video is
 		hsync:			out std_logic;
 		vsync:			out std_logic;
 		hblank:			out std_logic;
-		vblank:			out std_logic;
-        reset_n:         in std_logic);
+		vblank:			out std_logic);
 end video;
 
 architecture Behavioral of video is
@@ -68,12 +31,9 @@ architecture Behavioral of video is
 	signal hbl_st,hbl_end: std_logic_vector(8 downto 0);
 begin
 
-	process (clk, reset_n)
+	process (clk)
 	begin
-        if reset_n = '0' then
-            vsync <= '0';
-            hsync <= '0';
-		elsif rising_edge(clk) then
+		if rising_edge(clk) then
 			if ce_pix = '1' then
 				if hcount=487	then
 					vcount <= vcount + 1;

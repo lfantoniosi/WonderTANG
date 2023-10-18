@@ -657,8 +657,7 @@ video (
 	.hsync(vdp_HSync),
 	.vsync(vdp_VSync),
 	.hblank(vdp_HBlank),
-	.vblank(vdp_VBlank),
-    .reset_n(sms_reset_n)
+	.vblank(vdp_VBlank)
 );
 
 reg [8:0] vx;
