@@ -5,6 +5,11 @@
     <Version>5</Version>
     <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
     <FileList>
+        <File path="src/SMS/jt89/jt89.v" type="file.verilog" enable="1"/>
+        <File path="src/SMS/jt89/jt89_mixer.v" type="file.verilog" enable="1"/>
+        <File path="src/SMS/jt89/jt89_noise.v" type="file.verilog" enable="1"/>
+        <File path="src/SMS/jt89/jt89_tone.v" type="file.verilog" enable="1"/>
+        <File path="src/SMS/jt89/jt89_vol.v" type="file.verilog" enable="1"/>
         <File path="src/clockdiv.v" type="file.verilog" enable="1"/>
         <File path="src/crc16.v" type="file.verilog" enable="1"/>
         <File path="src/dpram.v" type="file.verilog" enable="1"/>
@@ -43,6 +48,7 @@
         <File path="src/OCM/sound/scc/scc_wave.vhd" type="file.vhdl" enable="1"/>
         <File path="src/OCM/sound/scc/tb/ram.vhd" type="file.vhdl" enable="1"/>
         <File path="src/PSG_YM2149/YM2149.vhdl" type="file.vhdl" enable="1"/>
+        <File path="src/SMS/jt89/jt89.vhd" type="file.vhdl" enable="1"/>
         <File path="src/SMS/vdp.vhd" type="file.vhdl" enable="1"/>
         <File path="src/SMS/vdp_background.vhd" type="file.vhdl" enable="1"/>
         <File path="src/SMS/vdp_cram.vhd" type="file.vhdl" enable="1"/>

@@ -509,8 +509,7 @@ assign reset_rom_n = ram_enabled_w && ~ram_fail_w ;
 //reg ff_sms_init = 0;
 wire sms_reset_n = reset_n_w;
 
-reg ce_cpu_p;
-reg ce_cpu_n;
+reg ce_cpu;
 reg ce_vdp;
 reg ce_pix;
 reg ce_sp;
@@ -521,15 +520,12 @@ always @(negedge clk54_w or negedge sms_reset_n) begin
         ce_sp <= 0;
         ce_vdp <= 0;//div5
         ce_pix <= 0;//div10
-        ce_cpu_p <= 0;//div15
-        ce_cpu_n <= 0;//div15
-
+        ce_cpu <= 0;//div15
     end else begin
         ce_sp <= clkd[0];
         ce_vdp <= 0;//div5
         ce_pix <= 0;//div10
-        ce_cpu_p <= 0;//div15
-        ce_cpu_n <= 0;//div15
+        ce_cpu <= 0;//div15
         clkd <= clkd + 1'd1;
         if (clkd==29) begin
             clkd <= 0;
@@ -537,22 +533,18 @@ always @(negedge clk54_w or negedge sms_reset_n) begin
             ce_pix <= 1;
         end else if (clkd==24) begin
             ce_vdp <= 1;
-            ce_cpu_p <= 1;
+            ce_cpu <= 1;
         end else if (clkd==19) begin
             ce_vdp <= 1;
             ce_pix <= 1;
-        end else if (clkd==17) begin
-            ce_cpu_n <= 1;
         end else if (clkd==14) begin
             ce_vdp <= 1;
         end else if (clkd==9) begin
-            ce_cpu_p <= 1;
+            ce_cpu <= 1;
             ce_vdp <= 1;
             ce_pix <= 1;
         end else if (clkd==4) begin
             ce_vdp <= 1;
-        end else if (clkd==2) begin
-            ce_cpu_n <= 1;
         end
     end
 end
@@ -568,6 +560,10 @@ BUFG (
 BUFG (
 .O(ce_sp_w),
 .I(ce_sp)
+);
+BUFG (
+.O(ce_cpu_w),
+.I(ce_cpu)
 );
 
 wire vdp_cs, psg_cs;
@@ -603,6 +599,20 @@ always @(posedge clk54_w) begin
             ff_prev_vdp_wr_n <= vdp_wr_n;
         end
 end
+
+wire psg_wr_n = (~wr_n_w && psg_cs) ? 0: 1;
+wire [10:0] jt89_wave;
+jt89 (
+    .rst(~sms_reset_n),
+    .clk(clk54_w),
+    .clk_en(ce_cpu_w),
+    .din(cdin_w),
+    .wr_n(psg_wr_n),
+    //.ready(),
+    .mux(8'b11111111),
+    .soundL(jt89_wave)
+    //.soundR(jt89_wave)
+);
 
 
 wire vdp_smode_M1,vdp_smode_M2,vdp_smode_M3,vdp_smode_M4;
@@ -1163,33 +1173,40 @@ opll(
     .mixout(opll_mixout)
 ); 
 
-reg [14:0] opll_mix;
+reg [15:0] opll_mix;
+reg [15:0] scc_mix;
+reg [15:0] psg_mix;
+reg [15:0] jt89_mix;
+
 reg [14:0] opll_mix2;
+reg [14:0] psg_mix;
 reg [14:0] scc_wav;
 reg [14:0] scc_wav2;
-reg [16:0] fm_mix;
-reg [16:0] fm_mix2;
+reg [14:0] fm_mix;
+reg [14:0] fm_mix2;
+reg [14:0] jt89_mix;
+reg [14:0] jt89_mix2;
+
 reg [15:0] audio_sample;
 reg [15:0] audio_sample2;
-
 //wire [13:0] sample_mix_w = ff_sample4[13:0];
 
 always@(posedge clk54_w) begin
 
-        opll_mix <= { 1'b0, opll_mixout } + 15'b010000000000000;
-        scc_wav <= { 1'b0,  scc_wave_w[14:1]} + 15'b010000000000000;
-        fm_mix <= { opll_mix[13:0], 1'b0 } + { scc_wav[13:0], 1'b0 }; 
-        audio_sample <= { 4'b0, psg_wave_w, 4'b0 } + { 1'b0,  fm_mix[15:1] };
-
-        opll_mix2 <= { 1'b0, opll_mixout } - 15'b010000000000000;
-        scc_wav2 <= { 1'b0,  scc_wave_w[14:1]} - 15'b010000000000000;
-        fm_mix2 <= { opll_mix2[13:0], 1'b0 } + { scc_wav2[13:0], 1'b0 }; 
-        audio_sample2 <= { 4'b0, psg_wave_w, 4'b0 } + { 1'b0, opll_mix2[13:0], 1'b0 }+ { 1'b0,  fm_mix2[15:1] };
-
+       opll_mix <=  { opll_mixout[13:0], 2'b0 } + 16'b1000000000000000;
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14:0]} + 16'b0100000000000000;
+       psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
+`ifdef SMS
+       jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
+       audio_sample <= opll_mix + scc_mix + psg_mix + jt89_mix;
+`else
+       audio_sample <= opll_mix + scc_mix + psg_mix;
+`endif
+       audio_sample2 <= (~audio_sample) + 16'b1;
 end
 
 `ifdef SMS
-assign sample_w = audio_sample;
+assign sample_w = audio_sample2;
 `endif
 
 wire [13:0] lpf1_audio_w;
@@ -1201,7 +1218,7 @@ interpo #(
     .clk21m(clk54_w),
     .reset(~(ram_enabled_w)),
     .clkena(1),
-    .idata(audio_sample2[15:2]),
+    .idata(audio_sample[15:2]),
     .odata(lpf1_audio_w)
 );
 
