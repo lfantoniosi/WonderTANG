@@ -17,3 +17,7 @@ The Super Mega RAM SCC+ is a different ACVS-like MegaRam that support different 
 - ASCII16 (2MB)
 
 Use the utility SMRAM.COM to allow using different mappers as well activating the SCC+, otherwise it will just work like an ordinary MegaRAM 2MB.
+
+You need to flash the fpga/src/roms/Nextor-2.1.1.WonderTANG.ROM.bin into Tang Nano 20k flash memory using the programmer and selecting exFlash C Bin,Erase and Program at the address 0x100000 and set the flash as Generic Flash.
+
+![image](https://github.com/lfantoniosi/WonderTANG/assets/8690515/131b4672-0dc4-4aca-9201-65b8a67c23df)
