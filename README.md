@@ -3,6 +3,7 @@
 
 This cartridge allows any MSX computer to host a Sipeed Tang Nano 20K. The current fpga core implements:
 
+- MicroSD Nextor 2.1 Drive
 - 4MB Memory Mapper
 - 2MB Super Mega RAM SCC+
 - FM OPLL + MSX Music ROM
