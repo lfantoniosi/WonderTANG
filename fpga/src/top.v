@@ -1177,18 +1177,8 @@ reg [15:0] scc_mix;
 reg [15:0] psg_mix;
 reg [15:0] jt89_mix;
 
-reg [14:0] opll_mix2;
-reg [14:0] psg_mix;
-reg [14:0] scc_wav;
-reg [14:0] scc_wav2;
-reg [14:0] fm_mix;
-reg [14:0] fm_mix2;
-reg [14:0] jt89_mix;
-reg [14:0] jt89_mix2;
-
 reg [15:0] audio_sample;
 reg [15:0] audio_sample2;
-//wire [13:0] sample_mix_w = ff_sample4[13:0];
 
 always@(posedge clk54_w) begin
 
