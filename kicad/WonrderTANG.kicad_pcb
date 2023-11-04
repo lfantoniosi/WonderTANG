@@ -3002,7 +3002,7 @@
     (property "ki_keywords" "NPN Transistor")
     (path "/ce97a384-a9ac-4490-a214-0385397ad105")
     (attr through_hole)
-    (fp_text reference "Q1" (at -2.54 0 90) (layer "F.SilkS")
+    (fp_text reference "Q1" (at 1.084 3.463 -180) (layer "F.SilkS")
         (effects (font (size 1 1) (thickness 0.15)))
       (tstamp b515356f-5fce-42b6-8546-860d56f03965)
     )
