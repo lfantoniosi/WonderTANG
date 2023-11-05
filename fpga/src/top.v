@@ -325,8 +325,8 @@ always@(posedge clk108_w or negedge rst_n_w) begin
         endcase
     end
 end
-wire dotena_w;
-assign dotena_w = ff_dotena;
+//wire dotena_w;
+//assign dotena_w = ff_dotena;
 
 assign msel_n = ff_msel_n;
 
@@ -340,7 +340,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(sltsl_n),
     .dout(sltsl_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 
@@ -350,7 +350,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(clock),
     .dout(clock_cpu),
-    .ena(1)
+    .ena(ff_dotena)
 );
 BUFG (
 .O(clock_w),
@@ -363,7 +363,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(rd_n),
     .dout(rd_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 wire wr_n_w;
@@ -372,7 +372,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(wr_n),
     .dout(wr_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 wire [15:0] addrmux_w;
@@ -386,7 +386,7 @@ generate
             .reset_n(rst_n_w),
             .din(mp[i]),
             .dout(addrmux_w[i]),
-            .ena(~msel_n[0] & dotena_w)
+            .ena(~msel_n[0] & ff_dotena)
         );
 
         pinfilter (
@@ -394,7 +394,7 @@ generate
             .reset_n(rst_n_w),
             .din(mp[i]),
             .dout(addrmux_w[i+8]),
-            .ena(~msel_n[1] & dotena_w)
+            .ena(~msel_n[1] & ff_dotena)
         );
 
         pinfilter (
@@ -410,7 +410,7 @@ endgenerate
 
 reg [15:0] ff_addr;
 always@(posedge clk108_w ) begin
-    if (~msel_n[2] & dotena_w) ff_addr = addrmux_w;
+    if (~msel_n[2] & ff_dotena) ff_addr = addrmux_w;
 end
 
 wire [15:0] addr_w;
@@ -422,7 +422,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[0]),
     .dout(merq_n_w),
-    .ena(~msel_n[2] & dotena_w)
+    .ena(~msel_n[2] & ff_dotena)
 );
 
 wire iorq_n_w;
@@ -431,7 +431,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[1]),
     .dout(iorq_n_w),
-    .ena(~msel_n[2] & dotena_w)
+    .ena(~msel_n[2] & ff_dotena)
 );
 
 //wire cs1_n_w;
@@ -440,7 +440,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[2]),
 //    .dout(cs1_n_w),
-//    .ena(~msel_n[2] & dotena_w)
+//    .ena(~msel_n[2] & ff_dotena)
 //);
 
 //wire cs2_n_w;
@@ -449,7 +449,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[3]),
 //    .dout(cs2_n_w),
-//    .ena(~msel_n[2] & dotena_w)
+//    .ena(~msel_n[2] & ff_dotena)
 //);
 
 wire res_n_w;
@@ -458,7 +458,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[4]),
     .dout(res_n_w),
-    .ena(~msel_n[2] & dotena_w)
+    .ena(~msel_n[2] & ff_dotena)
 );
 
 wire rfsh_n_w;
@@ -467,7 +467,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[5]),
     .dout(rfsh_n_w),
-    .ena(~msel_n[2] & dotena_w)
+    .ena(~msel_n[2] & ff_dotena)
 );
 
 //wire cs12_n_w;
@@ -476,7 +476,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[6]),
 //    .dout(cs12_n_w),
-//    .ena(~msel_n[2] & dotena_w)
+//    .ena(~msel_n[2] & ff_dotena)
 //);
 
 wire m1_n_w;
@@ -485,7 +485,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[7]),
     .dout(m1_n_w),
-    .ena(~msel_n[2] & dotena_w)
+    .ena(~msel_n[2] & ff_dotena)
 );
 
 //////////////
@@ -812,7 +812,7 @@ expslot(
     .cdin(cdin_w),
     .cdout(expslot_cd_w),
     .busreq(expslot_busreq_w),
-    .enable(clock_w),
+    .enable(1),
     .rd_n(rd_n_w),
     .wr_n(wr_n_w),
     .sltsl_n(sltsl_n_w),
@@ -833,7 +833,7 @@ megaromBIOS(
     .addr(addr_w),
     .cdin(cdin_w),
     .merq_n(merq_n_w),
-    .enable(clock_w),
+    .enable(1),
     .sltsl_n(~slotsel_w[BIOS_SSLT]),
     .iorq_n(iorq_n_w),
     .m1_n(m1_n_w),
@@ -901,8 +901,8 @@ assign sram_busreq_w = sram_cs_w && ~rd_n_w;
 
 sram512(
     .clk(clk108_w),
-    .wea(clock_w && sram_cs_w && ~wr_n_w),
-    .rea(clock_w && sram_cs_w && ~rd_n_w),
+    .wea(sram_cs_w && ~wr_n_w),
+    .rea(sram_cs_w && ~rd_n_w),
     .addra(addr_w[8:0]),
     .dina(cdin_w),
     .douta(sram_cd_w),
@@ -1036,7 +1036,7 @@ mmapper(
     .cdin(cdin_w),
     .cdout(mmapper_cd_w),
     .busreq(mmapper_busreq_w),
-    .enable(clock_w),
+    .enable(1),
     .sltsl_n(~slotsel_w[MM_SSLT]),
     .iorq_n(iorq_n_w),
     .merq_n(merq_n_w),
@@ -1102,7 +1102,7 @@ megaramSCC(
     .cdout(scc_cd_w),
     .busreq(scc_busreq_w),
     .merq_n(merq_n_w),
-    .enable(clock_w),
+    .enable(1),
     .sltsl_n(~slotsel_w[MR_SSLT]),
     .iorq_n(iorq_n_w),
     .m1_n(m1_n_w),
@@ -1301,7 +1301,7 @@ assign ram_dout_w = (ram_addr_w[0] == 1'b0) ? ram_dout16_w[7:0] : ram_dout16_w[1
 
 reg [7:0] ff_cdout;
 always @(posedge clk108_w) begin
-    ff_cdout = 'z;
+    //ff_cdout = 'z;
     if (slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]||
         slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT] ||
         slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ff_cdout <= ram_dout_w;

@@ -7,7 +7,7 @@ module pinfilter(
     input reset_n,
     input din,
     input ena,
-    output reg dout,
+    output dout,
     output pos_edge, // detect posedge
     output neg_edge // detect negedge
 );
@@ -27,11 +27,12 @@ module pinfilter(
             if (ena) begin
                 dpipe <= { dpipe[0], din };
 
-                dout <= d_com;
+                //dout <= d_com;
             end
         end
     end
 
-    assign d_com = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d_com; 
+    assign dout = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout; 
+ //   assign d_com = (dpipe[0:0] == 1'b0) ? 1'b0 : (dpipe[0:0] == 1'b1) ? 1'b1 : d_com; 
 
 endmodule
