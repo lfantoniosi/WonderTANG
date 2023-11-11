@@ -12,27 +12,28 @@ module pinfilter(
     output neg_edge // detect negedge
 );
 
-    logic [3:0] dpipe;
+    logic [1:0] dpipe;
 
     reg d;
-    wire d_com;
-    wire e_com;
-
+    
     always @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
             d <= 1'b1;
-            dpipe <= 4'b1111;
+            dpipe <= 2'b11;
 
         end else begin
             if (ena) begin
                 dpipe <= { dpipe[0], din };
 
-                //dout <= d_com;
             end
+
+            d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d; 
+
         end
     end
 
-    assign dout = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout; 
- //   assign d_com = (dpipe[0:0] == 1'b0) ? 1'b0 : (dpipe[0:0] == 1'b1) ? 1'b1 : d_com; 
+    assign dout = d;
+
+//    assign dout = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d; 
 
 endmodule
