@@ -394,6 +394,34 @@ int main(void)
                         else 
                             megaram_type = TYPE_UNK;                    
                     } 
+                    else if (to_upper(*params) == 'K')
+                    {
+                        params++;
+                        if (*params == '5')
+                            megaram_type = TYPE_K5;
+                        else
+                        if (*params == '4')
+                            megaram_type = TYPE_K4;
+                        else
+                            megaram_type = TYPE_UNK;
+                    }
+                    else if (to_upper(*params) == 'A')
+                    {
+                        params++;
+                        if (*params == '8')
+                            megaram_type = TYPE_A8;
+                        else 
+                        if (*params == '1')
+                        {
+                            params++;
+                            if (*params == '6')
+                                megaram_type = TYPE_A16;
+                            else
+                                megaram_type = TYPE_UNK;
+                        }
+                        else
+                            megaram_type = TYPE_UNK;
+                    }
                     else if (to_upper(*params) == 'Y')
                     {
                         presAB = TRUE;
@@ -425,33 +453,46 @@ int main(void)
 
     } else megaram_type = TYPE_UNK;
 
-    if (filename == NULL)
+    if (!found) 
     {
-        printf("\r\nUSAGE: SMRAM [/Rx /Zx] filename\r\n\r\n"
-                " /Rx: Set MegaROM type\r\n   1: ASCII16\r\n   3: ASCII8\r\n   5: Konami SCC\r\n   6: Konami\r\n\r\n"
-                " /Zx: Set cpu mode\r\n   0: current\r\n   1: Z80\r\n   2: R800 ROM\r\n   3: R800 DRAM\r\n\r\n"
+        printf("ERROR: Super MegaRAM SCC+ not found...\r\n");
+        return 0;
+    }
+    else
+    if (filename == NULL || megaram_type == TYPE_UNK)
+    {
+        printf("\r\nUSAGE: SMRAM [/Rx /Zx /Y] filename\r\n\r\n"
+                " /Rx: Set MegaROM type\r\n"
+                "   1: ASCII16    (/A16)\r\n"
+                "   3: ASCII8     (/A8)\r\n"
+                "   5: Konami SCC (/K5)\r\n"
+                "   6: Konami     (/K4)\r\n\r\n"
+                " /Zx: Set cpu mode\r\n"
+                "   0: current\r\n"
+                "   1: Z80\r\n"
+                "   2: R800 ROM\r\n"
+                "   3: R800 DRAM\r\n\r\n"
+                " /Y:  Preserve AB header\r\n\r\n"
         );
         return 0;
     }
 
     if (megaram_type != TYPE_UNK)
     {
-
-
         printf("\r\nMapper Type: ");
         switch(megaram_type)
         {
             case TYPE_K4:
-                 printf("Konami (/R6)\r\n");
+                 printf("Konami (/R6 or /K4)\r\n");
                  break;
             case TYPE_K5:
-                 printf("Konami SCC (/R5)\r\n");
+                 printf("Konami SCC (/R5 or /K5)\r\n");
                  break;
             case TYPE_A16:
-                 printf("ASCII16 (/R1)\r\n");
+                 printf("ASCII16 (/R1 or /A16)\r\n");
                  break;
             case TYPE_A8:
-                 printf("ASCII8 (/R3)\r\n");
+                 printf("ASCII8 (/R3 or /A8)\r\n");
                  break;
         }
 
@@ -540,12 +581,15 @@ int main(void)
         jump(0xC000);
 
     } 
+
     else
     {
-        //if (found)
-        //{
-        //    printf("WARNING: MegaROM mapper not supported by Super MegaRAM SCC+\r\n");
-        //}
+        if (found)
+        {
+            printf("ERROR: MegaROM mapper not supported by Super MegaRAM SCC+\r\n");
+        }
+    }
+/*
         if (dos2_getenv("PROGRAM", path) == 0)
         {
             for(t = path; *t != '.' && *t != 0; t++);
@@ -579,7 +623,7 @@ int main(void)
             }
         }
     }
-
+*/
     return 1;
 }
 

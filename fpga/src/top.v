@@ -1102,7 +1102,7 @@ megaramSCC(
     .cdout(scc_cd_w),
     .busreq(scc_busreq_w),
     .merq_n(merq_n_w),
-    .enable(1),
+    .enable(clock_w),
     .sltsl_n(~slotsel_w[MR_SSLT]),
     .iorq_n(iorq_n_w),
     .m1_n(m1_n_w),
