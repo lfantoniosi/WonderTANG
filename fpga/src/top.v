@@ -425,6 +425,15 @@ pinfilter (
     .ena(~msel_n[2] & ff_dotena)
 );
 
+wire merq2_n_w;
+pinfilter2 (
+    .clk(clk108_w),
+    .reset_n(rst_n_w),
+    .din(mp[0]),
+    .dout(merq2_n_w),
+    .ena(~msel_n[2] & ff_dotena)
+);
+
 wire iorq_n_w;
 pinfilter (
     .clk(clk108_w),
@@ -1102,6 +1111,7 @@ megaramSCC(
     .cdout(scc_cd_w),
     .busreq(scc_busreq_w),
     .merq_n(merq_n_w),
+    .merq2_n(merq2_n_w),
     .enable(clock_w),
     .sltsl_n(~slotsel_w[MR_SSLT]),
     .iorq_n(iorq_n_w),

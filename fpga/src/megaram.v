@@ -6,6 +6,7 @@ module megaramSCC(
     output [7:0] cdout,
     output busreq,
     input merq_n,
+    input merq2_n,
     input enable,
     input sltsl_n,
     input iorq_n,
@@ -110,7 +111,7 @@ assign mem_addr = 23'h420000 + page_addr_w;
 
 assign cart_ena = (addr[15:14] == 2'b01 || addr[15:14] == 2'b10) && ~sltsl_n && ~merq_n && iorq_n ? 1 : 0;
 
-assign busreq = ff_scc_ram && ~sltsl_n && ~merq_n && iorq_n && addr[15:11] == 5'b10011 && ~rd_n ? scc_enable : 0;
-assign scc_req_w = ~sltsl_n && ~merq_n && iorq_n && addr[15:12] == 4'b1001 ? scc_enable : 0;
+assign busreq = ff_scc_ram && ~sltsl_n && ~merq2_n && iorq_n && addr[15:11] == 5'b10011 && ~rd_n ? scc_enable : 0;
+assign scc_req_w = ~sltsl_n && ~merq2_n && iorq_n && addr[15:12] == 4'b1001 ? scc_enable : 0;
 
 endmodule
