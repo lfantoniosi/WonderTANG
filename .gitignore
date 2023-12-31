@@ -42,3 +42,4 @@ sdcc/smram.map
 sdcc/smram.noi
 sdcc/smram.rel
 sdcc/smram.sym
+kicad/WonrderTANG-backups/*
