@@ -47,7 +47,7 @@ The following table shows the basic components needed to build the cartridge:
 
 ## Building the Cartridge
 
-Barebons PCBs can be ordered from PCBWay: 
+Barebone PCBs can be ordered from PCBWay: 
 
 <a href="https://www.pcbway.com/project/shareproject/WonderTANG_v1_01c_ba2c16ea.html"><img src="https://www.pcbway.com/project/img/images/frompcbway-1220.png" alt="PCB from PCBWay" /></a>
 
