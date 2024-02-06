@@ -2030,6 +2030,10 @@
     (uuid ff37ff6b-d7b4-4aea-b158-4dea9aea3092)
   )
 
+  (label "CART_5V" (at 93.345 154.94 0) (fields_autoplaced)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 05ff0d15-7bb8-4482-b40d-27460fb7d82a)
+  )
   (label "D0_33" (at 229.87 158.75 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 1885ad53-a704-4ec6-b0a0-fa36ac2365f1)

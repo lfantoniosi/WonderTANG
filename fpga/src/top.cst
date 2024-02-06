@@ -60,7 +60,7 @@ IO_PORT "mspi_miso" IO_TYPE=LVCMOS33;
 IO_LOC  "mspi_mosi" 61;
 IO_PORT "mspi_mosi" IO_TYPE=LVCMOS33;
 
-IO_LOC  "sound" 53;
+IO_LOC  "sound" 49;
 IO_PORT "sound" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "datadir" 52;
@@ -69,7 +69,7 @@ IO_PORT "datadir" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 IO_LOC  "clock" 76;
 IO_PORT "clock" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 
-IO_LOC  "jp_n" 41;
+IO_LOC  "jp_n" 53;
 IO_PORT "jp_n" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "rd_n" 15;
@@ -90,7 +90,7 @@ IO_PORT "busdir_n" IO_TYPE=LVCMOS33 PULL_MODE=UP;
 IO_LOC  "wait_n" 42;
 IO_PORT "wait_n" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
 
-IO_LOC  "audio" 49;
+IO_LOC  "audio" 41;
 IO_PORT "audio" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
 
 IO_LOC  "led" 86;

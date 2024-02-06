@@ -474,6 +474,10 @@
       {
         "netclass": "Power",
         "pattern": "GND"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/CART_5V"
       }
     ]
   },
