@@ -166,14 +166,16 @@ begin
     port map
     (
       clock_a			=> clk_sys,
-      address_a		=> xram_cpu_A(13 downto 0),
+      address_a		    => xram_cpu_A(13 downto 0),
       wren_a			=> vram_cpu_WE,
+      rden_a            => '1',
       data_a			=> D_in,
       q_a				=> vram_cpu_D_out,
 
       clock_b			=> clk_sys,
-      address_b		=> vram_vdp_A,
+      address_b		    => vram_vdp_A,
       wren_b			=> '0',
+      rden_b            => '1',
       data_b			=> ("00000000"),
       q_b				=> vram_vdp_D
     );

@@ -721,15 +721,18 @@ dpram#(
     .widthad_a(16),
     .width_a(6)
 )(
-    .address_a(vdp_color_addr),
-    .address_b(out_color_addr),
     .clock_a(clk_w),
-    .clock_b(clk_w),
-    .data_a({vdp_color[11:10], vdp_color[7:6], vdp_color[3:2] }),
-    .data_b( 6'd0 ),
+    .address_a(vdp_color_addr),
     .wren_a(~vx[8] & ~vy[8]),
-    .wren_b(0),
+    .rden_a(0),
+    .data_a({vdp_color[11:10], vdp_color[7:6], vdp_color[3:2] }),
 //    .q_a(),
+
+    .clock_b(clk_w),
+    .address_b(out_color_addr),
+    .wren_b(0),
+    .rden_b(1),
+//    .data_b( 6'd0 ),
     .q_b(vdp_color_out) 
 );
 
@@ -908,19 +911,23 @@ wire sd_timeout_error_w;
 assign sram_cs_w = ram_enabled_w && ff_sd_en && iorq_n_w && m1_n_w && ~merq_n_w && slotsel_w[BIOS_SSLT] && (addr_w >= SDC_SDATA && addr_w < SDC_ENABLE) ? 1 : 0;
 assign sram_busreq_w = sram_cs_w && ~rd_n_w;
 
-sram512(
-    .clk(clk108_w),
-    .wea(clock_w && sram_cs_w && ~wr_n_w),
-    .rea(clock_w && sram_cs_w && ~rd_n_w),
-    .addra(addr_w[8:0]),
-    .dina(cdin_w),
-    .douta(sram_cd_w),
+dpram#(
+    .widthad_a(9),
+    .width_a(8)
+)(
+    .clock_a(clk108_w),
+    .wren_a(clock_w && sram_cs_w && ~wr_n_w),
+    .rden_a(clock_w && sram_cs_w && ~rd_n_w),
+    .address_a(addr_w[8:0]),
+    .data_a(cdin_w),
+    .q_a(sram_cd_w),
 
-    .web(ff_sd_rstart && sd_outen_w),
-    .reb(ff_sd_wstart && sd_outen_w),
-    .addrb(sd_outaddr_w),
-    .dinb(sd_outbyte_w),
-    .doutb(sd_inbyte_w)
+    .clock_b(clk108_w),
+    .wren_b(ff_sd_rstart && sd_outen_w),
+    .rden_b(ff_sd_wstart && sd_outen_w),
+    .address_b(sd_outaddr_w),
+    .data_b(sd_outbyte_w),
+    .q_b(sd_inbyte_w)
 );
 
 sd_reader #(

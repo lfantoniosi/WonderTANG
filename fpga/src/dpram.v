@@ -11,32 +11,38 @@ parameter int width_a = 8
     input [width_a-1:0] data_a,
     input [width_a-1:0] data_b,
     input wren_a,
+    input rden_a,
     input wren_b,
-    output reg [width_a-1:0] q_a,
-    output reg [width_a-1:0] q_b
+    input rden_b,
+    output [width_a-1:0] q_a,
+    output [width_a-1:0] q_b
 );
 
 localparam int array_size = $pow(2,widthad_a);
 
     reg [width_a-1:0] mem_r[0:array_size-1];
+    reg [width_a-1:0] a_r;
+    reg [width_a-1:0] b_r;
 
     always @(posedge clock_a) begin
     
-        q_a <= mem_r[address_a];
-
-        if (wren_a) 
-            mem_r[address_a] <= data_a;
-
+        if (wren_a || rden_a) 
+            if (wren_a) 
+                mem_r[address_a] <= data_a;
+            else
+                a_r <= mem_r[address_a];
     end
 
     always @(posedge clock_b) begin
     
-        q_b <= mem_r[address_b];
-
-        if (wren_b) 
-            mem_r[address_b] <= data_b;
-
+        if (wren_b || rden_b) 
+            if (wren_b) 
+                mem_r[address_b] <= data_b;
+            else
+                b_r <= mem_r[address_b];
     end
 
+assign q_a = a_r;
+assign q_b = b_r;
 
 endmodule
