@@ -746,7 +746,7 @@ dpram#(
     localparam NUM_CHANNELS = 3;
 
     clockdiv #(
-        .CLK_SRC(25),
+        .CLK_SRC(27),
         .CLK_DIV(0.044100),
         .PRECISION_BITS(16)
     ) audioclkd (
