@@ -56,25 +56,25 @@
         <File path="src/SMS/vdp_sprite_shifter.vhd" type="file.vhdl" enable="1"/>
         <File path="src/SMS/vdp_sprites.vhd" type="file.vhdl" enable="1"/>
         <File path="src/SMS/video.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/attacktable.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/controller.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/envelopegenerator.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/envelopememory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/feedbackmemory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/lineartable.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/operator.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/opll.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/outputgenerator.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/outputmemory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/phasegenerator.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/phasememory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/registermemory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/sinetable.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/slotcounter.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/temporalmixer.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/vm2413.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/voicememory.vhd" type="file.vhdl" enable="1"/>
-        <File path="src/vm2413/voicerom.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/attacktable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/controller.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/envelopegenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/envelopememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/feedbackmemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/lineartable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/operator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/opll.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/outputgenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/outputmemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/phasegenerator.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/phasememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/registermemory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/sinetable.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/slotcounter.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/temporalmixer.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/vm2413.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/voicememory.vhd" type="file.vhdl" enable="1"/>
+        <File path="src/VM2413/voicerom.vhd" type="file.vhdl" enable="1"/>
         <File path="src/top.cst" type="file.cst" enable="1"/>
         <File path="src/top.sdc" type="file.sdc" enable="1"/>
     </FileList>
