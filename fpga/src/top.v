@@ -1239,8 +1239,8 @@ esepwm#(
 );
 
 
-assign audio = ff_wait ? 0 : audio_w;
-assign sound = ff_wait ? 0 : sound_w;
+assign sound = ff_wait ? 0 : audio_w;
+assign audio = ff_wait ? 0 : sound_w;
 
 ///// FM ROM
 
