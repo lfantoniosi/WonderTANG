@@ -1195,6 +1195,7 @@ reg [15:0] psg_mix;
 reg [15:0] jt89_mix;
 
 reg [15:0] audio_sample;
+reg [15:0] sound_sample;
 reg [15:0] audio_sample2;
 
 always@(posedge clk54_w) begin
@@ -1205,8 +1206,10 @@ always@(posedge clk54_w) begin
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
        audio_sample <= opll_mix + scc_mix + psg_mix + jt89_mix;
+       sound_sample <= opll_mix + scc_mix + jt89_mix;
 `else
        audio_sample <= opll_mix + scc_mix + psg_mix;
+       sound_sample <= opll_mix + scc_mix;
 `endif
        audio_sample2 <= (~audio_sample) + 16'b1;
 end
@@ -1215,53 +1218,30 @@ end
 assign sample_w = audio_sample2;
 `endif
 
-wire [13:0] lpf1_audio_w;
-wire [13:0] lpf2_audio_w;
-
-interpo #(
-    .MSBI(13)    
-)(
-    .clk21m(clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(audio_sample[15:2]),
-    .odata(lpf1_audio_w)
-);
-
-lpf1 #(
-	.MSBI(13)
-) (
-    .clk21m (clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(lpf1_audio_w),
-    .odata (lpf2_audio_w)
-);
-
-
-wire [13:0] dacin_w;
-lpf2 #(
-	.MSBI(13)
-) (
-    .clk21m (clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(lpf2_audio_w),
-    .odata (dacin_w)
-);
-
 wire audio_w;
 esepwm#(
-    .MSBI(13)
+    .MSBI(16)
 )(
-    .clk(clk54_w),
+    .clk(clk108_w),
     .reset(~(ram_enabled_w)),
-    .DACin(dacin_w),
+    .DACin(audio_sample),
     .DACout(audio_w)
 );
 
-assign audio = audio_w;
-assign sound = audio_w;
+wire sound_w;
+esepwm#(
+    .MSBI(16)
+)(
+    .clk(clk108p_w),
+    .reset(~(ram_enabled_w)),
+    .DACin(sound_sample),
+    .DACout(sound_w)
+);
+
+
+assign audio = ff_wait ? 0 : audio_w;
+assign sound = ff_wait ? 0 : sound_w;
+
 ///// FM ROM
 
 wire [7:0] fmrom_cd_w;
