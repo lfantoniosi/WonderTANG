@@ -1163,7 +1163,7 @@ YM2149(
   //.O_IOA(),
   //.O_IOA_OE_L(),
   .I_IOB(psg_portb_w),
-  .O_IOB(psg_portb_w),
+  //.O_IOB(psg_portb_w),
   //O_IOB_OE_L(),
   .ENA(1),
   .RESET_L(ram_enabled_w),
@@ -1196,51 +1196,53 @@ reg [15:0] jt89_mix;
 
 reg [15:0] audio_sample;
 reg [15:0] sound_sample;
-reg [15:0] audio_sample2;
+reg [15:0] audio_hdmi;
+
 
 always@(posedge clk54_w) begin
 
        opll_mix <=  { opll_mixout[13:0], 2'b0 } + 16'b1000000000000000;
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14:0]} + 16'b0100000000000000;
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14:0] } + 16'b0100000000000000;
        psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
-       audio_sample <= opll_mix + scc_mix + psg_mix + jt89_mix;
-       sound_sample <= opll_mix + scc_mix + jt89_mix;
+       audio_sample <= opll_mix + scc_mix + jt89_mix;
+       sound_sample <= opll_mix + scc_mix + psg_mix + jt89_mix;
 `else
-       audio_sample <= opll_mix + scc_mix + psg_mix;
-       sound_sample <= opll_mix + scc_mix;
+       audio_sample <= opll_mix + scc_mix;
+       sound_sample <= opll_mix + scc_mix + psg_mix;
 `endif
-       audio_sample2 <= (~audio_sample) + 16'b1;
+       audio_hdmi <= (~audio_sample) + 16'b1;
 end
 
 `ifdef SMS
-assign sample_w = audio_sample2;
+assign sample_w = audio_hdmi;
 `endif
 
-wire audio_w;
-esepwm#(
-    .MSBI(16)
-)(
-    .clk(clk108_w),
-    .reset(~(ram_enabled_w)),
-    .DACin(audio_sample),
-    .DACout(audio_w)
-);
 
 wire sound_w;
 esepwm#(
     .MSBI(16)
 )(
-    .clk(clk108p_w),
+    .clk(clk54_w),
     .reset(~(ram_enabled_w)),
     .DACin(sound_sample),
     .DACout(sound_w)
 );
 
+wire audio_w;
+esepwm#(
+    .MSBI(16)
+)(
+    .clk(clk54_w),
+    .reset(~(ram_enabled_w)),
+    .DACin(audio_sample), //.DACin(dacin_w),
+    .DACout(audio_w)
+);
 
-assign sound = ff_wait ? 0 : audio_w;
-assign audio = ff_wait ? 0 : sound_w;
+
+assign sound = ff_wait ? 0 : sound_w; // JACK
+assign audio = ff_wait ? 0 : audio_w; // EDGE
 
 ///// FM ROM
 
