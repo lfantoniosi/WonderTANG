@@ -1202,7 +1202,7 @@ reg [15:0] audio_hdmi;
 always@(posedge clk54_w) begin
 
        opll_mix <=  { opll_mixout[13:0], 2'b0 } + 16'b1000000000000000;
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14:0] } + 16'b0100000000000000;
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0100000000000000;
        psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
