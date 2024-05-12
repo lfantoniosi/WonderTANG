@@ -1202,8 +1202,8 @@ reg [15:0] audio_hdmi;
 always@(posedge clk54_w) begin
 
        opll_mix <=  { opll_mixout[13:0], 2'b0 } + 16'b1000000000000000;
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0100000000000000;
-       psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] } + 16'b0100000000000000;
+       psg_mix <=   { 3'b0, psg_wave_w[7:0], 5'b0 };
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
        audio_sample <= opll_mix + scc_mix + jt89_mix;
@@ -1212,22 +1212,45 @@ always@(posedge clk54_w) begin
        audio_sample <= opll_mix + scc_mix;
        sound_sample <= opll_mix + scc_mix + psg_mix;
 `endif
-       audio_hdmi <= (~audio_sample) + 16'b1;
+       audio_hdmi <= (~sound_sample) + 16'b1;
 end
 
 `ifdef SMS
 assign sample_w = audio_hdmi;
 `endif
 
-
-wire sound_w;
-esepwm#(
-    .MSBI(16)
+wire [15:0] lpf1_audio_w;
+wire [15:0] lpf2_audio_w;
+interpo #(
+    .MSBI(16)    
 )(
-    .clk(clk54_w),
+    .clk21m(clk54_w),
     .reset(~(ram_enabled_w)),
-    .DACin(sound_sample),
-    .DACout(sound_w)
+    .clkena(1),
+    .idata(audio_sample),
+    .odata(lpf1_audio_w)
+);
+
+lpf1 #(
+	.MSBI(16)
+) (
+    .clk21m (clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(lpf1_audio_w),
+    .odata(lpf2_audio_w)
+);
+
+
+wire [15:0] dac_audio_w;
+lpf2 #(
+	.MSBI(16)
+) (
+    .clk21m(clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(lpf2_audio_w),
+    .odata (dac_audio_w)
 );
 
 wire audio_w;
@@ -1236,10 +1259,54 @@ esepwm#(
 )(
     .clk(clk54_w),
     .reset(~(ram_enabled_w)),
-    .DACin(audio_sample), //.DACin(dacin_w),
+    .DACin(dac_audio_w),
     .DACout(audio_w)
 );
 
+
+wire [15:0] lpf1_sound_w;
+wire [15:0] lpf2_sound_w;
+interpo #(
+    .MSBI(16)    
+)(
+    .clk21m(clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(sound_sample),
+    .odata(lpf1_sound_w)
+);
+
+lpf1 #(
+	.MSBI(16)
+) (
+    .clk21m (clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(lpf1_sound_w),
+    .odata(lpf2_sound_w)
+);
+
+
+wire [15:0] dac_sound_w;
+lpf2 #(
+	.MSBI(16)
+) (
+    .clk21m(clk54_w),
+    .reset(~(ram_enabled_w)),
+    .clkena(1),
+    .idata(lpf2_sound_w),
+    .odata (dac_sound_w)
+);
+
+wire sound_w;
+esepwm#(
+    .MSBI(16)
+)(
+    .clk(clk54_w),
+    .reset(~(ram_enabled_w)),
+    .DACin(dac_sound_w),
+    .DACout(sound_w)
+);
 
 assign sound = ff_wait ? 0 : sound_w; // JACK
 assign audio = ff_wait ? 0 : audio_w; // EDGE
