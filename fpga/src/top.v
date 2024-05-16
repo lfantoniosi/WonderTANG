@@ -340,7 +340,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(sltsl_n),
     .dout(sltsl_n_w),
-    .ena(ff_dotena)
+    .ena(1)
 );
 
 
@@ -350,12 +350,13 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(clock),
     .dout(clock_cpu),
-    .ena(ff_dotena)
+    .ena(1)
 );
 BUFG (
 .O(clock_w),
 .I(clock_cpu)
 );
+
 
 wire rd_n_w;
 pinfilter (
@@ -363,7 +364,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(rd_n),
     .dout(rd_n_w),
-    .ena(ff_dotena)
+    .ena(1)
 );
 
 wire wr_n_w;
@@ -372,7 +373,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(wr_n),
     .dout(wr_n_w),
-    .ena(ff_dotena)
+    .ena(1)
 );
 
 wire [15:0] addrmux_w;
@@ -1138,6 +1139,7 @@ wire [7:0] psg_wave_w;
 wire psg_req_w;
 assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1] == 7'b1010000) ? 1 : 0;
 //wire psg_busreq_w;
+
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
 reg ff_hclock;
@@ -1168,9 +1170,10 @@ YM2149(
   .ENA(1),
   .RESET_L(ram_enabled_w),
   .CLK(hclock_w),
-  .clkHigh(clk_w)
+  .clkHigh(clock_w)
   //debug()
   );
+
 
 wire opll_req_w;
 assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
