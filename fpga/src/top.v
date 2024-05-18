@@ -345,16 +345,16 @@ pinfilter (
 
 
 wire clock_w;
-pinfilter (
-    .clk(clk108_w),
-    .reset_n(rst_n_w),
-    .din(clock),
-    .dout(clock_cpu),
-    .ena(1)
-);
+//pinfilter (
+//    .clk(clk108_w),
+//    .reset_n(rst_n_w),
+//    .din(clock),
+//    .dout(clock_cpu),
+//    .ena(1)
+//);
 BUFG (
 .O(clock_w),
-.I(clock_cpu)
+.I(clock)
 );
 
 
