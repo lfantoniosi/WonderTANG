@@ -281,52 +281,55 @@ end else
 end
 
 //// DOT STATE
-wire [2:0] dotclk_w;
-reg [2:0] ff_dotclk;
-always @(posedge clk108_w or negedge rst_n_w) begin
-    if (rst_n_w == 0) begin
-        ff_dotclk <= 3'b000;
-    end else begin
-        ff_dotclk <= ff_dotclk + 3'b001;
-    end
-end
-assign dotclk_w = ff_dotclk;
 
 reg  [2:0] ff_msel_n;
 reg  ff_dotena;
 
+reg [2:0] dotena_state_ff;
 
 always@(posedge clk108_w or negedge rst_n_w) begin
     if (rst_n_w == 0) begin
-         ff_msel_n <= 3'b111; // none
+        dotena_state_ff = 3'd0;
+        ff_msel_n <= 3'b111; // none
         ff_dotena <= 1'b0;
-    end else begin 
-        case(dotclk_w) 
-        3'b000: begin
+    end
+    else begin
+        case(dotena_state_ff)
+        default: begin
             ff_msel_n <= 3'b110; // A0-A7
             ff_dotena <= 1'b0;
+            dotena_state_ff <= 3'd1;
         end
-        3'b001: ff_dotena <= 1'b1;
-        3'b010: begin
+        3'd1: begin
+            ff_dotena <= 1'b1;
+            dotena_state_ff <= 3'd2;
+        end
+        3'd2: begin
             ff_msel_n <= 3'b101; // A8-A15
             ff_dotena <= 1'b0;
+            dotena_state_ff <= 3'd3;
         end
-        3'b011: ff_dotena <= 1'b1;
-        3'b100: begin
+        3'd3: begin
+            ff_dotena <= 1'b1;
+            dotena_state_ff <= 3'd4;
+        end
+        3'd4: begin
             ff_msel_n <= 3'b011; // merq, iorq, cs1,cs2,c12, rfsh, m1
             ff_dotena <= 1'b0;
+            dotena_state_ff <= 3'd5;
         end
-        3'b101: ff_dotena <= 1'b1;
-        3'b110: begin
+        3'd5: begin
+            ff_dotena <= 1'b1;
+            dotena_state_ff <= 3'd6;
+        end
+        3'd6: begin
             ff_msel_n <= 3'b111; // none
             ff_dotena <= 1'b0;
+            dotena_state_ff <= 3'd0;
         end
-        3'b111: ff_dotena <= 1'b0;
         endcase
     end
 end
-//wire dotena_w;
-//assign dotena_w = ff_dotena;
 
 assign msel_n = ff_msel_n;
 
