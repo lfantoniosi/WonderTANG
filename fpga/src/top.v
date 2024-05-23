@@ -1081,8 +1081,8 @@ reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
 always @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
-        ff_megaram_type <= 2'b00;
-        ff_scc_enable <= '0;
+        ff_megaram_type <= 2'b01;
+        ff_scc_enable <= '1;
     end else begin
         if (megaram_cs_w) begin
 
