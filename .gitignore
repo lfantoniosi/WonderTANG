@@ -23,7 +23,6 @@ fpga/impl/gwsynthesis/WonderTANG_syn_rsc.xml
 fpga/impl/temp/rtl_parser.result
 fpga/impl/temp/rtl_parser_arg.json
 sdcc/crt0.rel
-sdcc/crt0.s
 sdcc/disk/CHUPIN.COM
 sdcc/disk/COMMAND.COM
 sdcc/disk/COMMAND2.COM

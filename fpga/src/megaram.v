@@ -68,7 +68,7 @@ always @(posedge clk or negedge reset_n) begin
                     endcase
                 end
             end
-            if (~ff_ram_ena && ~wr_n && cart_ena && addr[15:11] == 5'b10010) begin
+            if (/*~ff_ram_ena &&*/ ~wr_n && cart_ena && addr[15:11] == 5'b10010) begin
                 ff_scc_ram <= (cdin[5:0] == 6'h3F) ? scc_enable : 0;
             end
         end

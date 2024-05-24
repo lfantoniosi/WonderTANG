@@ -261,7 +261,7 @@ void jump(uint addr) __naked
     addr;
     __asm
 
-    ld      sp,(#__himem)
+    ld      sp,(0x0006)
     jp      (hl)
 
     __endasm;
@@ -368,6 +368,7 @@ int main(void)
     if (found)
     {
         printf("WonderTANG! Super MegaRAM SCC+\r\n");
+        printf("v1.01\r\n");
 
         sslt = 0x80 | (2 << 2) | i;
 
@@ -499,6 +500,8 @@ int main(void)
         for(t = filename; *t != ' ' && *t != 0; t++);
         *t = 0;
         handle = dos2_open(0, filename);
+
+        MEGA_PORT1 = TYPE_K4;
 
         if (handle)
         {

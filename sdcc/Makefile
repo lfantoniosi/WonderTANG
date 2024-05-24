@@ -8,7 +8,7 @@ ASMFLAGS =
 
 smram.com: crt0.rel smram.rel 
 	$(CC) $(CFLAGS) --data-loc 0 --code-loc 0x200 --no-std-crt0 $^ -osmram.ihx
-	hex2bin.exe -e com smram.ihx
+	hex2bin -e com smram.ihx
 	cp smram.com disk/SMRAM.COM
 
 all: smram.com
