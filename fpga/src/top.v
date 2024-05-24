@@ -430,7 +430,7 @@ pinfilter (
 );
 
 wire merq2_n_w;
-pinfilter (
+pinfilter2 (
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(mp[0]),
