@@ -87,8 +87,6 @@ wire reset_rom_n;
     reg ff_wait = 1;
 
     always @(posedge clk_w) begin
-        //ff_res1 <= 1;
-        //ff_res2 <= 1;
         ff_wait <= 1;
         case(ff_bootstate)
         BS_RES0: if (reset_ram_n) begin
@@ -158,11 +156,6 @@ wire reset_rom_n;
     );
 
     assign rst_n_w = ~rst_w;
-
-//    reg clk54;
-//    always @(posedge clk108_w) begin
-//        clk54 <= ~clk54;
-//    end
 
     CLKDIV #(
         .DIV_MODE(2)
@@ -348,16 +341,16 @@ pinfilter (
 
 
 wire clock_w;
-//pinfilter (
-//    .clk(clk108_w),
-//    .reset_n(rst_n_w),
-//    .din(clock),
-//    .dout(clock_cpu),
-//    .ena(1)
-//);
+pinfilter (
+    .clk(clk108_w),
+    .reset_n(rst_n_w),
+    .din(clock),
+    .dout(clock_cpu),
+    .ena(1)
+);
 BUFG (
 .O(clock_w),
-.I(clock)
+.I(clock_cpu)
 );
 
 
@@ -429,12 +422,14 @@ pinfilter (
     .ena(~msel_n[2] & ff_dotena)
 );
 
-wire merq2_n_w;
-pinfilter2 (
+wire merq_scc_n_w;
+pinfilter #(
+    .REGISTERED(1)
+) (
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(mp[0]),
-    .dout(merq2_n_w),
+    .dout(merq_scc_n_w),
     .ena(~msel_n[2] & ff_dotena)
 );
 
@@ -1122,7 +1117,7 @@ megaramSCC(
     .cdout(scc_cd_w),
     .busreq(scc_busreq_w),
     .merq_n(merq_n_w),
-    .merq2_n(merq2_n_w),
+    .merq_scc_n(merq_scc_n_w),
     .enable(clock_w),
     .sltsl_n(~slotsel_w[MR_SSLT]),
     .iorq_n(iorq_n_w),
@@ -1201,14 +1196,17 @@ reg [15:0] psg_mix;
 reg [15:0] jt89_mix;
 
 reg [15:0] audio_sample;
+reg [15:0] audio_sample_amp;
 reg [15:0] sound_sample;
+reg [15:0] sound_sample_amp;
+
 reg [15:0] audio_hdmi;
 
 
 always@(posedge clk54_w) begin
 
-       opll_mix <=  { opll_mixout[13:0], 2'b0 } + 16'b1000000000000000;
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] } + 16'b0100000000000000;
+       opll_mix <=  { opll_mixout[13], opll_mixout[13], opll_mixout[13:0] } + 16'b0010000000000000;
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] } + 16'b0010000000000000;
        psg_mix <=   { 3'b0, psg_wave_w[7:0], 5'b0 };
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
@@ -1218,6 +1216,11 @@ always@(posedge clk54_w) begin
        audio_sample <= opll_mix + scc_mix;
        sound_sample <= opll_mix + scc_mix + psg_mix;
 `endif
+
+       sound_sample_amp <= sound_sample[15] ? sound_sample : { sound_sample[14:0], 1'b0 };
+
+       audio_sample_amp <= audio_sample[15] ? audio_sample : { audio_sample[14:0], 1'b0 };
+
        audio_hdmi <= (~sound_sample) + 16'b1;
 end
 
@@ -1233,7 +1236,7 @@ interpo #(
     .clk21m(clk54_w),
     .reset(~(ram_enabled_w)),
     .clkena(1),
-    .idata(audio_sample),
+    .idata(audio_sample_amp),
     .odata(lpf1_audio_w)
 );
 
@@ -1278,7 +1281,7 @@ interpo #(
     .clk21m(clk54_w),
     .reset(~(ram_enabled_w)),
     .clkena(1),
-    .idata(sound_sample),
+    .idata(sound_sample_amp),
     .odata(lpf1_sound_w)
 );
 
