@@ -1514,7 +1514,7 @@ assign int_n = 1'b0;
 `endif
 
 assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b1 : 1'b0; 
-assign led = sound_sample[14]; //sd_busy_w;
+assign led = sd_busy_w;
 
 assign  pa_en = 1'b1;
 
