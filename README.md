@@ -26,6 +26,10 @@ Use the utility SMRAM.COM to allow using different mappers as well activating th
 
 Note: This is the new version using Tang Nano 20K internal DAC amplifier. Check the left side of your pcb for the correct version: https://www.pcbway.com/project/shareproject/WonderTANG_v2_00a_a813663c.html
 
+![Version 2.0](images/v20-front.jpg)
+
+![Audo connector](images/v20-connector.jpg)
+
 
 | Reference                   | Value                      | Description                                          | Qty | Link        |
 |-----------------------------|----------------------------|------------------------------------------------------|-----|-------------|
