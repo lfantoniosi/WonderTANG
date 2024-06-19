@@ -1259,17 +1259,17 @@ reg [15:0] sound_sample;
 reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
-
+/*
 bitshift(
     .clk(clk54_w),
-    .din(opll_mix),
+    .din(opll_mix + 16'b0010000000000000),
     .shift(ff_opll_vol),
     .dout(opll_mix_vol)
 );
 
 bitshift(
     .clk(clk54_w),
-    .din(scc_mix),
+    .din(scc_mix + 16'b0000100000000000),
     .shift(ff_scc_vol),
     .dout(scc_mix_vol)
 );
@@ -1283,14 +1283,14 @@ bitshift(
 
 bitshift(
     .clk(clk54_w),
-    .din(jt89_mix),
+    .din(jt89_mix + 16'b0000010000000000),
     .shift(ff_psg_vol),
     .dout(jt89_mix_vol)
 );
-
+*/
 
 always@(posedge clk54_w) begin
-
+/*
 `ifdef OPLL       
        opll_mix <=  { opll_mixout[13], opll_mixout[13:0], 1'b0 }; // + 16'b0010000000000000; 
 `endif
@@ -1303,34 +1303,35 @@ always@(posedge clk54_w) begin
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }; // + 16'b0000010000000000; 
 `endif
+*/
 
-       sound_sample <= 16'b0001000000000000 
+       sound_sample <= 16'b0
 `ifdef OPLL       
-       + opll_mix_vol
+       + { opll_mixout[13], opll_mixout[13:0], 1'b0 } + 16'b0010000000000000
 `endif
 `ifdef SCC
-       + scc_mix_vol 
+       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0000100000000000
 `endif 
 `ifdef PSG
-       + psg_mix_vol
+       + { 4'b0, psg_wave_w[7:0], 4'b0 }
 `endif
 `ifdef SMS
-       + jt89_mix_vol
+       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }
 `endif
        ;
 
        hdmi_sample <= 16'b0
 `ifdef OPLL       
-       + opll_mix_vol
+       + { opll_mixout[13], opll_mixout[13:0], 1'b0 }
 `endif
 `ifdef SCC
-       + scc_mix_vol 
+       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }
 `endif 
 `ifdef PSG
-       + psg_mix_vol
+       + { 4'b0, psg_wave_w[7:0], 4'b0 }
 `endif
 `ifdef SMS
-       + jt89_mix_vol
+       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }
 `endif
        ;
 
