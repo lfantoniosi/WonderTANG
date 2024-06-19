@@ -10,12 +10,15 @@
         <File path="src/SMS/jt89/jt89_noise.v" type="file.verilog" enable="1"/>
         <File path="src/SMS/jt89/jt89_tone.v" type="file.verilog" enable="1"/>
         <File path="src/SMS/jt89/jt89_vol.v" type="file.verilog" enable="1"/>
+        <File path="src/audio_drive.v.v" type="file.verilog" enable="1"/>
+        <File path="src/bitshift.v" type="file.verilog" enable="1"/>
         <File path="src/clockdiv.v" type="file.verilog" enable="1"/>
         <File path="src/crc16.v" type="file.verilog" enable="1"/>
         <File path="src/dpram.v" type="file.verilog" enable="1"/>
         <File path="src/expslot.v" type="file.verilog" enable="1"/>
         <File path="src/flash.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/clk135.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_rpll/clkp54.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/clkp_108.v" type="file.verilog" enable="1"/>
         <File path="src/hdmi/audio_clock_regeneration_packet.sv" type="file.verilog" enable="1"/>
         <File path="src/hdmi/audio_info_frame.sv" type="file.verilog" enable="1"/>

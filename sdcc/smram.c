@@ -7,7 +7,7 @@
 #define BDOS_C_WRITE		2
 #define BDOS_C_RAWIO		6
 
-#define TYPE_K4  0x00
+#define TYPE_K4  0x04
 #define TYPE_K5  0x05
 #define TYPE_A16 0x16
 #define TYPE_A8  0x08
@@ -30,6 +30,12 @@
 #define Z80_ROM   0x00
 #define R800_ROM  0x81
 #define R800_DRAM 0x82
+
+#define RAMAD0	0xF341
+#define RAMAD1	0xF342
+#define RAMAD2	0xF343
+#define RAMAD3	0xF344
+
 
 void bdos() __naked
 {
@@ -256,6 +262,15 @@ uchar dos2_getenv(char *var, char *buf) __naked
 	__endasm;	
 }
 
+char hexToNum(char h)
+{
+    //if (h >= 'A' && h <= 'F')
+    //    return h-'A' + 10;
+    if (h >= '0' && h <='9')
+        return h-'0';    
+    return 0;
+}
+
 void jump(uint addr) __naked
 {
     addr;
@@ -267,24 +282,7 @@ void jump(uint addr) __naked
     __endasm;
 }
 
-void copyandrun() __naked
-{
-	__asm
-    ld      bc,#0x4000
-    or      a
-    sbc     hl,bc
-    ld      b,h
-    ld      c,l
-    ld      hl,#0x4000
-    ld      de,#0x0100
-    ldir
-    jp      0x0100
-	__endasm;
-}
-
-void copyandrun_end() __naked {}
-
-void runROM() __naked
+void runROM_page1() __naked
 {
 	__asm
     di
@@ -302,16 +300,36 @@ void runROM() __naked
     jp      (hl)
 	__endasm;
 }
+void runROM_page1_end() __naked {}
 
-void runROM_end() __naked {}
+void runROM_page2() __naked
+{
+	__asm
+    di
+    ld      sp,#0xCFFF
+    ld      hl,#HTIMI
+    ld      a,#0xC9
+    ld      (hl),a
+    ld      hl,#HKEYI
+    ld      (hl),a
+
+    ld      a,(EXPTBL)
+    ld      hl,#0
+    call    #ENASLT
+    ld      hl,(0x8002)
+    jp      (hl)
+	__endasm;
+}
+void runROM_page2_end() __naked {}
 
 bool found = FALSE;
 char* filename = NULL;
-int megaram_type = TYPE_UNK;
+int megaram_type = TYPE_K5;
 uchar curslt, cursslt, sslt, b;
 const uchar *s;
 uchar *t;
 char* params;
+char paramlen = 0;
 FHANDLE handle;
 uint bytes_read;
 int i;
@@ -322,8 +340,13 @@ uchar slotid;
 bool presAB = FALSE;
 char path[256];
 char cpumode = 1; // defaults to Z80_ROM
-uint *romstart;
+uint romstart;
 bool page2 = FALSE;
+bool help = FALSE;
+char scc_vol = 9;
+char psg_vol = 9;
+char opll_vol = 9;
+char c;
 
 int main(void)
 {
@@ -360,19 +383,17 @@ int main(void)
             if (found) break;
         }
     }
-
-    //if (!found)  { i = 1; found = TRUE; }
-    
+    //found = TRUE;
     sslt = 0;
 
     if (found)
     {
-        printf("WonderTANG! Super MegaRAM SCC+\r\n");
-        printf("v1.01\r\n");
+        printf("WonderTANG! Super MegaRAM SCC+\n\r");
+        printf("v2.00\n\r");
 
         sslt = 0x80 | (2 << 2) | i;
-
-        for(params = (char*)0x81; *params != 0; ++params)
+        paramlen = *((char*)0x80);
+        for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
         {
             if (*params != ' ')
             {
@@ -427,11 +448,41 @@ int main(void)
                     {
                         presAB = TRUE;
                     }
+                    else if (to_upper(*params) == 'V')
+                    {
+                        params++;
+                        uchar param = to_upper(*params++);
+                        switch(param)
+                        {
+                            case 'S': 
+                                scc_vol = hexToNum(to_upper(*params));
+                                printf("SCC+ volume %d\n\r", (int)scc_vol);
+                                break;
+                            case 'P': 
+                                psg_vol = hexToNum(to_upper(*params));
+                                printf("PSG volume %d\n\r", (int)psg_vol);
+                                break;
+                            case 'O': 
+                                opll_vol = hexToNum(to_upper(*params));
+                                printf("OPLL volume %d\n\r", (int)opll_vol);
+                                break;
+                            default:
+                            {
+                                printf("ERROR: wrong device volume...\n\r");
+                                return 0;
+                            }
+                            break;
+                        }
+                    }
                     else if (to_upper(*params) == 'Z')
                     {
                         params++;
                         if (*params >= '0' && *params <= '3')
                             cpumode = *params - '0';
+                    }
+                    else if (to_upper(*params) == '?')
+                    {
+                        help = TRUE;
                     }
                     else
                     {
@@ -456,177 +507,157 @@ int main(void)
 
     if (!found) 
     {
-        printf("ERROR: Super MegaRAM SCC+ not found...\r\n");
+        printf("ERROR: WonderTANG! not found...\n\r");
         return 0;
     }
     else
-    if (filename == NULL || megaram_type == TYPE_UNK)
+    if (help == TRUE || megaram_type == TYPE_UNK)
     {
-        printf("\r\nUSAGE: SMRAM [/Rx /Zx /Y] filename\r\n\r\n"
-                " /Rx: Set MegaROM type\r\n"
-                "   1: ASCII16    (/A16)\r\n"
-                "   3: ASCII8     (/A8)\r\n"
-                "   5: Konami SCC (/K5)\r\n"
-                "   6: Konami     (/K4)\r\n\r\n"
-                " /Zx: Set cpu mode\r\n"
-                "   0: current\r\n"
-                "   1: Z80\r\n"
-                "   2: R800 ROM\r\n"
-                "   3: R800 DRAM\r\n\r\n"
-                " /Y:  Preserve AB header\r\n\r\n"
+        printf("\n\rUSAGE: SMRAM [/Rx /Zx /Y] [romfile]\n\r\n\r"
+                " /Rx: Set MegaROM type\n\r"
+                "   1: ASCII16    (/A16)\n\r"
+                "   3: ASCII8     (/A8)\n\r"
+                "   5: Konami SCC (/K5)\n\r"
+                "   6: Konami     (/K4)\n\r\n\r"
+                " /Vxy: Set volume for\n\r"
+                "   S: SCC+\n\r"
+                "   P: PSG\n\r"
+                "   O: OPLL\n\r"
+                "   y: 0-9\n\r\n\r"
+                " /Zx: Set cpu mode\n\r"
+                "   0: current\n\r"
+                "   1: Z80\n\r"
+                "   2: R800 ROM\n\r"
+                "   3: R800 DRAM\n\r\n\r"
+                " /Y:  Preserve AB header\n\r\n\r"
         );
         return 0;
     }
 
-    if (megaram_type != TYPE_UNK)
+    printf("\r\nMapper Type: ");
+    switch(megaram_type)
     {
-        printf("\r\nMapper Type: ");
-        switch(megaram_type)
-        {
-            case TYPE_K4:
-                 printf("Konami (/R6 or /K4)\r\n");
-                 break;
-            case TYPE_K5:
-                 printf("Konami SCC (/R5 or /K5)\r\n");
-                 break;
-            case TYPE_A16:
-                 printf("ASCII16 (/R1 or /A16)\r\n");
-                 break;
-            case TYPE_A8:
-                 printf("ASCII8 (/R3 or /A8)\r\n");
-                 break;
-        }
-
-        for(t = filename; *t != ' ' && *t != 0; t++);
-        *t = 0;
-        handle = dos2_open(0, filename);
-
-        MEGA_PORT1 = TYPE_K4;
-
-        if (handle)
-        {
-                printf("Loading ROM file: %s - ", filename);
-                
-                enaslt(sslt, 0x4000);
-                page = 0;
-                romsize = 0;
-                printf("%04dKB", 0);
-
-                do {
-
-                    MEGA_PORT0 = 0; // enable paging
-                    *((uchar *)0x4000) = page++;
-                    b = MEGA_PORT0; (b); // enable ram
-                    bytes_read = dos2_read(handle, (void*)0x8000, 0x2000);
-                    if (presAB == FALSE && romsize == 0) 
-                        *((uchar*)(0x8000)) = 0;
-                    romsize += bytes_read;
-                    memcpy((void*)0x4000, (void*)0x8000, bytes_read);
-                    MEGA_PORT0 = 0; // enable paging
-                    printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
-
-                } while (bytes_read > 0);
-                
-                dos2_close(handle);
-        } 
-        else 
-        {
-            printf("ERROR: Failed loading %s\r\n", filename);
-            return 0;
-        }
-        *t = ' '; // restore space
-        MEGA_PORT1 = megaram_type;
-        
-        enaslt(sslt, 0x4000);
-
-        romstart = 0x4002;
-        if (*romstart > 0x7ffff)
-        {
-            enaslt(sslt, 0x8000);
-            page2 = TRUE;
-        }
-
-        switch(megaram_type)
-        {
-            case TYPE_K4:
-            case TYPE_K5:
-                *((uchar *)0x4000) = 0;
-                *((uchar *)0x6000) = 1;
-                if (page2)
-                {
-                    *((uchar *)0x8000) = 0;
-                    *((uchar *)0xA000) = 1;
-                }
+        case TYPE_K4:
+                printf("Konami (/R6 or /K4)\n\r");
                 break;
-            case TYPE_A16:
-                *((uchar *)0x6000) = 0;
-                if (page2)
-                    *((uchar *)0x8000) = 0;
+        case TYPE_K5:
+                printf("Konami SCC (/R5 or /K5)\n\r");
                 break;
-            case TYPE_A8:
-                *((uchar *)0x6000) = 0;
-                *((uchar *)0x6800) = 1;
-                if (page2)
-                {
-                    *((uchar *)0x7000) = 0;
-                    *((uchar *)0x7800) = 1;
-                }
+        case TYPE_A16:
+                printf("ASCII16 (/R1 or /A16)\n\r");
                 break;
-            default:
+        case TYPE_A8:
+                printf("ASCII8 (/R3 or /A8)\n\r");
                 break;
-        }
+    }
 
-        memcpy((void*)0xC000, &runROM, ((uint)&runROM_end - (uint)&runROM));
-        
-        if (cpumode != 0)
-            chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
-        
-        jump(0xC000);
+    MEGA_PORT1 = 0xF0 | scc_vol;
+    MEGA_PORT1 = 0xE0 | psg_vol;
+    MEGA_PORT1 = 0xD0 | opll_vol;
 
+    if (filename == 0) {        
+        if (megaram_type != TYPE_UNK)
+            MEGA_PORT1 = megaram_type;    
+        return 0;
     } 
 
-    else
+    for(t = filename; *t != ' ' && *t != 0; t++);
+    *t = 0;
+    handle = dos2_open(0, filename);
+
+    MEGA_PORT1 = TYPE_K4;
+
+    if (handle)
     {
-        if (found)
-        {
-            printf("ERROR: MegaROM mapper not supported by Super MegaRAM SCC+\r\n");
-        }
+            printf("Loading ROM file: %s - ", filename);
+            
+            enaslt(sslt, 0x4000);
+            page = 0;
+            romsize = 0;
+            printf("%04dKB", 0);
+
+            do {
+
+                MEGA_PORT0 = 0; // enable paging
+                *((uchar *)0x4000) = page++;
+                b = MEGA_PORT0; (b); // enable ram
+                bytes_read = dos2_read(handle, (void*)0x8000, 0x2000);
+                if (presAB == FALSE && romsize == 0) 
+                    *((uchar*)(0x8000)) = 0;
+                romsize += bytes_read;
+                memcpy((void*)0x4000, (void*)0x8000, bytes_read);
+                if (page == 0)
+                    romstart = *((uint*)0x8002);
+                MEGA_PORT0 = 0; // enable paging
+                printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
+
+            } while (bytes_read > 0);
+
+             *((uchar *)0x4000) = 0;
+            
+            dos2_close(handle);
+    } 
+    else 
+    {
+        printf("ERROR: Failed loading %s\n\r", filename);
+        return 0;
     }
-/*
-        if (dos2_getenv("PROGRAM", path) == 0)
-        {
-            for(t = path; *t != '.' && *t != 0; t++);
-            if (*t != 0)
-            {
-                *t++ = '2';
-                *t++ = '.';
-                *t++ = 'C';
-                *t++ = 'O';
-                *t++ = 'M';
-                *t++ = 0;
-            }          
-            handle = dos2_open(0, path);
-            if (handle)
-            {  
-                printf("Redirecting to SROM.COM...\r\n"); 
+    *t = ' '; // restore space
+    MEGA_PORT1 = megaram_type;
+    
+    enaslt(sslt, 0x4000);
+    romstart = 0x4002;
+    if (romstart > 0x7fff)
+    {
+        enaslt(sslt, 0x8000);
+        page2 = TRUE;
+    }
+    printf("\n\r\n\rStart address: 0x%04x (page %d)\n\r", romstart, page2 == TRUE ? 2 : 1);
 
-                addr = 0x4000;
-                do {
-                    bytes_read = dos2_read(handle, (void*)addr, 0x2000);
-                    addr += bytes_read;
-                } while(bytes_read > 0);
-                dos2_close(handle);
-                MEGA_PORT1 = TYPE_K4;
-                memcpy((void*)addr, &copyandrun, ((uint)&copyandrun_end - (uint)&copyandrun));
-                jump(addr);
-
-            } else 
+    switch(megaram_type)
+    {
+        case TYPE_K4:
+        case TYPE_K5:
+            *((uchar *)0x4000) = 0;
+            *((uchar *)0x6000) = 1;
+            if (page2)
             {
-                if (!found) printf("ERROR: Super MegaRAM SCC+ not found...\r\n");
+                *((uchar *)0x8000) = 0;
+                *((uchar *)0xA000) = 1;
             }
-        }
+            break;
+        case TYPE_A16:
+            *((uchar *)0x6000) = 0;
+            if (page2)
+                *((uchar *)0x8000) = 0;
+            break;
+        case TYPE_A8:
+            *((uchar *)0x6000) = 0;
+            *((uchar *)0x6800) = 1;
+            if (page2)
+            {
+                *((uchar *)0x7000) = 0;
+                *((uchar *)0x7800) = 1;
+            }
+            break;
+        default:
+            break;
     }
-*/
-    return 1;
+
+    if (page2 == TRUE)
+        memcpy((void*)0xC000, &runROM_page2, ((uint)&runROM_page2_end - (uint)&runROM_page2));
+    else
+        memcpy((void*)0xC000, &runROM_page1, ((uint)&runROM_page1_end - (uint)&runROM_page1));
+    
+    if (cpumode != 0)
+        chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
+    
+
+    printf("\n\rPress any key to proceed...\n\r");
+    c = getchar();
+
+    jump(0xC000);
+
+    return 1; // make sdcc happy
 }
 

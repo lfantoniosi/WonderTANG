@@ -4,7 +4,7 @@
 
 module pinfilter
 #(
-    parameter bit REGISTERED = 1'b0
+    parameter bit REGISTERED = 1'b1
 )(
     input clk,
     input reset_n,

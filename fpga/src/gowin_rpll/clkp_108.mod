@@ -7,7 +7,7 @@
 
 -mod_name clkp_108
 -file_name clkp_108
--path D:/src/fpga/the_last_tango/src/gowin_rpll/
+-path /home/felipe/src/fpga/WonderTANG/fpga/src/gowin_rpll/
 -type PLL
 -rPll true
 -file_type vlg
@@ -18,6 +18,7 @@
 -fbdiv_sel 4
 -dyn_odiv_sel false
 -odiv_sel 8
+-dyn_sdiv_sel 72
 -dyn_da_en false
 -rst_sig true
 -rst_sig_p false
@@ -29,6 +30,7 @@
 -clkoutp_bypass false
 -psda_sel 8
 -dutyda_sel 8
--en_clkoutd false
+-en_clkoutd true
 -clkoutd_bypass false
+-clkoutd_src CLKOUT
 -en_clkoutd3 false

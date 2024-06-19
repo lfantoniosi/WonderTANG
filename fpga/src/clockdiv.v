@@ -29,6 +29,7 @@ parameter int PRECISION_BITS = 16
 )
 (
     input clk_src,
+    inout reset_n,
     output clk_div
 );
 
@@ -42,23 +43,47 @@ logic [PRECISION_BITS:0] sdiff = 0;
 logic clk_skew = 0;
 logic clkd;
 
-always_ff@(posedge clk_src)
+always_ff@(posedge clk_src or negedge reset_n)
 begin
-    
+    if(!reset_n) begin
+        sdiff <= 0;
+        clkd <= clk_src;
+    end else 
     if (sdiff[PRECISION_BITS-1] == 0)
         if (cdiv != CLK_HALF-1 && cdiv != CLK_END-1) 
             cdiv++;
         else begin 
             clkd <= ~clkd; 
             if (cdiv == CLK_END-1) begin
-                sdiff = sdiff + SKW_TICKS;
-                cdiv = 0;
+                sdiff <= sdiff + SKW_TICKS;
+                cdiv <= 0;
             end
-            else cdiv = cdiv + 1;
-
+            else cdiv <= cdiv + 1;
         end
     else sdiff[PRECISION_BITS-1] = 0;
+end
 
+assign clk_div = clkd;
+
+
+endmodule
+
+
+module clockdiv2
+(
+    input clk_src,
+    input reset_n,
+    output clk_div
+);
+
+logic clkd;
+
+always_ff@(posedge clk_src or negedge reset_n)
+begin
+    if(!reset_n)
+        clkd = clk_src;
+    else
+        clkd = ~clkd;
 end
 
 assign clk_div = clkd;

@@ -1,14 +1,13 @@
 `define SMS
+`define PSG
+`define OPLL
+`define SCC
 
 module top(
     input   clk,
-//    input   clk_pll0,
-//    input   clk_pll1,
-//    input   clk_pll2,
-
     input   s1,
 
-    input dead_pin,
+    output led,
 
 `ifdef SMS
     // hdmi output
@@ -18,9 +17,10 @@ module top(
     output     [2:0]  tmds_data_n,
 `endif
 
-    output audio,
-    output sound,
-    input jp_n,
+    output hp_ws,
+    output hp_din,
+    output hp_bck,
+    output pa_en,
 
     input clock,
     input rd_n,
@@ -30,7 +30,6 @@ module top(
     output int_n,
     output busdir_n,
     output wait_n,
-    output led,
     output datadir,
 
     inout [7:0] cd,
@@ -87,7 +86,7 @@ wire reset_rom_n;
     reg ff_wait = 1;
 
     always @(posedge clk_w) begin
-        ff_wait <= 1;
+        //ff_wait <= 1;
         case(ff_bootstate)
         BS_RES0: if (reset_ram_n) begin
                     ff_bootstate <= ff_bootstate + 1;
@@ -143,6 +142,7 @@ wire reset_rom_n;
         .clkout(clk108), //output clkout
         .lock(clk108_lock_w), //output lock
         .clkoutp(clk108p), //output clkoutp
+        .clkoutd(clk_pa),
         .reset(~s1n_w), //input reset
         .clkin(clk) //input clkin
     );
@@ -154,9 +154,12 @@ wire reset_rom_n;
     .O(clk108p_w),
     .I(clk108p)
     );
-
+    BUFG(
+    .O(clk_pa_w),
+    .I(clk_pa)
+    );
     assign rst_n_w = ~rst_w;
-
+/*
     CLKDIV #(
         .DIV_MODE(2)
     )(
@@ -164,6 +167,14 @@ wire reset_rom_n;
     .RESETN(clk108_lock_w),
     .CLKOUT(clk54)
     );
+*/
+
+    clockdiv2(
+        .clk_src(clk108_w),
+        .reset_n(clk108_lock_w),
+        .clk_div(clk54)
+    );
+
     BUFG(
     .O(clk54_w),
     .I(clk54)
@@ -341,16 +352,17 @@ pinfilter (
 
 
 wire clock_w;
+
 pinfilter (
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(clock),
-    .dout(clock_cpu),
+    .dout(clock3),
     .ena(1)
 );
 BUFG (
 .O(clock_w),
-.I(clock_cpu)
+.I(clock3)
 );
 
 
@@ -750,6 +762,7 @@ dpram#(
         .PRECISION_BITS(16)
     ) audioclkd (
         .clk_src(clk_w),
+        .reset_n(sms_reset_n),
         .clk_div(clk_audio)
     );
     BUFG clk_audio_bufg_inst(
@@ -1074,10 +1087,19 @@ assign megaram_cs_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w
 reg ff_scc_enable;
 reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
+reg [3:0] ff_scc_vol;
+reg [3:0] ff_psg_vol;
+reg [3:0] ff_opll_vol;
+
 always @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_megaram_type <= 2'b01;
         ff_scc_enable <= '1;
+
+        ff_scc_vol <= 4'h0;
+        ff_psg_vol <= 4'h0;
+        ff_opll_vol <= 4'h0;
+
     end else begin
         if (megaram_cs_w) begin
 
@@ -1094,12 +1116,23 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b11;
                 end
-                default: begin
+                8'h04: begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b00;
                 end
             endcase
 
+            case(cdin_w[7:4])
+                4'hF: begin
+                    ff_scc_vol <= 4'h9 - cdin_w[3:0];
+                end
+                4'hE: begin
+                    ff_psg_vol <= 4'h9 - cdin_w[3:0];
+                end
+                4'hD: begin
+                    ff_opll_vol <= 4'h9 - cdin_w[3:0];
+                end
+            endcase
         end
     end
 end
@@ -1132,6 +1165,7 @@ megaramSCC(
     .megaram_type(megaram_type_w)
 );
 //////////////// AUDIO
+`ifdef PSG
 //wire [7:0] psg_cd_w;
 wire [7:0] psg_wave_w;
 wire psg_req_w;
@@ -1140,14 +1174,18 @@ assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1]
 
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
-reg ff_hclock;
-always @(posedge clock_w) begin
-    ff_hclock <= ~ff_hclock;
-end
+
+clockdiv2(
+    .clk_src(clock_w),
+    .reset_n(ram_enabled_w),
+    .clk_div(hclock)
+);
 BUFG(
 .O(hclock_w),
-.I(ff_hclock)
+.I(hclock)
 );
+
+
 YM2149(
   .I_DA(cdin_w),
   //.O_DA(psg_cd_w),
@@ -1171,15 +1209,30 @@ YM2149(
   .clkHigh(clock_w)
   //debug()
   );
+`endif
 
-
+`ifdef OPLL   
 wire opll_req_w;
 assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
-
 wire [13:0] opll_mixout;
 
+
+clockdiv #(
+    .CLK_SRC(108),
+    .CLK_DIV(315.0/88.0),
+    .PRECISION_BITS(16)
+) (
+    .clk_src(clk108_w),
+    .reset_n(clk108_lock_w),
+    .clk_div(clk_opll)
+);
+BUFG(
+.O(clk_opll_w),
+.I(clk_opll)
+);
+
 opll(
-    .xin(clock_w),
+    .xin(clk_opll_w),
     //.xout(),
     .xena(1),
     .d(cdin_w),
@@ -1189,139 +1242,134 @@ opll(
     .ic_n(ram_enabled_w),
     .mixout(opll_mixout)
 ); 
+`endif
 
 reg [15:0] opll_mix;
 reg [15:0] scc_mix;
 reg [15:0] psg_mix;
 reg [15:0] jt89_mix;
 
-reg [15:0] audio_sample;
-reg [15:0] audio_sample_amp;
-reg [15:0] sound_sample;
-reg [15:0] sound_sample_amp;
+reg [15:0] opll_mix_vol;
+reg [15:0] scc_mix_vol;
+reg [15:0] psg_mix_vol;
+reg [15:0] jt89_mix_vol;
 
+
+reg [15:0] sound_sample;
 reg [15:0] audio_hdmi;
 
 
+bitshift(
+    .clk(clk54_w),
+    .din(opll_mix),
+    .shift(ff_opll_vol),
+    .dout(opll_mix_vol)
+);
+
+bitshift(
+    .clk(clk54_w),
+    .din(scc_mix),
+    .shift(ff_scc_vol),
+    .dout(scc_mix_vol)
+);
+
+bitshift(
+    .clk(clk54_w),
+    .din(psg_mix),
+    .shift(ff_psg_vol),
+    .dout(psg_mix_vol)
+);
+
+bitshift(
+    .clk(clk54_w),
+    .din(jt89_mix),
+    .shift(ff_psg_vol),
+    .dout(jt89_mix_vol)
+);
+
 always@(posedge clk54_w) begin
 
-       opll_mix <=  { opll_mixout[13], opll_mixout[13], opll_mixout[13:0] } + 16'b0010000000000000;
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] } + 16'b0010000000000000;
-       psg_mix <=   { 3'b0, psg_wave_w[7:0], 5'b0 };
+`ifdef OPLL       
+       opll_mix <=  { opll_mixout[13], opll_mixout[13:0], 1'b0 } + 16'b0010000000000000; 
+`endif
+`ifdef SCC
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0000100000000000; 
+`endif
+`ifdef PSG
+       psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
+`endif
 `ifdef SMS
        jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
-       audio_sample <= opll_mix + scc_mix + jt89_mix;
-       sound_sample <= opll_mix + scc_mix + psg_mix + jt89_mix;
-`else
-       audio_sample <= opll_mix + scc_mix;
-       sound_sample <= opll_mix + scc_mix + psg_mix;
 `endif
 
-       sound_sample_amp <= sound_sample[15] ? sound_sample : { sound_sample[14:0], 1'b0 };
+       sound_sample <= 16'b0
+`ifdef OPLL       
+       + opll_mix_vol
+`endif
+`ifdef SCC
+       + scc_mix_vol 
+`endif 
+`ifdef PSG
+       + psg_mix_vol
+`endif
+`ifdef SMS
+       + jt89_mix_vol
+`endif
+       ;
 
-       audio_sample_amp <= audio_sample[15] ? audio_sample : { audio_sample[14:0], 1'b0 };
-
-       audio_hdmi <= (~sound_sample) + 16'b1;
+       audio_hdmi <= (~sound_sample) + 16'b1; // 2-complement signed
 end
 
-`ifdef SMS
-assign sample_w = audio_hdmi;
-`endif
-
-wire [15:0] lpf1_audio_w;
-wire [15:0] lpf2_audio_w;
-interpo #(
-    .MSBI(16)    
-)(
-    .clk21m(clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(audio_sample_amp),
-    .odata(lpf1_audio_w)
-);
-
-lpf1 #(
-	.MSBI(16)
-) (
-    .clk21m (clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(lpf1_audio_w),
-    .odata(lpf2_audio_w)
-);
-
-
-wire [15:0] dac_audio_w;
-lpf2 #(
-	.MSBI(16)
-) (
-    .clk21m(clk54_w),
-    .reset(~(ram_enabled_w)),
-    .clkena(1),
-    .idata(lpf2_audio_w),
-    .odata (dac_audio_w)
-);
-
-wire audio_w;
-esepwm#(
-    .MSBI(16)
-)(
-    .clk(clk54_w),
-    .reset(~(ram_enabled_w)),
-    .DACin(dac_audio_w),
-    .DACout(audio_w)
-);
-
-
 wire [15:0] lpf1_sound_w;
-wire [15:0] lpf2_sound_w;
 interpo #(
     .MSBI(16)    
 )(
     .clk21m(clk54_w),
-    .reset(~(ram_enabled_w)),
+    .reset(~(1)),
     .clkena(1),
-    .idata(sound_sample_amp),
+    .idata(sound_sample),
     .odata(lpf1_sound_w)
 );
 
+wire [15:0] lpf2_sound_w;
 lpf1 #(
 	.MSBI(16)
 ) (
     .clk21m (clk54_w),
-    .reset(~(ram_enabled_w)),
+    .reset(~(1)),
     .clkena(1),
     .idata(lpf1_sound_w),
     .odata(lpf2_sound_w)
 );
-
 
 wire [15:0] dac_sound_w;
 lpf2 #(
 	.MSBI(16)
 ) (
     .clk21m(clk54_w),
-    .reset(~(ram_enabled_w)),
+    .reset(~(1)),
     .clkena(1),
     .idata(lpf2_sound_w),
     .odata (dac_sound_w)
 );
 
-wire sound_w;
-esepwm#(
-    .MSBI(16)
-)(
-    .clk(clk54_w),
-    .reset(~(ram_enabled_w)),
-    .DACin(dac_sound_w),
-    .DACout(sound_w)
+`ifdef SMS
+assign sample_w = audio_hdmi;
+`endif
+
+audio_drive(
+.clk_1p536m(clk_pa_w),
+.rst_n(1),
+.idata(dac_sound_w),
+//.req(),
+.HP_BCK(hp_bck),
+.HP_WS(hp_ws),
+.HP_DIN(hp_din)
 );
 
-assign sound = ff_wait ? 0 : sound_w; // JACK
-assign audio = ff_wait ? 0 : audio_w; // EDGE
 
 ///// FM ROM
-
+`ifdef OPLL   
 wire [7:0] fmrom_cd_w;
 wire fmrom_busreq_w;
 
@@ -1335,6 +1383,7 @@ rom #(
     .q(fmrom_cd_w),
     .enable(fmrom_busreq_w)
 );
+`endif
 
 //// SDRAM
 wire ram_re_w;
@@ -1382,9 +1431,12 @@ always @(posedge clk108_w) begin
         slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ff_cdout <= ram_dout_w;
     if (sram_busreq_w) ff_cdout <= sram_cd_w;
     if (sd_busreq_w) ff_cdout <= sd_cd_w;
+`ifdef SCC
     if (scc_busreq_w) ff_cdout <= scc_cd_w;
+`endif
+`ifdef OPLL
     if (fmrom_busreq_w) ff_cdout <= fmrom_cd_w;
-
+`endif
 `ifdef SMS
     if (~vdp_rd_n) ff_cdout <= vdp_cdout;
 `endif
@@ -1420,9 +1472,10 @@ memory_controller #(.FREQ(108_000_000) )
    (.clk(clk108_w), 
     .clk_sdram(clk108p_w), 
     .resetn(reset_n_w), // keeps resetting until not fail
-    .read(ram_re_w & ~ram_busy_w & bus_idle_w),
-    .write(ram_we_w & ~ram_busy_w & bus_idle_w),
-    .refresh(~rfsh_n_w & ~ram_busy_w),
+    .read(ram_re_w && ~ram_busy_w && bus_idle_w),
+    .write(ram_we_w && ~ram_busy_w && bus_idle_w),
+    //.refresh(~rfsh_n_w & ~ram_busy_w),
+    .refresh(~ram_re_w && ~ram_we_w && ~ram_busy_w),
     .addr( ram_addr_w[22:1] ),
     .din(ram_din_w),
     .wdm( ram_wdm_w ),
@@ -1438,12 +1491,15 @@ memory_controller #(.FREQ(108_000_000) )
 );
 
 `ifdef SMS
-assign int_n = ( ~vdp_irq_n) ? 1'b0 : 1'b1;
+assign int_n = ~vdp_irq_n;
 `else
-assign int_n = 1'b1;
+assign int_n = 1'b0;
 `endif
 
 assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b1 : 1'b0; 
 assign led = sd_busy_w;
+
+assign  pa_en = 1'b1;
+
 
 endmodule
