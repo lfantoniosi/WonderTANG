@@ -28,8 +28,6 @@ Note: This is the new version using Tang Nano 20K internal DAC amplifier. Check 
 
 ![Version 2.0](images/v20-front.jpg)
 
-![Audo connector](images/v20-connector.jpg)
-
 
 | Reference                   | Value                      | Description                                          | Qty | Link        |
 |-----------------------------|----------------------------|------------------------------------------------------|-----|-------------|
@@ -49,6 +47,8 @@ Note: This is the new version using Tang Nano 20K internal DAC amplifier. Check 
 | J3                          | Mini Micro male/female JST | Mini Micro male/female JST                           | 1   | AliExpress  |
 
 The audio J3 needs to be soldered into the TANG Nano 20K speaker pins (two small pins between the words SiPEED and TANG NANO 20K, polarity does not matter). Use the JST connector or solder it directly under the board.
+
+![Audo connector](images/v20-connector.jpg)
 
 ## Version 1.03c
 
