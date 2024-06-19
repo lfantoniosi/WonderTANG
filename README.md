@@ -50,7 +50,7 @@ The audio J3 needs to be soldered into the TANG Nano 20K speaker pins (two small
 
 ![Audo connector](images/v20-connector.jpg)
 
-## Version 1.03c
+## Version 1.02c
 
 Note: This is the first version of this board. Check the number on the left side of it.
 
