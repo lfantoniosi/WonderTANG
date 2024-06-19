@@ -756,16 +756,16 @@ dpram#(
     localparam AUDIO_BIT_WIDTH = 16;
     localparam NUM_CHANNELS = 3;
 
-    clockdiv #(
+    clockdivint #(
         .CLK_SRC(27),
-        .CLK_DIV(0.044100),
-        .PRECISION_BITS(16)
-    ) audioclkd (
+        .CLK_DIV(0.044100)//,
+        //.PRECISION_BITS(16)
+    ) (
         .clk_src(clk_w),
         .reset_n(sms_reset_n),
         .clk_div(clk_audio)
     );
-    BUFG clk_audio_bufg_inst(
+    BUFG (
     .O(clk_audio_w),
     .I(clk_audio)
     );
@@ -1217,10 +1217,10 @@ assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7
 wire [13:0] opll_mixout;
 
 
-clockdiv #(
+clockdivint #(
     .CLK_SRC(108),
-    .CLK_DIV(315.0/88.0),
-    .PRECISION_BITS(16)
+    .CLK_DIV(315.0/88.0)//,
+    //.PRECISION_BITS(16)
 ) (
     .clk_src(clk108_w),
     .reset_n(clk108_lock_w),
@@ -1256,6 +1256,7 @@ reg [15:0] jt89_mix_vol;
 
 
 reg [15:0] sound_sample;
+reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
 
@@ -1287,22 +1288,23 @@ bitshift(
     .dout(jt89_mix_vol)
 );
 
+
 always@(posedge clk54_w) begin
 
 `ifdef OPLL       
-       opll_mix <=  { opll_mixout[13], opll_mixout[13:0], 1'b0 } + 16'b0010000000000000; 
+       opll_mix <=  { opll_mixout[13], opll_mixout[13:0], 1'b0 }; // + 16'b0010000000000000; 
 `endif
 `ifdef SCC
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0000100000000000; 
+       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }; // + 16'b0000100000000000; 
 `endif
 `ifdef PSG
        psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
 `endif
 `ifdef SMS
-       jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 } + 16'b0000010000000000; 
+       jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }; // + 16'b0000010000000000; 
 `endif
 
-       sound_sample <= 16'b0
+       sound_sample <= 16'b0001000000000000 
 `ifdef OPLL       
        + opll_mix_vol
 `endif
@@ -1317,7 +1319,22 @@ always@(posedge clk54_w) begin
 `endif
        ;
 
-       audio_hdmi <= (~sound_sample) + 16'b1; // 2-complement signed
+       hdmi_sample <= 16'b0
+`ifdef OPLL       
+       + opll_mix_vol
+`endif
+`ifdef SCC
+       + scc_mix_vol 
+`endif 
+`ifdef PSG
+       + psg_mix_vol
+`endif
+`ifdef SMS
+       + jt89_mix_vol
+`endif
+       ;
+
+       audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
 end
 
 wire [15:0] lpf1_sound_w;
@@ -1497,7 +1514,7 @@ assign int_n = 1'b0;
 `endif
 
 assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b1 : 1'b0; 
-assign led = sd_busy_w;
+assign led = sound_sample[14]; //sd_busy_w;
 
 assign  pa_en = 1'b1;
 

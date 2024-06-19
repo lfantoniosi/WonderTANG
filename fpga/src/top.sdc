@@ -7,7 +7,7 @@ create_generated_clock -name clk_pa -source [get_ports {clk}] -master_clock clk 
 
 ////////////// SMS
 create_generated_clock -name clk135 -source [get_ports {clk}] -master_clock clk -divide_by 1 -multiply_by 5 -add [get_nets {clk135}]
-create_clock -name clk_audio -period 22727.273 -waveform {0 11363.637} [get_nets {clk_audio}] -add
+//create_clock -name clk_audio -period 22727.273 -waveform {0 11363.637} [get_nets {clk_audio}] -add
 ////////////////
 
 create_clock -name clock -period 279.36 -waveform {0 139.68} [get_ports {clock}] -add
