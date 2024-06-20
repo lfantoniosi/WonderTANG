@@ -18,7 +18,6 @@
         <File path="src/expslot.v" type="file.verilog" enable="1"/>
         <File path="src/flash.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/clk135.v" type="file.verilog" enable="1"/>
-        <File path="src/gowin_rpll/clkp54.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/clkp_108.v" type="file.verilog" enable="1"/>
         <File path="src/hdmi/audio_clock_regeneration_packet.sv" type="file.verilog" enable="1"/>
         <File path="src/hdmi/audio_info_frame.sv" type="file.verilog" enable="1"/>

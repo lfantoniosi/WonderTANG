@@ -448,6 +448,7 @@ int main(void)
                     {
                         presAB = TRUE;
                     }
+  /*
                     else if (to_upper(*params) == 'V')
                     {
                         params++;
@@ -474,6 +475,7 @@ int main(void)
                             break;
                         }
                     }
+*/                    
                     else if (to_upper(*params) == 'Z')
                     {
                         params++;
@@ -519,11 +521,11 @@ int main(void)
                 "   3: ASCII8     (/A8)\n\r"
                 "   5: Konami SCC (/K5)\n\r"
                 "   6: Konami     (/K4)\n\r\n\r"
-                " /Vxy: Set volume for\n\r"
-                "   S: SCC+\n\r"
-                "   P: PSG\n\r"
-                "   O: OPLL\n\r"
-                "   y: 0-9\n\r\n\r"
+//                " /Vxy: Set volume for\n\r"
+//                "   S: SCC+\n\r"
+//                "   P: PSG\n\r"
+//                "   O: OPLL\n\r"
+//                "   y: 0-9\n\r\n\r"
                 " /Zx: Set cpu mode\n\r"
                 "   0: current\n\r"
                 "   1: Z80\n\r"

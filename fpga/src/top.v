@@ -1087,18 +1087,18 @@ assign megaram_cs_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w
 reg ff_scc_enable;
 reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
-reg [3:0] ff_scc_vol;
-reg [3:0] ff_psg_vol;
-reg [3:0] ff_opll_vol;
+//reg [3:0] ff_scc_vol;
+//reg [3:0] ff_psg_vol;
+//reg [3:0] ff_opll_vol;
 
 always @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_megaram_type <= 2'b01;
         ff_scc_enable <= '1;
 
-        ff_scc_vol <= 4'h0;
-        ff_psg_vol <= 4'h0;
-        ff_opll_vol <= 4'h0;
+//        ff_scc_vol <= 4'h0;
+//        ff_psg_vol <= 4'h0;
+//        ff_opll_vol <= 4'h0;
 
     end else begin
         if (megaram_cs_w) begin
@@ -1121,7 +1121,7 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
                     ff_megaram_type <= 2'b00;
                 end
             endcase
-
+/*
             case(cdin_w[7:4])
                 4'hF: begin
                     ff_scc_vol <= 4'h9 - cdin_w[3:0];
@@ -1133,6 +1133,7 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
                     ff_opll_vol <= 4'h9 - cdin_w[3:0];
                 end
             endcase
+*/            
         end
     end
 end
@@ -1244,66 +1245,11 @@ opll(
 ); 
 `endif
 
-reg [15:0] opll_mix;
-reg [15:0] scc_mix;
-reg [15:0] psg_mix;
-reg [15:0] jt89_mix;
-
-reg [15:0] opll_mix_vol;
-reg [15:0] scc_mix_vol;
-reg [15:0] psg_mix_vol;
-reg [15:0] jt89_mix_vol;
-
-
 reg [15:0] sound_sample;
 reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
-/*
-bitshift(
-    .clk(clk54_w),
-    .din(opll_mix + 16'b0010000000000000),
-    .shift(ff_opll_vol),
-    .dout(opll_mix_vol)
-);
-
-bitshift(
-    .clk(clk54_w),
-    .din(scc_mix + 16'b0000100000000000),
-    .shift(ff_scc_vol),
-    .dout(scc_mix_vol)
-);
-
-bitshift(
-    .clk(clk54_w),
-    .din(psg_mix),
-    .shift(ff_psg_vol),
-    .dout(psg_mix_vol)
-);
-
-bitshift(
-    .clk(clk54_w),
-    .din(jt89_mix + 16'b0000010000000000),
-    .shift(ff_psg_vol),
-    .dout(jt89_mix_vol)
-);
-*/
-
 always@(posedge clk54_w) begin
-/*
-`ifdef OPLL       
-       opll_mix <=  { opll_mixout[13], opll_mixout[13:0], 1'b0 }; // + 16'b0010000000000000; 
-`endif
-`ifdef SCC
-       scc_mix <=   { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }; // + 16'b0000100000000000; 
-`endif
-`ifdef PSG
-       psg_mix <=   { 4'b0, psg_wave_w[7:0], 4'b0 };
-`endif
-`ifdef SMS
-       jt89_mix <=  { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }; // + 16'b0000010000000000; 
-`endif
-*/
 
        sound_sample <= 16'b0
 `ifdef OPLL       

@@ -474,8 +474,6 @@ _runROM_page2_end::
 ; Function main
 ; ---------------------------------
 _main::
-	call	___sdcc_enter_ix
-	dec	sp
 ;smram.c:353: curslt = (PPIA & 0x0C) >> 2;
 	in	a, (_PPIA)
 	and	a, #0x0c
@@ -504,7 +502,7 @@ _main::
 ;smram.c:356: for(i = 1; i < 4; i++)
 	ld	hl, #0x0001
 	ld	(_i), hl
-00233$:
+00225$:
 ;smram.c:358: slotid = *((uchar*)EXPTBL+i);
 	ld	hl, (_i)
 	ld	de, #0xfcc1
@@ -514,7 +512,7 @@ _main::
 ;smram.c:360: if (slotid & 0x80) {    // expanded ?
 	ld	a, (_slotid+0)
 	rlca
-	jr	NC, 00234$
+	jr	NC, 00226$
 ;smram.c:362: enaslt(i | 0x80, 0x4000); // looking for BIOS, sslot 0
 	ld	a, (_i+0)
 	or	a, #0x80
@@ -535,7 +533,7 @@ _main::
 	ld	(_t), hl
 ;smram.c:368: for(int j=0; j<22; j++)
 	ld	bc, #0x0000
-00231$:
+00223$:
 	ld	a, c
 	sub	a, #0x16
 	ld	a, b
@@ -562,16 +560,16 @@ _main::
 	ld	a, c
 	sub	a, #0x15
 	or	a, b
-	jr	NZ, 00232$
+	jr	NZ, 00224$
 ;smram.c:374: found = TRUE;
 	ld	hl, #_found
 	ld	(hl), #0x01
 ;smram.c:375: break;
 	jr	00105$
-00232$:
+00224$:
 ;smram.c:368: for(int j=0; j<22; j++)
 	inc	bc
-	jr	00231$
+	jr	00223$
 00105$:
 ;smram.c:379: *((uchar*)0x6000) = b; // return whatever was there
 	ld	hl, #0x6000
@@ -587,7 +585,7 @@ _main::
 	ld	a, (_found+0)
 	or	a, a
 	jr	NZ, 00110$
-00234$:
+00226$:
 ;smram.c:356: for(i = 1; i < 4; i++)
 	ld	hl, (_i)
 	inc	hl
@@ -599,7 +597,7 @@ _main::
 	ccf
 	rra
 	sbc	a, #0x80
-	jp	C, 00233$
+	jp	C, 00225$
 00110$:
 ;smram.c:387: sslt = 0;
 	ld	hl, #_sslt
@@ -607,7 +605,7 @@ _main::
 ;smram.c:389: if (found)
 	ld	a, (_found+0)
 	or	a, a
-	jp	Z, 00182$
+	jp	Z, 00174$
 ;smram.c:391: printf("WonderTANG! Super MegaRAM SCC+\n\r");
 	ld	hl, #___str_1
 	push	hl
@@ -628,38 +626,34 @@ _main::
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, #0x0081
 	ld	(_params), hl
-	ld	bc, #___str_5+0
-00237$:
-	ld	de, (_params)
-	ld	a, (de)
-	ld	-1 (ix), a
+00229$:
+	ld	bc, (_params)
+	ld	a, (bc)
+	ld	e, a
 	or	a, a
-	jr	NZ, 00236$
+	jr	NZ, 00228$
 	ld	a, (_paramlen+0)
 	or	a, a
-	jp	NZ, 00183$
-00236$:
+	jp	NZ, 00175$
+00228$:
 ;smram.c:398: if (*params != ' ')
-	ld	a, -1 (ix)
+	ld	a, e
 	sub	a, #0x20
-	jp	Z,00238$
+	jp	Z,00230$
 ;smram.c:400: if (*params == '/')
-	ld	a, -1 (ix)
+	ld	a, e
 	sub	a, #0x2f
-	jp	NZ,00176$
+	jp	NZ,00168$
 ;smram.c:402: params++;
 	ld	hl, (_params)
 	inc	hl
 	ld	(_params), hl
 ;smram.c:403: if (to_upper(*params) == 'R') {
 	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
+	ld	a, (hl)
 	call	_to_upper
-	pop	bc
 	sub	a, #0x52
-	jr	NZ, 00169$
+	jr	NZ, 00161$
 ;smram.c:404: params++;
 	ld	hl, (_params)
 	inc	hl
@@ -673,7 +667,7 @@ _main::
 ;smram.c:406: megaram_type = TYPE_K4;
 	ld	hl, #0x0004
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00121$:
 ;smram.c:408: if (*params == '5')
 	cp	a, #0x35
@@ -681,7 +675,7 @@ _main::
 ;smram.c:409: megaram_type = TYPE_K5;
 	ld	hl, #0x0005
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00118$:
 ;smram.c:411: if (*params == '1')
 	cp	a, #0x31
@@ -689,7 +683,7 @@ _main::
 ;smram.c:412: megaram_type = TYPE_A16;
 	ld	hl, #0x0016
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00115$:
 ;smram.c:414: if (*params == '3')
 	sub	a, #0x33
@@ -697,22 +691,19 @@ _main::
 ;smram.c:415: megaram_type = TYPE_A8;
 	ld	hl, #0x0008
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00112$:
 ;smram.c:417: megaram_type = TYPE_UNK;                    
 	ld	hl, #0x00ff
 	ld	(_megaram_type), hl
-	jp	00238$
-00169$:
+	jp	00230$
+00161$:
 ;smram.c:419: else if (to_upper(*params) == 'K')
 	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
+	ld	a, (hl)
 	call	_to_upper
-	pop	bc
 	sub	a, #0x4b
-	jr	NZ, 00166$
+	jr	NZ, 00158$
 ;smram.c:421: params++;
 	ld	hl, (_params)
 	inc	hl
@@ -726,7 +717,7 @@ _main::
 ;smram.c:423: megaram_type = TYPE_K5;
 	ld	hl, #0x0005
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00127$:
 ;smram.c:425: if (*params == '4')
 	sub	a, #0x34
@@ -734,22 +725,19 @@ _main::
 ;smram.c:426: megaram_type = TYPE_K4;
 	ld	hl, #0x0004
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00124$:
 ;smram.c:428: megaram_type = TYPE_UNK;
 	ld	hl, #0x00ff
 	ld	(_megaram_type), hl
-	jp	00238$
-00166$:
+	jp	00230$
+00158$:
 ;smram.c:430: else if (to_upper(*params) == 'A')
 	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
+	ld	a, (hl)
 	call	_to_upper
-	pop	bc
 	sub	a, #0x41
-	jr	NZ, 00163$
+	jr	NZ, 00155$
 ;smram.c:432: params++;
 	ld	hl, (_params)
 	inc	hl
@@ -763,7 +751,7 @@ _main::
 ;smram.c:434: megaram_type = TYPE_A8;
 	ld	hl, #0x0008
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00136$:
 ;smram.c:436: if (*params == '1')
 	sub	a, #0x31
@@ -780,448 +768,320 @@ _main::
 ;smram.c:440: megaram_type = TYPE_A16;
 	ld	hl, #0x0016
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00130$:
 ;smram.c:442: megaram_type = TYPE_UNK;
 	ld	hl, #0x00ff
 	ld	(_megaram_type), hl
-	jp	00238$
+	jp	00230$
 00133$:
 ;smram.c:445: megaram_type = TYPE_UNK;
 	ld	hl, #0x00ff
 	ld	(_megaram_type), hl
-	jp	00238$
-00163$:
+	jp	00230$
+00155$:
 ;smram.c:447: else if (to_upper(*params) == 'Y')
 	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
+	ld	a, (hl)
 	call	_to_upper
-	pop	bc
 	sub	a, #0x59
-	jr	NZ, 00160$
+	jr	NZ, 00152$
 ;smram.c:449: presAB = TRUE;
 	ld	hl, #_presAB
 	ld	(hl), #0x01
-	jp	00238$
-00160$:
-;smram.c:451: else if (to_upper(*params) == 'V')
-	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	pop	bc
-	sub	a, #0x56
-	jp	NZ,00157$
-;smram.c:453: params++;
-	ld	hl, (_params)
-	inc	hl
-	ld	(_params), hl
-;smram.c:454: uchar param = to_upper(*params++);
-	ld	hl, (_params)
-	ld	e, (hl)
-	ld	hl, (_params)
-	inc	hl
-	ld	(_params), hl
-	push	bc
-	ld	a, e
-	call	_to_upper
-	pop	bc
-;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
-	ld	hl, (_params)
-;smram.c:455: switch(param)
-	cp	a, #0x4f
-	jr	Z, 00140$
-	cp	a, #0x50
-	jr	Z, 00139$
-	sub	a, #0x53
-	jr	NZ, 00141$
-;smram.c:458: scc_vol = hexToNum(to_upper(*params));
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	call	_hexToNum
-	pop	bc
-	ld	(_scc_vol+0), a
-;smram.c:459: printf("SCC+ volume %d\n\r", (int)scc_vol);
-	ld	a, (_scc_vol+0)
-	ld	d, #0x00
-	push	bc
-	ld	e, a
-	push	de
-	ld	hl, #___str_3
-	push	hl
-	call	_printf
-	pop	af
-	pop	af
-	pop	bc
-;smram.c:460: break;
-	jp	00238$
-;smram.c:461: case 'P': 
-00139$:
-;smram.c:462: psg_vol = hexToNum(to_upper(*params));
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	call	_hexToNum
-	pop	bc
-	ld	(_psg_vol+0), a
-;smram.c:463: printf("PSG volume %d\n\r", (int)psg_vol);
-	ld	a, (_psg_vol+0)
-	ld	d, #0x00
-	push	bc
-	ld	e, a
-	push	de
-	ld	hl, #___str_4
-	push	hl
-	call	_printf
-	pop	af
-	pop	af
-	pop	bc
-;smram.c:464: break;
-	jp	00238$
-;smram.c:465: case 'O': 
-00140$:
-;smram.c:466: opll_vol = hexToNum(to_upper(*params));
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	call	_hexToNum
-	pop	bc
-	ld	(_opll_vol+0), a
-;smram.c:467: printf("OPLL volume %d\n\r", (int)opll_vol);
-	ld	a, (_opll_vol+0)
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	e, c
-	ld	d, b
-	push	bc
-	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	push	hl
-	push	de
-	call	_printf
-	pop	af
-	pop	af
-	pop	bc
-;smram.c:468: break;
-	jp	00238$
-;smram.c:469: default:
-00141$:
-;smram.c:471: printf("ERROR: wrong device volume...\n\r");
-	ld	hl, #___str_6
-	push	hl
-	call	_printf
-	pop	af
-;smram.c:472: return 0;
-	ld	de, #0x0000
-	jp	00243$
-;smram.c:475: }
-00157$:
-;smram.c:477: else if (to_upper(*params) == 'Z')
-	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	pop	bc
-	sub	a, #0x5a
-	jr	NZ, 00154$
-;smram.c:479: params++;
-	ld	hl, (_params)
-	inc	hl
-	ld	(_params), hl
-;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
-	ld	hl, (_params)
-	ld	e, (hl)
-;smram.c:480: if (*params >= '0' && *params <= '3')
-	ld	a, e
-	sub	a, #0x30
-	jr	C, 00238$
-	ld	a, #0x33
-	sub	a, e
-	jr	C, 00238$
-;smram.c:481: cpumode = *params - '0';
-	ld	a, e
-	ld	hl, #_cpumode
-	add	a, #0xd0
-	ld	(hl), a
-	jr	00238$
-00154$:
-;smram.c:483: else if (to_upper(*params) == '?')
-	ld	hl, (_params)
-	ld	e, (hl)
-	push	bc
-	ld	a, e
-	call	_to_upper
-	pop	bc
-	sub	a, #0x3f
-	jr	NZ, 00147$
-;smram.c:485: help = TRUE;
-	ld	hl, #_help
-	ld	(hl), #0x01
-	jr	00238$
-;smram.c:490: while(*params++ != 0 && *params != ' ');
-00147$:
-	ld	hl, (_params)
-	ld	e, (hl)
-	ld	hl, (_params)
-	inc	hl
-	ld	(_params), hl
-	ld	a, e
-	or	a, a
-	jr	Z, 00238$
+	jr	00230$
+00152$:
+;smram.c:479: else if (to_upper(*params) == 'Z')
 	ld	hl, (_params)
 	ld	a, (hl)
-	sub	a, #0x20
-	jr	Z, 00238$
-	jr	00147$
-00176$:
-;smram.c:495: filename = params;
-	ld	(_filename), de
-;smram.c:496: while(*params != 0 && *params != ' ') {
-00172$:
+	call	_to_upper
+	sub	a, #0x5a
+	jr	NZ, 00149$
+;smram.c:481: params++;
+	ld	hl, (_params)
+	inc	hl
+	ld	(_params), hl
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, (_params)
 	ld	c, (hl)
-;smram.c:496: while(*params != 0 && *params != ' ') {
+;smram.c:482: if (*params >= '0' && *params <= '3')
+	ld	a, c
+	sub	a, #0x30
+	jr	C, 00230$
+	ld	a, #0x33
+	sub	a, c
+	jr	C, 00230$
+;smram.c:483: cpumode = *params - '0';
+	ld	a, c
+	ld	hl, #_cpumode
+	add	a, #0xd0
+	ld	(hl), a
+	jr	00230$
+00149$:
+;smram.c:485: else if (to_upper(*params) == '?')
+	ld	hl, (_params)
+	ld	a, (hl)
+	call	_to_upper
+	sub	a, #0x3f
+	jr	NZ, 00142$
+;smram.c:487: help = TRUE;
+	ld	hl, #_help
+	ld	(hl), #0x01
+	jr	00230$
+;smram.c:492: while(*params++ != 0 && *params != ' ');
+00142$:
+	ld	hl, (_params)
+	ld	c, (hl)
+	ld	hl, (_params)
+	inc	hl
+	ld	(_params), hl
 	ld	a, c
 	or	a, a
-	jr	Z, 00183$
+	jr	Z, 00230$
+	ld	hl, (_params)
+	ld	a, (hl)
+	sub	a, #0x20
+	jr	Z, 00230$
+	jr	00142$
+00168$:
+;smram.c:497: filename = params;
+	ld	(_filename), bc
+;smram.c:498: while(*params != 0 && *params != ' ') {
+00164$:
+;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
+	ld	hl, (_params)
+	ld	c, (hl)
+;smram.c:498: while(*params != 0 && *params != ' ') {
+	ld	a, c
+	or	a, a
+	jr	Z, 00175$
 	ld	a, c
 	sub	a, #0x20
-	jr	Z, 00183$
-;smram.c:497: *params = to_upper(*params);
+	jr	Z, 00175$
+;smram.c:499: *params = to_upper(*params);
 	push	hl
 	ld	a, c
 	call	_to_upper
 	pop	hl
 	ld	(hl), a
-;smram.c:498: params++;
+;smram.c:500: params++;
 	ld	hl, (_params)
 	inc	hl
 	ld	(_params), hl
-	jr	00172$
-;smram.c:501: break;
-00238$:
+	jr	00164$
+;smram.c:503: break;
+00230$:
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, (_params)
 	inc	hl
 	ld	(_params), hl
 	ld	iy, #_paramlen
 	dec	0 (iy)
-	jp	00237$
-00182$:
-;smram.c:506: } else megaram_type = TYPE_UNK;
+	jp	00229$
+00174$:
+;smram.c:508: } else megaram_type = TYPE_UNK;
 	ld	hl, #0x00ff
 	ld	(_megaram_type), hl
-00183$:
-;smram.c:508: if (!found) 
+00175$:
+;smram.c:510: if (!found) 
 	ld	a, (_found+0)
 	or	a, a
-	jr	NZ, 00188$
-;smram.c:510: printf("ERROR: WonderTANG! not found...\n\r");
-	ld	hl, #___str_7
+	jr	NZ, 00180$
+;smram.c:512: printf("ERROR: WonderTANG! not found...\n\r");
+	ld	hl, #___str_3
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:511: return 0;
+;smram.c:513: return 0;
 	ld	de, #0x0000
-	jp	00243$
-00188$:
-;smram.c:514: if (help == TRUE || megaram_type == TYPE_UNK)
+	ret
+00180$:
+;smram.c:516: if (help == TRUE || megaram_type == TYPE_UNK)
 	ld	a, (_help+0)
 	dec	a
-	jr	Z, 00184$
+	jr	Z, 00176$
 	ld	a, (_megaram_type+0)
 	inc	a
 	ld	hl, #_megaram_type + 1
 	or	a, (hl)
-	jr	NZ, 00189$
-00184$:
-;smram.c:533: );
-	ld	hl, #___str_8
+	jr	NZ, 00181$
+00176$:
+;smram.c:535: );
+	ld	hl, #___str_4
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:534: return 0;
+;smram.c:536: return 0;
 	ld	de, #0x0000
-	jp	00243$
-00189$:
-;smram.c:537: printf("\r\nMapper Type: ");
-	ld	hl, #___str_9
+	ret
+00181$:
+;smram.c:539: printf("\r\nMapper Type: ");
+	ld	hl, #___str_5
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:538: switch(megaram_type)
+;smram.c:540: switch(megaram_type)
 	ld	a, (_megaram_type+0)
 	sub	a, #0x04
 	ld	iy, #_megaram_type
 	or	a, 1 (iy)
-	jr	Z, 00190$
+	jr	Z, 00182$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x05
 	or	a, 1 (iy)
-	jr	Z, 00191$
+	jr	Z, 00183$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x08
 	or	a, 1 (iy)
-	jr	Z, 00193$
+	jr	Z, 00185$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x16
 	or	a, 1 (iy)
-	jr	Z, 00192$
-	jr	00194$
-;smram.c:540: case TYPE_K4:
-00190$:
-;smram.c:541: printf("Konami (/R6 or /K4)\n\r");
-	ld	hl, #___str_10
+	jr	Z, 00184$
+	jr	00186$
+;smram.c:542: case TYPE_K4:
+00182$:
+;smram.c:543: printf("Konami (/R6 or /K4)\n\r");
+	ld	hl, #___str_6
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:542: break;
-	jr	00194$
-;smram.c:543: case TYPE_K5:
-00191$:
-;smram.c:544: printf("Konami SCC (/R5 or /K5)\n\r");
-	ld	hl, #___str_11
+;smram.c:544: break;
+	jr	00186$
+;smram.c:545: case TYPE_K5:
+00183$:
+;smram.c:546: printf("Konami SCC (/R5 or /K5)\n\r");
+	ld	hl, #___str_7
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:545: break;
-	jr	00194$
-;smram.c:546: case TYPE_A16:
-00192$:
-;smram.c:547: printf("ASCII16 (/R1 or /A16)\n\r");
-	ld	bc, #___str_12+0
+;smram.c:547: break;
+	jr	00186$
+;smram.c:548: case TYPE_A16:
+00184$:
+;smram.c:549: printf("ASCII16 (/R1 or /A16)\n\r");
+	ld	bc, #___str_8+0
 	push	bc
 	call	_printf
 	pop	af
-;smram.c:548: break;
-	jr	00194$
-;smram.c:549: case TYPE_A8:
-00193$:
-;smram.c:550: printf("ASCII8 (/R3 or /A8)\n\r");
-	ld	bc, #___str_13+0
+;smram.c:550: break;
+	jr	00186$
+;smram.c:551: case TYPE_A8:
+00185$:
+;smram.c:552: printf("ASCII8 (/R3 or /A8)\n\r");
+	ld	bc, #___str_9+0
 	push	bc
 	call	_printf
 	pop	af
-;smram.c:552: }
-00194$:
-;smram.c:554: MEGA_PORT1 = 0xF0 | scc_vol;
+;smram.c:554: }
+00186$:
+;smram.c:556: MEGA_PORT1 = 0xF0 | scc_vol;
 	ld	a, (_scc_vol+0)
 	or	a, #0xf0
 	out	(_MEGA_PORT1), a
-;smram.c:555: MEGA_PORT1 = 0xE0 | psg_vol;
+;smram.c:557: MEGA_PORT1 = 0xE0 | psg_vol;
 	ld	a, (_psg_vol+0)
 	or	a, #0xe0
 	out	(_MEGA_PORT1), a
-;smram.c:556: MEGA_PORT1 = 0xD0 | opll_vol;
+;smram.c:558: MEGA_PORT1 = 0xD0 | opll_vol;
 	ld	a, (_opll_vol+0)
 	or	a, #0xd0
 	out	(_MEGA_PORT1), a
-;smram.c:558: if (filename == 0) {        
+;smram.c:560: if (filename == 0) {        
 	ld	a, (_filename+1)
 	ld	hl, #_filename
 	or	a, (hl)
-	jr	NZ, 00198$
-;smram.c:559: if (megaram_type != TYPE_UNK)
+	jr	NZ, 00190$
+;smram.c:561: if (megaram_type != TYPE_UNK)
 	ld	a, (_megaram_type+0)
 	inc	a
 	ld	hl, #_megaram_type + 1
 	or	a, (hl)
-	jr	Z, 00196$
-;smram.c:560: MEGA_PORT1 = megaram_type;    
+	jr	Z, 00188$
+;smram.c:562: MEGA_PORT1 = megaram_type;    
 	ld	a, (_megaram_type+0)
 	out	(_MEGA_PORT1), a
-00196$:
-;smram.c:561: return 0;
+00188$:
+;smram.c:563: return 0;
 	ld	de, #0x0000
-	jp	00243$
-00198$:
-;smram.c:564: for(t = filename; *t != ' ' && *t != 0; t++);
+	ret
+00190$:
+;smram.c:566: for(t = filename; *t != ' ' && *t != 0; t++);
 	ld	hl, (_filename)
 	ld	(_t), hl
-00241$:
+00233$:
 ;smram.c:370: if (*s++ != *t++) break;
 	ld	hl, (_t)
-;smram.c:564: for(t = filename; *t != ' ' && *t != 0; t++);
+;smram.c:566: for(t = filename; *t != ' ' && *t != 0; t++);
 	ld	a, (hl)
 	cp	a, #0x20
-	jr	Z, 00199$
+	jr	Z, 00191$
 	or	a, a
-	jr	Z, 00199$
+	jr	Z, 00191$
 	ld	hl, (_t)
 	inc	hl
 	ld	(_t), hl
-	jr	00241$
-00199$:
-;smram.c:565: *t = 0;
+	jr	00233$
+00191$:
+;smram.c:567: *t = 0;
 	ld	(hl), #0x00
-;smram.c:566: handle = dos2_open(0, filename);
+;smram.c:568: handle = dos2_open(0, filename);
 	ld	de, (_filename)
 	xor	a, a
 	call	_dos2_open
 	ld	(_handle+0), a
-;smram.c:568: MEGA_PORT1 = TYPE_K4;
+;smram.c:570: MEGA_PORT1 = TYPE_K4;
 	ld	a, #0x04
 	out	(_MEGA_PORT1), a
-;smram.c:570: if (handle)
+;smram.c:572: if (handle)
 	ld	a, (_handle+0)
 	or	a, a
-	jp	Z, 00209$
-;smram.c:572: printf("Loading ROM file: %s - ", filename);
-	ld	bc, #___str_14
+	jp	Z, 00201$
+;smram.c:574: printf("Loading ROM file: %s - ", filename);
+	ld	bc, #___str_10
 	ld	hl, (_filename)
 	push	hl
 	push	bc
 	call	_printf
 	pop	af
 	pop	af
-;smram.c:574: enaslt(sslt, 0x4000);
+;smram.c:576: enaslt(sslt, 0x4000);
 	ld	de, #0x4000
 	ld	a, (_sslt+0)
 	call	_enaslt
-;smram.c:575: page = 0;
+;smram.c:577: page = 0;
 	ld	hl, #_page
 	ld	(hl), #0x00
-;smram.c:576: romsize = 0;
+;smram.c:578: romsize = 0;
 	xor	a, a
 	ld	(_romsize+0), a
 	ld	(_romsize+1), a
 	ld	(_romsize+2), a
 	ld	(_romsize+3), a
-;smram.c:577: printf("%04dKB", 0);
-	ld	bc, #___str_15
+;smram.c:579: printf("%04dKB", 0);
+	ld	bc, #___str_11
 	ld	hl, #0x0000
 	push	hl
 	push	bc
 	call	_printf
 	pop	af
 	pop	af
-;smram.c:579: do {
-00205$:
-;smram.c:581: MEGA_PORT0 = 0; // enable paging
+;smram.c:581: do {
+00197$:
+;smram.c:583: MEGA_PORT0 = 0; // enable paging
 	ld	a, #0x00
 	out	(_MEGA_PORT0), a
-;smram.c:582: *((uchar *)0x4000) = page++;
+;smram.c:584: *((uchar *)0x4000) = page++;
 	ld	a, (_page+0)
 	ld	c, a
 	ld	hl, #_page
 	inc	(hl)
 	ld	hl, #0x4000
 	ld	(hl), c
-;smram.c:583: b = MEGA_PORT0; (b); // enable ram
+;smram.c:585: b = MEGA_PORT0; (b); // enable ram
 	in	a, (_MEGA_PORT0)
 	ld	(_b+0), a
-;smram.c:584: bytes_read = dos2_read(handle, (void*)0x8000, 0x2000);
+;smram.c:586: bytes_read = dos2_read(handle, (void*)0x8000, 0x2000);
 	ld	h, #0x20
 	push	hl
 	ld	de, #0x8000
@@ -1229,21 +1089,21 @@ _main::
 	call	_dos2_read
 	ex	de, hl
 	ld	(_bytes_read), hl
-;smram.c:585: if (presAB == FALSE && romsize == 0) 
+;smram.c:587: if (presAB == FALSE && romsize == 0) 
 	ld	a, (_presAB+0)
 	or	a, a
-	jr	NZ, 00201$
+	jr	NZ, 00193$
 	ld	a, (_romsize+3)
 	ld	iy, #_romsize
 	or	a, 2 (iy)
 	or	a, 1 (iy)
 	or	a, 0 (iy)
-	jr	NZ, 00201$
-;smram.c:586: *((uchar*)(0x8000)) = 0;
+	jr	NZ, 00193$
+;smram.c:588: *((uchar*)(0x8000)) = 0;
 	ld	hl, #0x8000
 	ld	(hl), #0x00
-00201$:
-;smram.c:587: romsize += bytes_read;
+00193$:
+;smram.c:589: romsize += bytes_read;
 	ld	bc, (_bytes_read)
 	ld	de, #0x0000
 	ld	a, c
@@ -1262,180 +1122,180 @@ _main::
 	ld	a, d
 	adc	a, (hl)
 	ld	(hl), a
-;smram.c:588: memcpy((void*)0x4000, (void*)0x8000, bytes_read);
+;smram.c:590: memcpy((void*)0x4000, (void*)0x8000, bytes_read);
 	ld	de, #0x4000
 	ld	hl, #0x8000
 	ld	bc, (_bytes_read)
 	ld	a, b
 	or	a, c
-	jr	Z, 00777$
+	jr	Z, 00735$
 	ldir
-00777$:
-;smram.c:589: if (page == 0)
+00735$:
+;smram.c:591: if (page == 0)
 	ld	a, (_page+0)
 	or	a, a
-	jr	NZ, 00204$
-;smram.c:590: romstart = *((uint*)0x8002);
+	jr	NZ, 00196$
+;smram.c:592: romstart = *((uint*)0x8002);
 	ld	hl, #0x8002
 	ld	a, (hl)
 	inc	hl
 	ld	(_romstart+0), a
 	ld	a, (hl)
 	ld	(_romstart+1), a
-00204$:
-;smram.c:591: MEGA_PORT0 = 0; // enable paging
+00196$:
+;smram.c:593: MEGA_PORT0 = 0; // enable paging
 	ld	a, #0x00
 	out	(_MEGA_PORT0), a
-;smram.c:592: printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
+;smram.c:594: printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
 	ld	hl, (_romsize + 1)
 	ld	a, (#_romsize + 3)
 	ld	e, a
 	ld	b, #0x02
-00778$:
+00736$:
 	srl	e
 	rr	h
 	rr	l
-	djnz	00778$
-	ld	bc, #___str_16
+	djnz	00736$
+	ld	bc, #___str_12
 	push	hl
 	push	bc
 	call	_printf
 	pop	af
 	pop	af
-;smram.c:594: } while (bytes_read > 0);
+;smram.c:596: } while (bytes_read > 0);
 	ld	a, (_bytes_read+1)
 	ld	hl, #_bytes_read
 	or	a, (hl)
-	jp	NZ, 00205$
-;smram.c:596: *((uchar *)0x4000) = 0;
+	jp	NZ, 00197$
+;smram.c:598: *((uchar *)0x4000) = 0;
 	ld	hl, #0x4000
 	ld	(hl), #0x00
-;smram.c:598: dos2_close(handle);
+;smram.c:600: dos2_close(handle);
 	ld	a, (_handle+0)
 	call	_dos2_close
-	jr	00210$
-00209$:
-;smram.c:602: printf("ERROR: Failed loading %s\n\r", filename);
+	jr	00202$
+00201$:
+;smram.c:604: printf("ERROR: Failed loading %s\n\r", filename);
 	ld	hl, (_filename)
 	push	hl
-	ld	hl, #___str_17
+	ld	hl, #___str_13
 	push	hl
 	call	_printf
 	pop	af
 	pop	af
-;smram.c:603: return 0;
+;smram.c:605: return 0;
 	ld	de, #0x0000
-	jp	00243$
-00210$:
-;smram.c:605: *t = ' '; // restore space
+	ret
+00202$:
+;smram.c:607: *t = ' '; // restore space
 	ld	hl, (_t)
 	ld	(hl), #0x20
-;smram.c:606: MEGA_PORT1 = megaram_type;
+;smram.c:608: MEGA_PORT1 = megaram_type;
 	ld	a, (_megaram_type+0)
 	out	(_MEGA_PORT1), a
-;smram.c:608: enaslt(sslt, 0x4000);
+;smram.c:610: enaslt(sslt, 0x4000);
 	ld	de, #0x4000
 	ld	a, (_sslt+0)
 	call	_enaslt
-;smram.c:609: romstart = 0x4002;
+;smram.c:611: romstart = 0x4002;
 	ld	hl, #0x4002
 	ld	(_romstart), hl
-;smram.c:615: printf("\n\r\n\rStart address: 0x%04x (page %d)\n\r", romstart, page2 == TRUE ? 2 : 1);
+;smram.c:617: printf("\n\r\n\rStart address: 0x%04x (page %d)\n\r", romstart, page2 == TRUE ? 2 : 1);
 	ld	a, (_page2+0)
 	dec	a
-	jr	NZ, 00245$
+	jr	NZ, 00237$
 	ld	bc, #0x0002
-	jr	00246$
-00245$:
+	jr	00238$
+00237$:
 	ld	bc, #0x0001
-00246$:
+00238$:
 	push	bc
 	ld	hl, #0x4002
 	push	hl
-	ld	hl, #___str_18
+	ld	hl, #___str_14
 	push	hl
 	call	_printf
 	pop	af
 	pop	af
 	pop	af
-;smram.c:617: switch(megaram_type)
+;smram.c:619: switch(megaram_type)
 	ld	a, (_megaram_type+0)
 	sub	a, #0x04
 	ld	iy, #_megaram_type
 	or	a, 1 (iy)
-	jr	Z, 00214$
+	jr	Z, 00206$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x05
 	or	a, 1 (iy)
-	jr	Z, 00214$
+	jr	Z, 00206$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x08
 	or	a, 1 (iy)
-	jr	Z, 00220$
+	jr	Z, 00212$
 	ld	a, (_megaram_type+0)
 	sub	a, #0x16
 	or	a, 1 (iy)
-	jr	Z, 00217$
-	jr	00224$
-;smram.c:620: case TYPE_K5:
-00214$:
-;smram.c:621: *((uchar *)0x4000) = 0;
+	jr	Z, 00209$
+	jr	00216$
+;smram.c:622: case TYPE_K5:
+00206$:
+;smram.c:623: *((uchar *)0x4000) = 0;
 	ld	hl, #0x4000
 	ld	(hl), #0x00
-;smram.c:622: *((uchar *)0x6000) = 1;
+;smram.c:624: *((uchar *)0x6000) = 1;
 	ld	h, #0x60
 	ld	(hl), #0x01
-;smram.c:623: if (page2)
+;smram.c:625: if (page2)
 	ld	a, (_page2+0)
 	or	a, a
-	jr	Z, 00224$
-;smram.c:625: *((uchar *)0x8000) = 0;
+	jr	Z, 00216$
+;smram.c:627: *((uchar *)0x8000) = 0;
 	ld	h, #0x80
 	ld	(hl), #0x00
-;smram.c:626: *((uchar *)0xA000) = 1;
+;smram.c:628: *((uchar *)0xA000) = 1;
 	ld	h, #0xa0
 	ld	(hl), #0x01
-;smram.c:628: break;
-	jr	00224$
-;smram.c:629: case TYPE_A16:
-00217$:
-;smram.c:630: *((uchar *)0x6000) = 0;
+;smram.c:630: break;
+	jr	00216$
+;smram.c:631: case TYPE_A16:
+00209$:
+;smram.c:632: *((uchar *)0x6000) = 0;
 	ld	hl, #0x6000
 	ld	(hl), #0x00
-;smram.c:631: if (page2)
+;smram.c:633: if (page2)
 	ld	a, (_page2+0)
 	or	a, a
-	jr	Z, 00224$
-;smram.c:632: *((uchar *)0x8000) = 0;
+	jr	Z, 00216$
+;smram.c:634: *((uchar *)0x8000) = 0;
 	ld	h, #0x80
 	ld	(hl), #0x00
-;smram.c:633: break;
-	jr	00224$
-;smram.c:634: case TYPE_A8:
-00220$:
-;smram.c:635: *((uchar *)0x6000) = 0;
+;smram.c:635: break;
+	jr	00216$
+;smram.c:636: case TYPE_A8:
+00212$:
+;smram.c:637: *((uchar *)0x6000) = 0;
 	ld	hl, #0x6000
 	ld	(hl), #0x00
-;smram.c:636: *((uchar *)0x6800) = 1;
+;smram.c:638: *((uchar *)0x6800) = 1;
 	ld	h, #0x68
 	ld	(hl), #0x01
-;smram.c:637: if (page2)
+;smram.c:639: if (page2)
 	ld	a, (_page2+0)
 	or	a, a
-	jr	Z, 00224$
-;smram.c:639: *((uchar *)0x7000) = 0;
+	jr	Z, 00216$
+;smram.c:641: *((uchar *)0x7000) = 0;
 	ld	h, #0x70
 	ld	(hl), #0x00
-;smram.c:640: *((uchar *)0x7800) = 1;
+;smram.c:642: *((uchar *)0x7800) = 1;
 	ld	h, #0x78
 	ld	(hl), #0x01
-;smram.c:645: }
-00224$:
-;smram.c:647: if (page2 == TRUE)
+;smram.c:647: }
+00216$:
+;smram.c:649: if (page2 == TRUE)
 	ld	a, (_page2+0)
 	dec	a
-	jr	NZ, 00226$
-;smram.c:648: memcpy((void*)0xC000, &runROM_page2, ((uint)&runROM_page2_end - (uint)&runROM_page2));
+	jr	NZ, 00218$
+;smram.c:650: memcpy((void*)0xC000, &runROM_page2, ((uint)&runROM_page2_end - (uint)&runROM_page2));
 	ld	hl, #_runROM_page2
 	ld	bc, #_runROM_page2_end
 	ld	de, #_runROM_page2
@@ -1448,11 +1308,11 @@ _main::
 	ld	de, #0xc000
 	ld	a, b
 	or	a, c
-	jr	Z, 00227$
+	jr	Z, 00219$
 	ldir
-	jr	00227$
-00226$:
-;smram.c:650: memcpy((void*)0xC000, &runROM_page1, ((uint)&runROM_page1_end - (uint)&runROM_page1));
+	jr	00219$
+00218$:
+;smram.c:652: memcpy((void*)0xC000, &runROM_page1, ((uint)&runROM_page1_end - (uint)&runROM_page1));
 	ld	hl, #_runROM_page1
 	ld	bc, #_runROM_page1_end
 	ld	de, #_runROM_page1
@@ -1465,49 +1325,46 @@ _main::
 	ld	de, #0xc000
 	ld	a, b
 	or	a, c
-	jr	Z, 00789$
+	jr	Z, 00747$
 	ldir
-00789$:
-00227$:
-;smram.c:652: if (cpumode != 0)
+00747$:
+00219$:
+;smram.c:654: if (cpumode != 0)
 	ld	a, (_cpumode+0)
 	or	a, a
-	jr	Z, 00229$
-;smram.c:653: chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
+	jr	Z, 00221$
+;smram.c:655: chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
 	ld	a, (_cpumode+0)
 	dec	a
-	jr	NZ, 00247$
+	jr	NZ, 00239$
 	ld	c, a
-	jr	00248$
-00247$:
+	jr	00240$
+00239$:
 	ld	a, (_cpumode+0)
 	sub	a, #0x02
 	ld	c, #0x81
-	jr	Z, 00250$
+	jr	Z, 00242$
 	ld	c, #0x82
-00250$:
-00248$:
+00242$:
+00240$:
 	ld	a, c
 	call	_chgcpu
-00229$:
-;smram.c:656: printf("\n\rPress any key to proceed...\n\r");
-	ld	hl, #___str_19
+00221$:
+;smram.c:658: printf("\n\rPress any key to proceed...\n\r");
+	ld	hl, #___str_15
 	push	hl
 	call	_printf
 	pop	af
-;smram.c:657: c = getchar();
+;smram.c:659: c = getchar();
 	call	_getchar
 	ld	hl, #_c
 	ld	(hl), e
-;smram.c:659: jump(0xC000);
+;smram.c:661: jump(0xC000);
 	ld	hl, #0xc000
 	call	_jump
-;smram.c:661: return 1; // make sdcc happy
+;smram.c:663: return 1; // make sdcc happy
 	ld	de, #0x0001
-00243$:
-;smram.c:662: }
-	inc	sp
-	pop	ix
+;smram.c:664: }
 	ret
 ___str_0:
 	.ascii "WonderTANG! uSD Driver"
@@ -1523,31 +1380,11 @@ ___str_2:
 	.db 0x0d
 	.db 0x00
 ___str_3:
-	.ascii "SCC+ volume %d"
-	.db 0x0a
-	.db 0x0d
-	.db 0x00
-___str_4:
-	.ascii "PSG volume %d"
-	.db 0x0a
-	.db 0x0d
-	.db 0x00
-___str_5:
-	.ascii "OPLL volume %d"
-	.db 0x0a
-	.db 0x0d
-	.db 0x00
-___str_6:
-	.ascii "ERROR: wrong device volume..."
-	.db 0x0a
-	.db 0x0d
-	.db 0x00
-___str_7:
 	.ascii "ERROR: WonderTANG! not found..."
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_8:
+___str_4:
 	.db 0x0a
 	.db 0x0d
 	.ascii "USAGE: SMRAM [/Rx /Zx /Y] [romfile]"
@@ -1568,23 +1405,6 @@ ___str_8:
 	.db 0x0a
 	.db 0x0d
 	.ascii "   6: Konami     (/K4)"
-	.db 0x0a
-	.db 0x0d
-	.db 0x0a
-	.db 0x0d
-	.ascii " /Vxy: Set volume for"
-	.db 0x0a
-	.db 0x0d
-	.ascii "   S: SCC+"
-	.db 0x0a
-	.db 0x0d
-	.ascii "   P: PSG"
-	.db 0x0a
-	.db 0x0d
-	.ascii "   O: OPLL"
-	.db 0x0a
-	.db 0x0d
-	.ascii "   y: 0-9"
 	.db 0x0a
 	.db 0x0d
 	.db 0x0a
@@ -1612,38 +1432,38 @@ ___str_8:
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_9:
+___str_5:
 	.db 0x0d
 	.db 0x0a
 	.ascii "Mapper Type: "
 	.db 0x00
-___str_10:
+___str_6:
 	.ascii "Konami (/R6 or /K4)"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_11:
+___str_7:
 	.ascii "Konami SCC (/R5 or /K5)"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_12:
+___str_8:
 	.ascii "ASCII16 (/R1 or /A16)"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_13:
+___str_9:
 	.ascii "ASCII8 (/R3 or /A8)"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_14:
+___str_10:
 	.ascii "Loading ROM file: %s - "
 	.db 0x00
-___str_15:
+___str_11:
 	.ascii "%04dKB"
 	.db 0x00
-___str_16:
+___str_12:
 	.db 0x08
 	.db 0x08
 	.db 0x08
@@ -1652,12 +1472,12 @@ ___str_16:
 	.db 0x08
 	.ascii "%04dKB"
 	.db 0x00
-___str_17:
+___str_13:
 	.ascii "ERROR: Failed loading %s"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_18:
+___str_14:
 	.db 0x0a
 	.db 0x0d
 	.db 0x0a
@@ -1666,7 +1486,7 @@ ___str_18:
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
-___str_19:
+___str_15:
 	.db 0x0a
 	.db 0x0d
 	.ascii "Press any key to proceed..."
