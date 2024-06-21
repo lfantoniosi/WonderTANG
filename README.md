@@ -57,13 +57,7 @@ You can access V2.0b gerber files from github at:
 
 [https://github.com/lfantoniosi/WonderTANG/tree/4a21359a5136a5a96363da55edc5d934acfd37c5/kicad/gerber](https://github.com/lfantoniosi/WonderTANG/tree/4a21359a5136a5a96363da55edc5d934acfd37c5/kicad/gerber)
 
-Or you can order V2.0a PCBs directly from:
-
-[https://www.pcbway.com/project/shareproject/WonderTANG_v2_00a_a813663c.html](https://www.pcbway.com/project/shareproject/WonderTANG_v2_00a_a813663c.html)
-
-<a href="https://www.pcbway.com/project/shareproject/WonderTANG_v2_00a_a813663c.html"><img src="https://www.pcbway.com/project/img/images/frompcbway-1220.png" alt="PCB from PCBWay" /></a>
-
-A small part of the money will be donated to the author of the project.
+I recommend JCLPCB: https://jlcpcb.com/
 
 #### Bill of Materials
 
