@@ -57,7 +57,7 @@ You can access V2.0b gerber files from github at:
 
 [https://github.com/lfantoniosi/WonderTANG/tree/4a21359a5136a5a96363da55edc5d934acfd37c5/kicad/gerber](https://github.com/lfantoniosi/WonderTANG/tree/4a21359a5136a5a96363da55edc5d934acfd37c5/kicad/gerber)
 
-I recommend JCLPCB: https://jlcpcb.com/
+I recommend JLCPCB: https://jlcpcb.com/
 
 #### Bill of Materials
 
