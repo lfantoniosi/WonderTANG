@@ -11534,7 +11534,7 @@
 				)
 			)
 		)
-		(property "Value" "LED"
+		(property "Value" "uSD"
 			(at 350.8375 124.46 0)
 			(effects
 				(font
@@ -13030,15 +13030,15 @@
 		(fields_autoplaced yes)
 		(uuid "adebba55-1f23-46da-be2a-56b29da75b06")
 		(property "Reference" "J3"
-			(at 344.17 104.775 0)
+			(at 344.17 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "Conn_02x01"
-			(at 344.17 107.315 0)
+		(property "Value" "AUDIO"
+			(at 344.17 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
