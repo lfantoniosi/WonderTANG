@@ -1215,7 +1215,7 @@ YM2149(
 `ifdef OPLL   
 wire opll_req_w;
 assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
-wire [13:0] opll_mixout;
+wire [15:0] opll_mixout;
 
 
 clockdivint #(
@@ -1231,7 +1231,7 @@ BUFG(
 .O(clk_opll_w),
 .I(clk_opll)
 );
-
+/*
 opll(
     .xin(clk_opll_w),
     //.xout(),
@@ -1243,17 +1243,34 @@ opll(
     .ic_n(ram_enabled_w),
     .mixout(opll_mixout)
 ); 
+*/
+jt2413 (
+    .rst(~ram_enabled_w),
+    .clk(clk_opll_w),
+    .cen(1'b1),
+    .din(cdin_w),
+    .addr(addr_w[0]),
+    .cs_n(~opll_req_w),
+    .wr_n(wr_n_w),
+    //.dout
+    //.irq_en
+    .snd(opll_mixout)
+    //.sample
+);
+
+
+
 `endif
 
 reg [15:0] sound_sample;
 reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
-always@(posedge clk54_w) begin
+always@(posedge clk108_w) begin
 
        sound_sample <= 16'b0
 `ifdef OPLL       
-       + { opll_mixout[13], opll_mixout[13:0], 1'b0 } + 16'b0010000000000000
+       + opll_mixout 
 `endif
 `ifdef SCC
        + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0000100000000000
@@ -1268,7 +1285,7 @@ always@(posedge clk54_w) begin
 
        hdmi_sample <= 16'b0
 `ifdef OPLL       
-       + { opll_mixout[13], opll_mixout[13:0], 1'b0 }
+       + opll_mixout
 `endif
 `ifdef SCC
        + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }
@@ -1283,7 +1300,7 @@ always@(posedge clk54_w) begin
 
        audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
 end
-
+/*
 wire [15:0] lpf1_sound_w;
 interpo #(
     .MSBI(16)    
@@ -1316,7 +1333,7 @@ lpf2 #(
     .idata(lpf2_sound_w),
     .odata (dac_sound_w)
 );
-
+*/
 `ifdef SMS
 assign sample_w = audio_hdmi;
 `endif
@@ -1324,7 +1341,7 @@ assign sample_w = audio_hdmi;
 audio_drive(
 .clk_1p536m(clk_pa_w),
 .rst_n(1),
-.idata(dac_sound_w),
+.idata( sound_sample),
 //.req(),
 .HP_BCK(hp_bck),
 .HP_WS(hp_ws),

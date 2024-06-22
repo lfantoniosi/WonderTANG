@@ -1,0 +1,3 @@
+[submodule "fpga/src/jtopl"]
+	path = fpga/src/jtopl
+	url = https://github.com/jotego/jtopl.git
