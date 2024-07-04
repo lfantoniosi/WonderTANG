@@ -3,9 +3,10 @@
 
 
 module pinfilter
-#(
-    parameter bit REGISTERED = 1'b1
-)(
+//#(
+//    parameter bit REGISTERED = 1'b1
+//)
+(
     input clk,
     input reset_n,
     input din,
@@ -28,14 +29,14 @@ module pinfilter
             if (ena) begin
 
                 dpipe <= { dpipe[0], din };
-
-                if (REGISTERED)
-                    dout <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout;
+    
+                //if (REGISTERED)
+                dout <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout;
 
             end
 
-            if (~REGISTERED)
-                dout <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout;
+            //if (~REGISTERED)
+            //    dout <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : dout;
 
         end
     end

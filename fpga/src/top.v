@@ -435,9 +435,11 @@ pinfilter (
 );
 
 wire merq_scc_n_w;
-pinfilter #(
-    .REGISTERED(1)
-) (
+pinfilter 
+//#(
+//    .REGISTERED(1)
+//) 
+(
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(mp[0]),
@@ -1268,12 +1270,12 @@ reg [15:0] audio_hdmi;
 
 always@(posedge clk108_w) begin
 
-       sound_sample <= 16'b0
+       sound_sample <= 16'b0000100000000000
 `ifdef OPLL       
-       + opll_mixout 
+       + { opll_mixout[15], opll_mixout[15:1] }
 `endif
 `ifdef SCC
-       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } + 16'b0000100000000000
+       +  { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } 
 `endif 
 `ifdef PSG
        + { 4'b0, psg_wave_w[7:0], 4'b0 }
@@ -1285,7 +1287,7 @@ always@(posedge clk108_w) begin
 
        hdmi_sample <= 16'b0
 `ifdef OPLL       
-       + opll_mixout
+       + {  opll_mixout[15], opll_mixout[15:1] }
 `endif
 `ifdef SCC
        + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }
@@ -1305,7 +1307,7 @@ wire [15:0] lpf1_sound_w;
 interpo #(
     .MSBI(16)    
 )(
-    .clk21m(clk54_w),
+    .clk21m(clk_pa_w),
     .reset(~(1)),
     .clkena(1),
     .idata(sound_sample),
@@ -1316,7 +1318,7 @@ wire [15:0] lpf2_sound_w;
 lpf1 #(
 	.MSBI(16)
 ) (
-    .clk21m (clk54_w),
+    .clk21m (clk_pa_w),
     .reset(~(1)),
     .clkena(1),
     .idata(lpf1_sound_w),
@@ -1327,7 +1329,7 @@ wire [15:0] dac_sound_w;
 lpf2 #(
 	.MSBI(16)
 ) (
-    .clk21m(clk54_w),
+    .clk21m(clk_pa_w),
     .reset(~(1)),
     .clkena(1),
     .idata(lpf2_sound_w),
