@@ -79,46 +79,63 @@ wire reset_rom_n;
     reg ff_res1 = 1;
     reg ff_res2 = 1;
 
-    localparam BS_RES0              = 32'd0;
-    localparam BS_RES1              = 32'd13500000;
-    localparam BS_WARM              = 32'd27000000;
-    reg [31:0] ff_bootstate          = BS_RES0;
-    reg ff_wait = 1;
-
-    always @(posedge clk_w) begin
-        //ff_wait <= 1;
-        case(ff_bootstate)
-        BS_RES0: if (reset_ram_n) begin
-                    ff_bootstate <= ff_bootstate + 1;
-                    ff_res1 <= 0;
-                 end
-        BS_RES0+32: begin
-                    ff_bootstate <= ff_bootstate + 1;
-                    ff_res1 <= 1;
-                 end
-        BS_RES1: if (reset_ram_n) begin
-                    ff_bootstate <= ff_bootstate + 1;
-                    ff_res2 <= 0;
-                 end
-        BS_RES1+32: begin
-                    ff_bootstate <= ff_bootstate + 1;
-                    ff_res2 <= 1;
-                 end
-        BS_WARM: begin
-                    ff_res1 <= 1;
-                    ff_res2 <= 1;
-                    ff_wait <= 0;
-                 end
-        default: begin
-                    ff_bootstate <= ff_bootstate + 1;
-                 end
-        endcase
-
-    end
+    localparam CLK_FRQ              = 27_000_000;
+    localparam BS_RES0              = 0;
+    localparam BS_RES1              = CLK_FRQ/2;
+    localparam BS_WARM              = CLK_FRQ;
 
     reg ff_s1n = 0;
     always @(posedge clk_w) ff_s1n <= ~s1;
     wire s1n_w = ff_s1n && ff_res1;
+    wire rgb;
+    wire rgb_done;
+
+    ws2812(
+    .clk(clk_w),
+    .rst_n(ff_s1n),
+    .WS2812(rgb), // output to the interface of WS2812
+    .done(rgb_done)
+    );       
+
+    reg [31:0] ff_bootstate          = BS_RES0;
+    reg ff_wait = 1;
+    reg ff_rgb_state = 0;
+
+    always @(posedge clk_w) begin
+        //ff_wait <= 1;
+        if (rgb_done)
+            case(ff_bootstate)
+            BS_RES0: if (reset_ram_n) begin
+                        ff_bootstate <= ff_bootstate + 1;
+                        ff_res1 <= 0;
+                        ff_res2 <= 1;
+                        ff_wait <= 1;
+                        ff_rgb_state <= 0;
+            end
+            BS_RES0+32: begin
+                        ff_bootstate <= ff_bootstate + 1;
+                        ff_res1 <= 1;
+            end
+            BS_RES1: if (reset_ram_n) begin
+                        ff_bootstate <= ff_bootstate + 1;
+                        ff_res2 <= 0;
+            end
+            BS_RES1+32: begin
+                        ff_bootstate <= ff_bootstate + 1;
+                        ff_res2 <= 1;
+            end
+            BS_WARM: begin
+                        ff_res1 <= 1;
+                        ff_res2 <= 1;
+                        ff_wait <= 0;
+            end
+            default: begin
+                        ff_bootstate <= ff_bootstate + 1;
+            end
+            endcase
+    end
+ 
+
 
 `ifdef SMS
     clk135 (
@@ -1270,27 +1287,12 @@ reg [15:0] audio_hdmi;
 
 always@(posedge clk108_w) begin
 
-       sound_sample <= 16'b0000100000000000
-`ifdef OPLL       
-       + { opll_mixout[15], opll_mixout[15:1] }
-`endif
-`ifdef SCC
-       +  { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] } 
-`endif 
-`ifdef PSG
-       + { 4'b0, psg_wave_w[7:0], 4'b0 }
-`endif
-`ifdef SMS
-       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }
-`endif
-       ;
-
        hdmi_sample <= 16'b0
 `ifdef OPLL       
        + {  opll_mixout[15], opll_mixout[15:1] }
 `endif
 `ifdef SCC
-       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:2] }
+       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] }
 `endif 
 `ifdef PSG
        + { 4'b0, psg_wave_w[7:0], 4'b0 }
@@ -1300,42 +1302,10 @@ always@(posedge clk108_w) begin
 `endif
        ;
 
+       sound_sample <= hdmi_sample + 16'b0000100000000000;
        audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
 end
-/*
-wire [15:0] lpf1_sound_w;
-interpo #(
-    .MSBI(16)    
-)(
-    .clk21m(clk_pa_w),
-    .reset(~(1)),
-    .clkena(1),
-    .idata(sound_sample),
-    .odata(lpf1_sound_w)
-);
 
-wire [15:0] lpf2_sound_w;
-lpf1 #(
-	.MSBI(16)
-) (
-    .clk21m (clk_pa_w),
-    .reset(~(1)),
-    .clkena(1),
-    .idata(lpf1_sound_w),
-    .odata(lpf2_sound_w)
-);
-
-wire [15:0] dac_sound_w;
-lpf2 #(
-	.MSBI(16)
-) (
-    .clk21m(clk_pa_w),
-    .reset(~(1)),
-    .clkena(1),
-    .idata(lpf2_sound_w),
-    .odata (dac_sound_w)
-);
-*/
 `ifdef SMS
 assign sample_w = audio_hdmi;
 `endif
@@ -1439,8 +1409,8 @@ assign busdir_cs_w = (mmapper_busreq_w || ~vdp_rd_n) ? 1 : 0;
 assign iord_w = (mmapper_busreq_w || ~vdp_rd_n) ? 1 : 0;
 assign busdir_n = ~iord_w; // io port without sltsl
 
-assign datadir = ((~sltsl_n_w || busdir_cs_w) && ~rd_n_w) ? 0 : 1;
-assign cd = datadir ? 8'bzzzzzzzz : ff_cdout;
+assign datadir = rgb_done == 0 ? 0 : ((~sltsl_n_w || busdir_cs_w) && ~rd_n_w) ? 0 : 1;
+assign cd = rgb_done == 0 ? { rgb, rgb, rgb, rgb, rgb, rgb, rgb, rgb } : datadir ? 8'bzzzzzzzz : ff_cdout;
 wire bus_idle_w;
 assign bus_idle_w = &msel_n || ~flash_idle_w; // read/write only when bus is idling to avoid getting corrupt addresses
 

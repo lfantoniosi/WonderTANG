@@ -146,8 +146,10 @@ module flash
           STATE_DONE: begin
             r_CS <= 1;
             r_busy <= 1;
-            counter <= STARTUP_WAIT;
-            state <= STATE_INIT_POWER;
+            r_MOSI <= 1;
+            r_SCLK <= 1;
+            //counter <= STARTUP_WAIT;
+            //state <= STATE_INIT_POWER;
           end
 
         endcase
