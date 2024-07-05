@@ -67,6 +67,7 @@ module top(
 
 wire reset_ram_n;
 wire reset_rom_n;
+wire res_n_w;
 
     wire clk_w;
     BUFG(
@@ -86,13 +87,13 @@ wire reset_rom_n;
 
     reg ff_s1n = 0;
     always @(posedge clk_w) ff_s1n <= ~s1;
-    wire s1n_w = ff_s1n && ff_res1;
+    wire s1n_w = ff_s1n && ff_res1 && res_n_w;
     wire rgb;
     wire rgb_done;
 
     ws2812(
     .clk(clk_w),
-    .rst_n(ff_s1n),
+    .rst_n(ff_s1n && res_n_w),
     .WS2812(rgb), // output to the interface of WS2812
     .done(rgb_done)
     );       
@@ -491,7 +492,7 @@ pinfilter (
 //    .ena(~msel_n[2] & ff_dotena)
 //);
 
-wire res_n_w;
+//wire res_n_w;
 pinfilter (
     .clk(clk108_w),
     .reset_n(rst_n_w),
@@ -1292,17 +1293,17 @@ always@(posedge clk108_w) begin
        + {  opll_mixout[15], opll_mixout[15:1] }
 `endif
 `ifdef SCC
-       + { scc_wave_w[14], scc_wave_w[14], scc_wave_w[14:1] }
+       + { scc_wave_w[14], scc_wave_w[14:0] }
 `endif 
 `ifdef PSG
-       + { 4'b0, psg_wave_w[7:0], 4'b0 }
+       + { 3'b0, psg_wave_w[7:0], 5'b0 }
 `endif
 `ifdef SMS
        + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }
 `endif
        ;
 
-       sound_sample <= hdmi_sample + 16'b0000100000000000;
+       sound_sample <= hdmi_sample + 16'b0001000000000000;
        audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
 end
 

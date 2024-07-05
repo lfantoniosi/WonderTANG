@@ -13,7 +13,7 @@ create_clock -name clk_audio -period 22727.273 -waveform {0 11363.637} [get_nets
 create_clock -name clock -period 279.36 -waveform {0 139.68} [get_ports {clock}] -add
 
 // PSG
-create_generated_clock -name hclock -source [get_ports {clock}] -master_clock clock -divide_by 2 -multiply_by 1 -add [get_nets {hclock}]
+//create_generated_clock -name hclock -source [get_ports {clock}] -master_clock clock -divide_by 2 -multiply_by 1 -add [get_nets {hclock}]
 // OPLL
 //create_clock -name clk_opll -period 279.36 -waveform {0 139.68} [get_nets {clk_opll}] -add
 
