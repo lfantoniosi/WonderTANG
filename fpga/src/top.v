@@ -1311,10 +1311,24 @@ end
 assign sample_w = audio_hdmi;
 `endif
 
+clockdivint #(
+    .CLK_SRC(27),
+    .CLK_DIV(0.044100*16.0)
+    //.PRECISION_BITS(16)
+) (
+    .clk_src(clk_w),
+    .reset_n(clk108_lock_w),
+    .clk_div(clk_sound)
+);
+BUFG (
+.O(clk_sound_w),
+.I(clk_sound)
+);
+
 audio_drive(
-.clk_1p536m(clk_pa_w),
-.rst_n(1),
-.idata( sound_sample),
+.clk_1p536m(clk_sound_w),
+.rst_n(clk108_lock_w),
+.idata(sound_sample),
 //.req(),
 .HP_BCK(hp_bck),
 .HP_WS(hp_ws),
