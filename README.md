@@ -72,7 +72,7 @@ I recommend JLCPCB: https://jlcpcb.com/
 | D1                          | LED-3MM                    | LED 3MM Red                                          | 1   | AliExpress  |
 | D2                          | 1N5817                     | SCHOTTKY BARRIER RECTIFIER DIODE                    | 1   | AliExpress  |
 | U1, U2, U3, U4, U6          | SOCKET-DIP-NARROW-20       | DIP Socket Narrow 20 pins                            | 5   | AliExpress  |
-| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | AliExpress  |
+| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | See note    |
 | Q1,Q2                       | 2N3904                     | 2N3904 NPN switching Transistor                      | 2   | AliExpress  |
 | J2                          | CP1-3523N                  | CONN JACK STEREO 3.5MM R/A                           | 1   | AliExpress  |
 | J3                          | Mini Micro male/female JST | Mini Micro male/female JST                           | 1   | AliExpress  |
@@ -83,6 +83,10 @@ I recommend JLCPCB: https://jlcpcb.com/
 The audio J3 needs to be soldered into the TANG Nano 20K speaker pins (two small pins between the words SiPEED and TANG NANO 20K, polarity does not matter). Use the JST connector or solder it directly under the board.
 
 [<img src="images/WonderTANG-V2.0a-front-build-audio-connector.jpg" width="512"/>](images/WonderTANG-V2.0a-front-build-audio-connector.jpg)
+
+#### 74LVC245AN
+
+Be aware of fake 74VLC245 sold from Chinese vendors like AliExpress or UTSource. There are reports of they being 74LS245 rebranded as LVC which does not work. You need genuine 75LVC245. Buy then from DigiKey, Mouser or Adafruit.
 
 
 ### [V1.02d (PREVIOUS)](https://github.com/lfantoniosi/WonderTANG/tree/0e938fb70acad34c753a95fd54bb3fdd6095d590/kicad/)
@@ -120,7 +124,7 @@ You can access V1.02d gerber files from github at:
 | D1                          | LED-3MM                    | LED 3MM Red                                          | 1   | AliExpress  |
 | D2                          | 1N5817                     | SCHOTTKY BARRIER RECTIFIER DIODE                    | 1   | AliExpress  |
 | U1, U2, U3, U4, U6          | SOCKET-DIP-NARROW-20       | DIP Socket Narrow 20 pins                            | 5   | AliExpress  |
-| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | AliExpress  |
+| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | See note above  |
 | Q1,Q2                       | 2N3904                     | 2N3904 NPN switching Transistor                      | 2   | AliExpress  |
 | C13                         | ELEC-DIP-10UF-16V          | Electrolytic Capacitor DIP 10uF 16V                  | 1   | AliExpress  |
 | C1, C2                      | ELEC-DIP-4.7UF-16V         | Electrolytic Capacitor DIP 7.7uF 16V                 | 2   | AliExpress  |
@@ -175,7 +179,7 @@ A small part of the money will be donated to the author of the project.
 | D1                          | LED-3MM                    | LED 3MM Red                                          | 1   | AliExpress  |
 | D2                          | 1N5817                     | SCHOTTKY BARRIER RECTIFIER DIODE                    | 1   | AliExpress  |
 | U1, U2, U3, U4, U6          | SOCKET-DIP-NARROW-20       | DIP Socket Narrow 20 pins                            | 5   | AliExpress  |
-| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | AliExpress  |
+| U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | See note above  |
 | Q1                          | 2N3904                     | 2N3904 NPN switching Transistor                      | 1   | AliExpress  |
 | J1, J3                      | PH-254-S-M-40-BLACK        | 2.54mm 1 x 40 Pin Male Single Row Pin Header Strip Black | 1 | AliExpress  |
 | J2                          | SJ1-3533NG                 | SJ1-3533NG Audio P4 3 Pin connector                  | 1   | AliExpress  |
