@@ -1299,7 +1299,7 @@ always@(posedge clk108_w) begin
        + { 3'b0, psg_wave_w[7:0], 5'b0 }
 `endif
 `ifdef SMS
-       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0], 1'b0 }
+       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0] }
 `endif
        ;
 
