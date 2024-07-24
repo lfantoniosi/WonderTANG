@@ -22,6 +22,6 @@ smram.rel: smram.c types.h
 	$(ASM) $(ASMFLAGS) -o $@ $<
 
 clean:
-	+rm *.rel *.asm *.lst *.sym *.map *.ihx smram.com *.lk *.noi disk/smram.com
+	+rm *.rel *.asm *.lst *.sym *.map *.ihx smram.com *.lk *.noi disk/SMRAM.COM
 	
 
