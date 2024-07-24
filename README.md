@@ -74,7 +74,7 @@ I recommend JLCPCB: https://jlcpcb.com/
 | U1, U2, U3, U4, U6          | SOCKET-DIP-NARROW-20       | DIP Socket Narrow 20 pins                            | 5   | AliExpress  |
 | U1, U2, U3, U4, U6          | SN74LVC245AN               | OCTAL BUS TRANSCEIVER WITH 3-STATE OUTPUTS           | 5   | See note    |
 | Q1,Q2                       | 2N3904                     | 2N3904 NPN switching Transistor                      | 2   | AliExpress  |
-| J2                          | CP1-3523N                  | CONN JACK STEREO 3.5MM R/A                           | 1   | AliExpress  |
+| J2                          | SJ1-3525N                  | CONN JACK STEREO 3.5MM R/A                           | 1   | AliExpress  |
 | J3                          | Mini Micro male/female JST | Mini Micro male/female JST                           | 1   | AliExpress  |
 | U5                          | Tang Nano 20K              | Tang Nano 20K                                        | 1   | AliExpress  |
 
