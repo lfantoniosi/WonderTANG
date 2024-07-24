@@ -1107,22 +1107,24 @@ assign megaram_cs_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w
 reg ff_scc_enable;
 reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
-//reg [3:0] ff_scc_vol;
-//reg [3:0] ff_psg_vol;
-//reg [3:0] ff_opll_vol;
+reg [2:0] ff_scc_vol;
+reg [2:0] ff_psg_vol;
+reg [2:0] ff_opll_vol;
+
+reg [2:0] ff_scc_ngain;
+reg [2:0] ff_psg_ngain;
+reg [2:0] ff_opll_ngain;
 
 always @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_megaram_type <= 2'b01;
         ff_scc_enable <= '1;
 
-//        ff_scc_vol <= 4'h0;
-//        ff_psg_vol <= 4'h0;
-//        ff_opll_vol <= 4'h0;
-
+        ff_scc_vol <= 7;
+        ff_psg_vol <= 7;
+        ff_opll_vol <= 7;
     end else begin
         if (megaram_cs_w) begin
-
             case(cdin_w)
                 8'h05: begin
                     ff_scc_enable <= 1'b1;
@@ -1141,20 +1143,21 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
                     ff_megaram_type <= 2'b00;
                 end
             endcase
-/*
             case(cdin_w[7:4])
                 4'hF: begin
-                    ff_scc_vol <= 4'h9 - cdin_w[3:0];
+                    ff_scc_vol <= cdin_w[2:0];
                 end
                 4'hE: begin
-                    ff_psg_vol <= 4'h9 - cdin_w[3:0];
+                    ff_psg_vol <= cdin_w[2:0];
                 end
                 4'hD: begin
-                    ff_opll_vol <= 4'h9 - cdin_w[3:0];
+                    ff_opll_vol <= cdin_w[2:0];
                 end
             endcase
-*/            
         end
+        ff_scc_ngain <= 7 - ff_scc_vol;
+        ff_psg_ngain <= 7 - ff_psg_vol;
+        ff_opll_ngain <= 7 - ff_opll_vol;
     end
 end
 
@@ -1282,29 +1285,69 @@ jt2413 (
 
 `endif
 
+reg [15:0] audio_sample1;
+reg [15:0] audio_sample2;
+
+reg [15:0] audio_sample_psg;
+reg signed [15:0] audio_sample_scc;
+reg signed [15:0] audio_sample_opll;
+
+reg [15:0] audio_sample_psg_without_ngain;
+reg signed [15:0] audio_sample_scc_without_ngain;
+reg signed [15:0] audio_sample_opll_without_ngain;
+
 reg [15:0] sound_sample;
 reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
 always@(posedge clk108_w) begin
+    audio_sample_psg_without_ngain <= 16'(psg_wave_w) <<< 3;
+    audio_sample_scc_without_ngain <= 16'(signed'(scc_wave_w)) >>> 2;
+    audio_sample_opll_without_ngain <= 16'(signed'(opll_mixout)) >>> 3;
 
-       hdmi_sample <= 16'b0
-`ifdef OPLL       
-       + {  opll_mixout[15], opll_mixout[15:1] }
-`endif
-`ifdef SCC
-       + { scc_wave_w[14], scc_wave_w[14:0] }
-`endif 
+    if (ff_psg_vol == 0) begin
+        audio_sample_psg <= 16'd0;
+    end
+    else begin
+        audio_sample_psg <= audio_sample_psg_without_ngain >>> ff_psg_ngain;
+    end
+
+    if (ff_scc_vol == 0) begin
+        audio_sample_scc <= 16'd0;
+    end
+    else begin
+        audio_sample_scc <= audio_sample_scc_without_ngain >>> ff_scc_ngain;
+    end
+
+    if (ff_opll_vol == 0) begin
+        audio_sample_opll <= 16'd0;
+    end
+    else begin
+        audio_sample_opll <= audio_sample_opll_without_ngain >>> ff_opll_ngain;
+    end
+
+    // combine audio samples by adding two each time
+    audio_sample1 <= 16'b0
 `ifdef PSG
-       + { 3'b0, psg_wave_w[7:0], 5'b0 }
+        + audio_sample_psg
 `endif
 `ifdef SMS
-       + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0] }
+        + 16'(signed'(jt89_wave))
 `endif
-       ;
+        ;
+    audio_sample2 <= 16'b0
+`ifdef SCC
+        + audio_sample_scc
+`endif
+`ifdef OPLL
+        + audio_sample_opll
+`endif
+        ;
 
-       sound_sample <= hdmi_sample + 16'b0001000000000000;
-       audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
+    hdmi_sample <= audio_sample1 + audio_sample2;
+
+    sound_sample <= hdmi_sample;
+    audio_hdmi = -hdmi_sample; // 2-complement signed
 end
 
 `ifdef SMS

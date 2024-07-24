@@ -262,13 +262,11 @@ uchar dos2_getenv(char *var, char *buf) __naked
 	__endasm;	
 }
 
-char hexToNum(char h)
+int vol_parm_to_num(char h)
 {
-    //if (h >= 'A' && h <= 'F')
-    //    return h-'A' + 10;
-    if (h >= '0' && h <='9')
+    if (h >= '0' && h <='7')
         return h-'0';    
-    return 0;
+    return -1;
 }
 
 void jump(uint addr) __naked
@@ -343,9 +341,13 @@ char cpumode = 1; // defaults to Z80_ROM
 uint romstart;
 bool page2 = FALSE;
 bool help = FALSE;
-char scc_vol = 9;
-char psg_vol = 9;
-char opll_vol = 9;
+
+#define DEFAULT_VOL 7
+
+int scc_vol = DEFAULT_VOL;
+int psg_vol = DEFAULT_VOL;
+int opll_vol = DEFAULT_VOL;
+
 char c;
 
 int main(void)
@@ -448,34 +450,38 @@ int main(void)
                     {
                         presAB = TRUE;
                     }
-  /*
                     else if (to_upper(*params) == 'V')
                     {
                         params++;
                         uchar param = to_upper(*params++);
+                        const char *audio_source[] = { "SCC+", "PSG", "OPLL" };
+                        char audio_idx = 0;
+                        int audio_vol = -1;
                         switch(param)
                         {
-                            case 'S': 
-                                scc_vol = hexToNum(to_upper(*params));
-                                printf("SCC+ volume %d\n\r", (int)scc_vol);
+                            case 'S':
+                                audio_vol = scc_vol = vol_parm_to_num(to_upper(*params));
+                                audio_idx = 0;
                                 break;
                             case 'P': 
-                                psg_vol = hexToNum(to_upper(*params));
-                                printf("PSG volume %d\n\r", (int)psg_vol);
+                                audio_vol = psg_vol = vol_parm_to_num(to_upper(*params));
+                                audio_idx = 1;
                                 break;
                             case 'O': 
-                                opll_vol = hexToNum(to_upper(*params));
-                                printf("OPLL volume %d\n\r", (int)opll_vol);
+                                audio_vol = opll_vol = vol_parm_to_num(to_upper(*params));
+                                audio_idx = 2;
                                 break;
                             default:
-                            {
                                 printf("ERROR: wrong device volume...\n\r");
-                                return 0;
-                            }
-                            break;
+                                return 3;
+                        }
+                        if (audio_vol >= 0)
+                            printf("%s volume %d\n\r", audio_source[audio_idx], audio_vol);
+                        else {
+                            printf("invalid %s volume %c\n\r", audio_source[audio_idx], *params);
+                            return 4;
                         }
                     }
-*/                    
                     else if (to_upper(*params) == 'Z')
                     {
                         params++;
@@ -510,7 +516,7 @@ int main(void)
     if (!found) 
     {
         printf("ERROR: WonderTANG! not found...\n\r");
-        return 0;
+        return 1;
     }
     else
     if (help == TRUE || megaram_type == TYPE_UNK)
@@ -521,11 +527,11 @@ int main(void)
                 "   3: ASCII8     (/A8)\n\r"
                 "   5: Konami SCC (/K5)\n\r"
                 "   6: Konami     (/K4)\n\r\n\r"
-//                " /Vxy: Set volume for\n\r"
-//                "   S: SCC+\n\r"
-//                "   P: PSG\n\r"
-//                "   O: OPLL\n\r"
-//                "   y: 0-9\n\r\n\r"
+                " /Vxy: Set volume for\n\r"
+                "   S: SCC+\n\r"
+                "   P: PSG\n\r"
+                "   O: OPLL\n\r"
+                "   y: 0-7\n\r\n\r"
                 " /Zx: Set cpu mode\n\r"
                 "   0: current\n\r"
                 "   1: Z80\n\r"
@@ -553,9 +559,9 @@ int main(void)
                 break;
     }
 
-    MEGA_PORT1 = 0xF0 | scc_vol;
-    MEGA_PORT1 = 0xE0 | psg_vol;
-    MEGA_PORT1 = 0xD0 | opll_vol;
+    MEGA_PORT1 = 0xF0 | (scc_vol & 0x0F);
+    MEGA_PORT1 = 0xE0 | (psg_vol & 0x0F);
+    MEGA_PORT1 = 0xD0 | (opll_vol & 0x0F);
 
     if (filename == 0) {        
         if (megaram_type != TYPE_UNK)
@@ -602,7 +608,7 @@ int main(void)
     else 
     {
         printf("ERROR: Failed loading %s\n\r", filename);
-        return 0;
+        return 2;
     }
     *t = ' '; // restore space
     MEGA_PORT1 = megaram_type;
@@ -660,6 +666,6 @@ int main(void)
 
     jump(0xC000);
 
-    return 1; // make sdcc happy
+    return 0; // make sdcc happy
 }
 
