@@ -22,4 +22,4 @@ create_clock -name clk_opll -period 279.36 -waveform {0 139.68} [get_nets {clk_o
 // PSG
 create_clock -name hclock -period 558.72 -waveform {0 279.36} [get_nets {hclock}] -add
 
-set_clock_groups -asynchronous -group [get_clocks {clk}] -group [get_clocks {clock}] -group [get_clocks {clk108 clk108p}] -group [get_clocks {clk135 clk54 clk_audio}] -group [get_clocks {clk_sound clk_opll}]
+//set_clock_groups -asynchronous -group [get_clocks {clk}] -group [get_clocks {clock}] -group [get_clocks {clk108 clk108p}] -group [get_clocks {clk135 clk54 clk_audio}] -group [get_clocks {clk_sound clk_opll}]
