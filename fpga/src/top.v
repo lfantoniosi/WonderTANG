@@ -365,19 +365,19 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(sltsl_n),
     .dout(sltsl_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 
-wire clock_w;
-
-pinfilter (
+pinfilter 
+ (
     .clk(clk108_w),
     .reset_n(rst_n_w),
     .din(clock),
     .dout(clock3),
-    .ena(1)
+    .ena(ff_dotena)
 );
+
 BUFG (
 .O(clock_w),
 .I(clock3)
@@ -390,7 +390,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(rd_n),
     .dout(rd_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 wire wr_n_w;
@@ -399,7 +399,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(wr_n),
     .dout(wr_n_w),
-    .ena(1)
+    .ena(ff_dotena)
 );
 
 wire [15:0] addrmux_w;
@@ -454,9 +454,6 @@ pinfilter (
 
 wire merq_scc_n_w;
 pinfilter 
-//#(
-//    .REGISTERED(1)
-//) 
 (
     .clk(clk108_w),
     .reset_n(rst_n_w),
@@ -1196,9 +1193,20 @@ assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1]
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
 
+/*
 clockdiv2(
     .clk_src(clock_w),
     .reset_n(ram_enabled_w),
+    .clk_div(hclock)
+);
+*/
+clockdivint #(
+    .CLK_SRC(108),
+    .CLK_DIV(315.0/88.0/2.0)//,
+    //.PRECISION_BITS(16)
+) (
+    .clk_src(clk108_w),
+    .reset_n(clk108_lock_w),
     .clk_div(hclock)
 );
 BUFG(
