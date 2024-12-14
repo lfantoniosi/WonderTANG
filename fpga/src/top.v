@@ -368,7 +368,6 @@ pinfilter (
     .ena(ff_dotena)
 );
 
-
 pinfilter 
  (
     .clk(clk108_w),
@@ -453,9 +452,10 @@ pinfilter (
 );
 
 wire merq_scc_n_w;
-pinfilter 
+pinfilter2
 (
     .clk(clk108_w),
+    .reg_clk(clock_w),
     .reset_n(rst_n_w),
     .din(mp[0]),
     .dout(merq_scc_n_w),
