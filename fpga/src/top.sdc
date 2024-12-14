@@ -12,7 +12,8 @@ create_generated_clock -name clk54 -source [get_ports {clk}] -master_clock clk -
 create_clock -name clk_audio -period 22675.73696 -waveform {0 11337.86848} [get_nets {clk_audio}] -add
 ////////////////
 
-create_clock -name clock -period 69.832 -waveform {0 34.916} [get_ports {clock}] -add
+//create_clock -name clock -period 69.832 -waveform {0 34.916} [get_ports {clock}] -add
+create_clock -name clock -period 34.916 -waveform {0 17.458} [get_ports {clock}] -add
 
 create_clock -name clk_sound -period 1417.23356 -waveform {0 708.61678} [get_nets {clk_sound}] -add
 
