@@ -77,7 +77,7 @@ reg  [ 7:0] cnt3 = 0;
 reg  [ 7:0] cnt4 = 8'hFF;
 
 
-always @ (posedge clk or negedge rstn)
+always_ff @ (posedge clk or negedge rstn)
     if(~rstn) begin
         {busy, done, timeout, syntaxe} <= 0;
         sdclk <= 1'b0;

@@ -18,7 +18,7 @@ reg [2:0] ff_memreg;
 
 integer i;
 
-always @(posedge clk or negedge reset_n) begin
+always_ff @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
        ff_memreg <= 3'b0;
     end else begin

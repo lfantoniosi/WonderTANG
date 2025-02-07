@@ -7,6 +7,10 @@ module top(
     input   clk,
     input   s1,
 
+    input   pll0,
+    input   pll1,
+    input   pll2,
+
     output led,
 
 `ifdef SMS
@@ -65,16 +69,14 @@ module top(
     output [3:0] O_sdram_dqm       // 32/4
 );
 
-wire reset_ram_n;
-wire reset_rom_n;
-wire res_n_w;
+    wire reset_ram_n;
+    wire reset_rom_n;
+    wire res_n_w;
 
-    wire clk_w;
     BUFG(
     .O(clk_w),
     .I(clk)
     );
-
 
     reg [2:0] ff_cold_boot = 4;
     reg ff_res1 = 1;
@@ -86,14 +88,15 @@ wire res_n_w;
     localparam BS_WARM              = CLK_FRQ;
 
     reg ff_s1n = 0;
-    always @(posedge clk_w) ff_s1n <= ~s1;
-    wire s1n_w = ff_s1n && ff_res1 && res_n_w;
+    clk_domain (.clk(clk_w), .req(1'b1), .i(res_n_w), .o(res_n_clk_w));
+    always_ff @(posedge clk_w) ff_s1n <= ~s1;
+    wire s1n_w = ff_s1n && ff_res1 && res_n_clk_w;
     wire rgb;
     wire rgb_done;
 
     ws2812(
     .clk(clk_w),
-    .rst_n(ff_s1n && res_n_w),
+    .rst_n(ff_s1n && res_n_clk_w),
     .WS2812(rgb), // output to the interface of WS2812
     .done(rgb_done)
     );       
@@ -102,7 +105,7 @@ wire res_n_w;
     reg ff_wait = 1;
     reg ff_rgb_state = 0;
 
-    always @(posedge clk_w) begin
+    always_ff @(posedge clk_w) begin
         //ff_wait <= 1;
         if (rgb_done)
             case(ff_bootstate)
@@ -134,35 +137,20 @@ wire res_n_w;
                         ff_bootstate <= ff_bootstate + 1;
             end
             endcase
-    end
- 
+    end    
 
-
-`ifdef SMS
-    clk135 (
-        .clkout(clk135), //output clkout
-        .lock(clk135_lock_w), //output lock
-        .reset(~s1n_w), //input reset
-        .clkin(clk) //input clkin
-    );
-    BUFG (
-    .O(clk135_w),
-    .I(clk135)
+    BUFG(
+    .O(pll0_w),
+    .I(pll0)
     );
 
-    assign rst_w = ~clk135_lock_w & ~clk108_lock_w;
-`else
-
-    assign rst_w = ~clk108_lock_w;
-`endif
-
-    clkp_108 (
+    CLK108M (
         .clkout(clk108), //output clkout
         .lock(clk108_lock_w), //output lock
         .clkoutp(clk108p), //output clkoutp
-        .clkoutd(clk_pa),
+        .clkoutd(clk54), //output clkoutd
         .reset(~s1n_w), //input reset
-        .clkin(clk) //input clkin
+        .clkin(pll0) //input clkin
     );
     BUFG(
     .O(clk108_w),
@@ -173,30 +161,96 @@ wire res_n_w;
     .I(clk108p)
     );
     BUFG(
-    .O(clk_pa_w),
-    .I(clk_pa)
-    );
-    assign rst_n_w = ~rst_w;
-/*
-    CLKDIV #(
-        .DIV_MODE(2)
-    )(
-    .HCLKIN(clk108_w),
-    .RESETN(clk108_lock_w),
-    .CLKOUT(clk54)
-    );
-*/
-
-    clockdiv2(
-        .clk_src(clk108_w),
-        .reset_n(clk108_lock_w),
-        .clk_div(clk54)
-    );
-
-    BUFG(
     .O(clk54_w),
     .I(clk54)
     );
+
+    BUFG(
+    .O(pll1_w),
+    .I(pll1)
+    );
+    clockdivint #(
+        .CLK_SRC(10),
+        .CLK_DIV(1)
+    ) (
+        .clk_src(pll1_w),
+        .reset_n(s1n_w),
+        .clk_div(clk_opll)
+    );
+    BUFG (
+    .O(clk_opll_w),
+    .I(clk_opll)
+    );
+    clockdivint #(
+        .CLK_SRC(20),
+        .CLK_DIV(1)
+    ) (
+        .clk_src(pll1_w),
+        .reset_n(s1n_w),
+        .clk_div(clk_psg)
+    );
+    BUFG(
+    .O(clk_psg_w),
+    .I(clk_psg)
+    );
+
+
+    BUFG(
+    .O(pll2_w),
+    .I(pll2)
+    );
+    clockdivint #(
+        .CLK_SRC(10),
+        .CLK_DIV(1)
+    ) (
+        .clk_src(pll2_w),
+        .reset_n(s1n_w),
+        .clk_div(clk_sound)
+    );
+    BUFG (
+    .O(clk_sound_w),
+    .I(clk_sound)
+    );
+
+
+ 
+`ifdef SMS
+    CLK135M27 (
+        .clkout(clk135), //output clkout
+        .lock(clk135_lock_w), //output lock
+        //.clkoutd(clk27),
+        .reset(~s1n_w), //input reset
+        .clkin(clk) //input clkin
+    );
+    BUFG (
+    .O(clk135_w),
+    .I(clk135)
+    );
+    wire clk27_w = clk_w;
+    
+    //BUFG(
+    //.O(clk27_w),
+    //.I(clk27)
+    //);
+
+    assign rst_w = ~clk135_lock_w & ~clk108_lock_w;
+`else
+
+   clockdiv2(
+       .clk_src(clk54_w),
+       .reset_n(clk108_lock_w),
+       .clk_div(clk27)
+   );
+   BUFG(
+   .O(clk27_w),
+   .I(clk27)
+   );
+
+    assign rst_w = ~clk108_lock_w;
+`endif
+
+    assign rst_n_w = ~rst_w;
+
 
 /// FLASH ROM LOADER - BIOS
 
@@ -222,7 +276,7 @@ wire flash_busy_w;
 wire[7:0] flash_dout_w;
 reg ff_flash_terminate = 0;
 flash(
-    .clk(clk_w),
+    .clk(clk27_w),
     .reset_n(reset_rom_n),
     .SCLK(mspi_sclk),
     .CS(mspi_cs),
@@ -245,7 +299,7 @@ localparam STATE_IDLE           = 8'd3;
 
 wire flash_idle_w = (ff_flash_state == STATE_IDLE) ? 1'b1 : 1'b0;
 
-always @(posedge clk_w, negedge reset_rom_n) begin
+always_ff @(posedge clk27_w, negedge reset_rom_n) begin
 if (reset_rom_n == 0) begin
     ff_flash_state = STATE_RESET;
     ff_flash_rd <= 0;
@@ -309,14 +363,15 @@ reg  ff_dotena;
 
 reg [2:0] dotena_state_ff;
 
-always@(posedge clk108_w or negedge rst_n_w) begin
+always_ff @(posedge clk108_w or negedge rst_n_w) begin
     if (rst_n_w == 0) begin
-        dotena_state_ff = 3'd0;
+        dotena_state_ff <= 3'd0;
         ff_msel_n <= 3'b111; // none
-        ff_dotena <= 1'b0;
+        //ff_dotena <= 1'b0;
     end
     else begin
         case(dotena_state_ff)
+        //default: begin
         default: begin
             ff_msel_n <= 3'b110; // A0-A7
             ff_dotena <= 1'b0;
@@ -349,9 +404,13 @@ always@(posedge clk108_w or negedge rst_n_w) begin
             ff_dotena <= 1'b0;
             dotena_state_ff <= 3'd0;
         end
+
         endcase
+   
     end
 end
+
+wire dotena_w = ff_dotena;
 
 assign msel_n = ff_msel_n;
 
@@ -365,7 +424,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(sltsl_n),
     .dout(sltsl_n_w),
-    .ena(ff_dotena)
+    .ena(dotena_w)
 );
 
 pinfilter 
@@ -374,7 +433,7 @@ pinfilter
     .reset_n(rst_n_w),
     .din(clock),
     .dout(clock3),
-    .ena(ff_dotena)
+    .ena(dotena_w)
 );
 
 BUFG (
@@ -389,7 +448,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(rd_n),
     .dout(rd_n_w),
-    .ena(ff_dotena)
+    .ena(dotena_w)
 );
 
 wire wr_n_w;
@@ -398,7 +457,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(wr_n),
     .dout(wr_n_w),
-    .ena(ff_dotena)
+    .ena(dotena_w)
 );
 
 wire [15:0] addrmux_w;
@@ -412,7 +471,7 @@ generate
             .reset_n(rst_n_w),
             .din(mp[i]),
             .dout(addrmux_w[i]),
-            .ena(~msel_n[0] & ff_dotena)
+            .ena(~msel_n[0] & dotena_w)
         );
 
         pinfilter (
@@ -420,7 +479,7 @@ generate
             .reset_n(rst_n_w),
             .din(mp[i]),
             .dout(addrmux_w[i+8]),
-            .ena(~msel_n[1] & ff_dotena)
+            .ena(~msel_n[1] & dotena_w)
         );
 
         pinfilter (
@@ -435,8 +494,8 @@ generate
 endgenerate
 
 reg [15:0] ff_addr;
-always@(posedge clk108_w ) begin
-    if (~msel_n[2] & ff_dotena) ff_addr = addrmux_w;
+always_ff @(posedge clk108_w ) begin
+    if (~msel_n[2] & dotena_w) ff_addr <= addrmux_w;
 end
 
 wire [15:0] addr_w;
@@ -448,7 +507,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[0]),
     .dout(merq_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 wire merq_scc_n_w;
@@ -459,7 +518,7 @@ pinfilter2
     .reset_n(rst_n_w),
     .din(mp[0]),
     .dout(merq_scc_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 wire iorq_n_w;
@@ -468,7 +527,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[1]),
     .dout(iorq_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 //wire cs1_n_w;
@@ -477,7 +536,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[2]),
 //    .dout(cs1_n_w),
-//    .ena(~msel_n[2] & ff_dotena)
+//    .ena(~msel_n[2] & dotena_w)
 //);
 
 //wire cs2_n_w;
@@ -486,7 +545,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[3]),
 //    .dout(cs2_n_w),
-//    .ena(~msel_n[2] & ff_dotena)
+//    .ena(~msel_n[2] & dotena_w)
 //);
 
 //wire res_n_w;
@@ -495,7 +554,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[4]),
     .dout(res_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 wire rfsh_n_w;
@@ -504,7 +563,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[5]),
     .dout(rfsh_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 //wire cs12_n_w;
@@ -513,7 +572,7 @@ pinfilter (
 //    .reset_n(rst_n_w),
 //    .din(mp[6]),
 //    .dout(cs12_n_w),
-//    .ena(~msel_n[2] & ff_dotena)
+//    .ena(~msel_n[2] & dotena_w)
 //);
 
 wire m1_n_w;
@@ -522,7 +581,7 @@ pinfilter (
     .reset_n(rst_n_w),
     .din(mp[7]),
     .dout(m1_n_w),
-    .ena(~msel_n[2] & ff_dotena)
+    .ena(~msel_n[2] & dotena_w)
 );
 
 //////////////
@@ -550,7 +609,7 @@ reg ce_cpu;
 reg ce_vdp;
 reg ce_pix;
 reg ce_sp;
-always @(negedge clk54_w or negedge sms_reset_n) begin
+always_ff @(negedge clk54_w or negedge sms_reset_n) begin
 	reg [4:0] clkd;
     if (~sms_reset_n) begin
         clkd <= 0;
@@ -619,7 +678,7 @@ reg ff_vdp_rd_n, ff_vdp_wr_n;
 reg ff_prev_vdp_rd_n = 1;
 reg ff_prev_vdp_wr_n = 1;
 
-always @(posedge clk54_w) begin
+always_ff @(posedge clk54_w) begin
 
     if (ce_vdp_w) begin
         ff_vdp_rd_n <= 1;
@@ -700,7 +759,7 @@ video (
 reg [8:0] vx;
 reg [8:0] vy;
 wire [15:0] vdp_color_addr;
-always @(posedge clk54_w or negedge sms_reset_n) begin    
+always_ff @(posedge clk54_w or negedge sms_reset_n) begin    
     if (~sms_reset_n) begin
         vx <= 9'b111111110;
         vy <= '0;
@@ -729,7 +788,7 @@ wire [15:0] out_color_addr;
 reg [9:0] cx_off;
 reg [9:0] cy_off;
 
-always @(posedge clk_w) begin   
+always_ff @(posedge clk27_w) begin   
     cx_off <= cx_w - 9'd112; //9'd83; //9'd112;
     cy_off <= cy_w - 9'd44;
 
@@ -749,14 +808,14 @@ dpram#(
     .widthad_a(16),
     .width_a(6)
 )(
-    .clock_a(clk_w),
+    .clock_a(clk54_w),
     .address_a(vdp_color_addr),
     .wren_a(~vx[8] & ~vy[8]),
     .rden_a(0),
     .data_a({vdp_color[11:10], vdp_color[7:6], vdp_color[3:2] }),
 //    .q_a(),
 
-    .clock_b(clk_w),
+    .clock_b(clk27_w),
     .address_b(out_color_addr),
     .wren_b(0),
     .rden_b(1),
@@ -774,11 +833,11 @@ dpram#(
     localparam NUM_CHANNELS = 3;
 
     clockdivint #(
-        .CLK_SRC(27),
+        .CLK_SRC(54),
         .CLK_DIV(0.044100)//,
         //.PRECISION_BITS(16)
     ) (
-        .clk_src(clk_w),
+        .clk_src(clk54_w),
         .reset_n(sms_reset_n),
         .clk_div(clk_audio)
     );
@@ -788,16 +847,9 @@ dpram#(
     );
 
     wire [15:0] sample_w;
-
-    reg [15:0] audio_sample_word [1:0], audio_sample_word0 [1:0];
-    always @(posedge clk_w) begin       // crossing clock domain
-        audio_sample_word0[0] <= sample_w;
-        audio_sample_word[0] <= audio_sample_word0[0];
-        audio_sample_word0[1] <= sample_w;
-        audio_sample_word[1] <= audio_sample_word0[1];
-    end
     wire [15:0] audio_sample_word_w [1:0];
-    assign audio_sample_word_w = audio_sample_word;
+    clk_domain #(.WIDTH(16))(.clk(clk_audio_w), .req(1'b1), .i(sample_w), .o(audio_sample_word_w[0]));
+    clk_domain #(.WIDTH(16))(.clk(clk_audio_w), .req(1'b1), .i(sample_w), .o(audio_sample_word_w[1]));
 
     logic [9:0] tmds_ntsc [NUM_CHANNELS-1:0];
     hdmi #( .VIDEO_ID_CODE(2), 
@@ -815,7 +867,7 @@ dpram#(
             )
 
     hdmi_inst ( .clk_pixel_x5(clk135_w), 
-          .clk_pixel(clk_w), 
+          .clk_pixel(clk27_w), 
           .clk_audio(clk_audio_w),
           .rgb({r_w, g_w, b_w}), 
           .reset( ~sms_reset_n ),
@@ -826,12 +878,12 @@ dpram#(
         );
 
     
-    serializer #(.NUM_CHANNELS(NUM_CHANNELS), .VIDEO_RATE(0)) serializer(.clk_pixel(clk_w), .clk_pixel_x5(clk135_w), .reset(~sms_reset_n),
+    serializer #(.NUM_CHANNELS(NUM_CHANNELS), .VIDEO_RATE(0)) serializer(.clk_pixel(clk27_w), .clk_pixel_x5(clk135_w), .reset(~sms_reset_n),
     .tmds_internal(tmds_internal), .tmds(tmds) ); 
 
     // Gowin LVDS output buffer
     ELVDS_OBUF tmds_bufds [3:0] (
-        .I({clk_w, tmds}),
+        .I({clk27_w, tmds}),
         .O({tmds_clk_p, tmds_data_p}),
         .OB({tmds_clk_n, tmds_data_n})
     );
@@ -996,7 +1048,7 @@ assign sd_dat2 = 1;
 assign sd_dat3 = 1; // Must set sddat1~3 to 1 to avoid SD card from entering SPI mode
 
 
-always @(posedge clk108_w or negedge ram_enabled_w) begin
+always_ff @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_sd_en <= 0;
     end else begin
@@ -1013,7 +1065,7 @@ reg [7:0] ff_sd_cd;
 wire [7:0] sd_cd_w;
 assign sd_cd_w = ff_sd_cd;
 
-always @(posedge clk108_w or negedge ram_enabled_w) begin
+always_ff @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_sd_rstart <= '0;
         ff_sd_wstart <= '0;
@@ -1094,9 +1146,7 @@ mmapper(
 
 wire megaram_ena_w;
 wire [22:0] megaram_addr_w;
-wire scc_busreq_w;
-wire [7:0] scc_cd_w;
-wire [14:0] scc_wave_w;
+
 
 
 wire megaram_cs_w;
@@ -1108,9 +1158,9 @@ reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 //reg [3:0] ff_psg_vol;
 //reg [3:0] ff_opll_vol;
 
-always @(posedge clk108_w or negedge ram_enabled_w) begin
+always_ff @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
-        ff_megaram_type <= 2'b01;
+        ff_megaram_type <= 2'b00;
         ff_scc_enable <= '1;
 
 //        ff_scc_vol <= 4'h0;
@@ -1122,19 +1172,19 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
 
             case(cdin_w)
                 8'h05: begin
-                    ff_scc_enable <= 1'b1;
-                    ff_megaram_type <= 2'b01;
+                    ff_scc_enable <= 1;
+                    ff_megaram_type <= 2'b00;
                 end
                 8'h16: begin
-                    ff_scc_enable <= 1'b0;
+                    ff_scc_enable <= 0;
                     ff_megaram_type <= 2'b10;
                 end
                 8'h08: begin
-                    ff_scc_enable <= 1'b0;
+                    ff_scc_enable <= 0;
                     ff_megaram_type <= 2'b11;
                 end
                 8'h04: begin
-                    ff_scc_enable <= 1'b0;
+                    ff_scc_enable <= 0;
                     ff_megaram_type <= 2'b00;
                 end
             endcase
@@ -1156,11 +1206,14 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
 end
 
 wire scc_enable_w;
+wire scc_busreq_w;
 assign scc_enable_w = ff_scc_enable;
 wire [1:0] megaram_type_w;
 assign megaram_type_w = ff_megaram_type;
+wire [7:0] scc_cd_w;
+wire [14:0] scc_wave_w;
 
-megaramSCC(
+smegaram(
     .clk(clk108_w),
     .reset_n(ram_enabled_w),
     .addr(addr_w),
@@ -1182,111 +1235,84 @@ megaramSCC(
     .scc_enable(scc_enable_w),
     .megaram_type(megaram_type_w)
 );
+
+
+
+// wire scc_req_w;
+// //wire [7:0] scc_cdout_w;
+// //wire [14:0] scc_wavl_w;
+// wire wavemem_w;
+
+// wire scc_busreq_w = scc_enable_w && ~megaram_ena_w && wavemem_w && slotsel_w[MR_SSLT] && ~merq_scc_n_w && iorq_n_w && ~rd_n_w ? 1 : 0;
+// wire scc_req_w = scc_enable_w && ~megaram_ena_w && wavemem_w && slotsel_w[MR_SSLT] && ~merq_scc_n_w && iorq_n_w ? 1 : 0;
+// megaram(
+//      .clk21m(clock_w),
+//      .reset(~ram_enabled_w),
+//      .clkena(scc_enable_w),
+//      .req(scc_req_w),
+//      .wrt(~wr_n_w),
+//      .adr(addr_w),
+//      .dbi(scc_cd_w),
+//      .dbo(cdin_w),
+//      .ramdbi(8'h00),
+//      .mapsel(2'b00), // SCC+ "-0":SCC+, "01":ASC8K, "11":ASC16K
+//      .wavl(scc_wave_w),
+//      .wavemem(wavemem_w)
+//  );
+//clk_domain #(.WIDTH(8))(.clk(clk108_w), .req(scc_busreq_w), .i(scc_cdout_w), .o(scc_cd_w));
+//clk_domain #(.WIDTH(15))(.clk(clk108_w), .req(1), .i(scc_wavl_w), .o(scc_wave_w));
+
 //////////////// AUDIO
 `ifdef PSG
-//wire [7:0] psg_cd_w;
 wire [7:0] psg_wave_w;
 wire psg_req_w;
 assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1] == 7'b1010000) ? 1 : 0;
-//wire psg_busreq_w;
 
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
 
-/*
-clockdiv2(
-    .clk_src(clock_w),
-    .reset_n(ram_enabled_w),
-    .clk_div(hclock)
-);
-*/
-clockdivint #(
-    .CLK_SRC(108),
-    .CLK_DIV(315.0/88.0/2.0)//,
-    //.PRECISION_BITS(16)
-) (
-    .clk_src(clk108_w),
-    .reset_n(clk108_lock_w),
-    .clk_div(hclock)
-);
-BUFG(
-.O(hclock_w),
-.I(hclock)
-);
-
+wire [7:0] cdin_pll1_w;
+clk_domain #(.WIDTH(8))(.clk(pll1_w), .req(1'b1), .i(cdin_w), .o(cdin_pll1_w));
+clk_domain (.clk(pll1_w), .req(1'b1), .i(psg_req_w), .o(psg_req_pll1_w));
+clk_domain (.clk(pll1_w), .req(1'b1), .i(wr_n_w), .o(wr_n_pll1_w));
+wire [1:0] addr_pll1_w;
+clk_domain #(.WIDTH(2))(.clk(pll1_w), .req(1'b1), .i(addr_w), .o(addr_pll1_w));
+clk_domain (.clk(pll1_w), .req(1'b1), .i(ram_enabled_w), .o(ram_enabled_pll1_w));
 
 YM2149(
-  .I_DA(cdin_w),
-  //.O_DA(psg_cd_w),
-  //.O_DA_OE_L(psg_busreq_w),
+  .I_DA(cdin_pll1_w),
   .I_A9_L(0), 
   .I_A8(1),   
-  .I_BDIR( (psg_req_w && ~wr_n_w && ~addr_w[1]) ? 1 : 0),
+  .I_BDIR( (psg_req_pll1_w && ~wr_n_pll1_w && ~addr_pll1_w[1]) ? 1 : 0),
   .I_BC2(1),   
-  .I_BC1( psg_req_w && (~rd_n_w && addr_w[1] || ~wr_n_w && ~addr_w[0]) ? 1 : 0),  
+  .I_BC1( psg_req_pll1_w && (~rd_n_w && addr_pll1_w[1] || ~wr_n_pll1_w && ~addr_pll1_w[0]) ? 1 : 0),  
   .I_SEL_L(1),
   .O_AUDIO(psg_wave_w),
   .I_IOA(8'b0),
-  //.O_IOA(),
-  //.O_IOA_OE_L(),
   .I_IOB(psg_portb_w),
-  //.O_IOB(psg_portb_w),
-  //O_IOB_OE_L(),
   .ENA(1),
-  .RESET_L(ram_enabled_w),
-  .CLK(hclock_w),
-  .clkHigh(clock_w)
-  //debug()
+  .RESET_L(ram_enabled_pll1_w),
+  .CLK(clk_psg_w),
+  .clkHigh(clk_opll_w)
   );
 `endif
 
 `ifdef OPLL   
 wire opll_req_w;
 assign opll_req_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && ~wr_n_w && addr_w[7:1] == 7'b0111110) ? 1 : 0;
-wire [15:0] opll_mixout;
+clk_domain (.clk(pll1_w), .req(1'b1), .i(opll_req_w), .o(opll_req_pll1_w));
+wire [15:0] opll_mixout_w;
 
-
-clockdivint #(
-    .CLK_SRC(108),
-    .CLK_DIV(315.0/88.0)//,
-    //.PRECISION_BITS(16)
-) (
-    .clk_src(clk108_w),
-    .reset_n(clk108_lock_w),
-    .clk_div(clk_opll)
-);
-BUFG(
-.O(clk_opll_w),
-.I(clk_opll)
-);
-/*
-opll(
-    .xin(clk_opll_w),
-    //.xout(),
-    .xena(1),
-    .d(cdin_w),
-    .a(addr_w[0]),
-    .cs_n(~opll_req_w),
-    .we_n(wr_n_w),
-    .ic_n(ram_enabled_w),
-    .mixout(opll_mixout)
-); 
-*/
 jt2413 (
-    .rst(~ram_enabled_w),
+    .rst(~ram_enabled_pll1_w),
     .clk(clk_opll_w),
     .cen(1'b1),
-    .din(cdin_w),
-    .addr(addr_w[0]),
-    .cs_n(~opll_req_w),
-    .wr_n(wr_n_w),
-    //.dout
-    //.irq_en
-    .snd(opll_mixout)
-    //.sample
+    .din(cdin_pll1_w),
+    .addr(addr_pll1_w[0]),
+    .cs_n(~opll_req_pll1_w),
+    .wr_n(wr_n_pll1_w),
+    .snd(opll_mixout_w)
 );
-
-
 
 `endif
 
@@ -1294,23 +1320,28 @@ reg [15:0] sound_sample;
 reg [15:0] hdmi_sample;
 reg [15:0] audio_hdmi;
 
-always@(posedge clk108_w) begin
+reg [7:0] psg_wave_108_w;
+clk_domain #(.WIDTH(8))(.clk(clk108_w), .req(1'b1), .i(psg_wave_w), .o(psg_wave_108_w));
+reg [15:0] opll_mixout_108_w;
+clk_domain #(.WIDTH(16))(.clk(clk108_w), .req(1'b1), .i(opll_mixout_w), .o(opll_mixout_108_w));
+
+
+always_ff @(posedge clk108_w) begin
 
        hdmi_sample <= 16'b0
 `ifdef OPLL       
-       + {  opll_mixout[15], opll_mixout[15:1] }
+       + {  opll_mixout_108_w[15], opll_mixout_108_w[15:1] }
 `endif
 `ifdef SCC
        + { scc_wave_w[14], scc_wave_w[14:0] }
 `endif 
 `ifdef PSG
-       + { 3'b0, psg_wave_w[7:0], 5'b0 }
+       + { 3'b0, psg_wave_108_w[7:0], 5'b0 }
 `endif
 `ifdef SMS
        + { jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10], jt89_wave[10:0] }
 `endif
        ;
-
        sound_sample <= hdmi_sample + 16'b0001000000000000;
        audio_hdmi <= (~{hdmi_sample[14:0], 1'b0} ) + 16'b1; // 2-complement signed
 end
@@ -1319,30 +1350,19 @@ end
 assign sample_w = audio_hdmi;
 `endif
 
-clockdivint #(
-    .CLK_SRC(27),
-    .CLK_DIV(0.044100*16.0)
-    //.PRECISION_BITS(16)
-) (
-    .clk_src(clk_w),
-    .reset_n(clk108_lock_w),
-    .clk_div(clk_sound)
-);
-BUFG (
-.O(clk_sound_w),
-.I(clk_sound)
-);
+wire [15:0] sound_sample_w = sound_sample;
+wire [15:0] sound_sample_sound_w;
+clk_domain #(.WIDTH(16))(.clk(clk_sound_w), .req(sound_req_w), .i(sound_sample_w), .o(sound_sample_sound_w));
 
 audio_drive(
 .clk_1p536m(clk_sound_w),
-.rst_n(clk108_lock_w),
-.idata(sound_sample),
-//.req(),
+.rst_n(s1n_w),
+.idata(sound_sample_sound_w),
+.req(sound_req_w),
 .HP_BCK(hp_bck),
 .HP_WS(hp_ws),
 .HP_DIN(hp_din)
 );
-
 
 ///// FM ROM
 `ifdef OPLL   
@@ -1370,7 +1390,7 @@ wire [22:0] ram_addr_w;
 
 reg ff_mem_ack = 0;
 
-always @(posedge clk108_w) begin
+always_ff @(posedge clk108_w) begin
 
     if (~merq_n_w) begin
         if ((ram_re_w || ram_we_w) && ~ram_busy_w && bus_idle_w) begin
@@ -1400,11 +1420,11 @@ assign ram_we_w = (~flash_idle_w) ? rom_wr_w :
 assign ram_dout_w = (ram_addr_w[0] == 1'b0) ? ram_dout16_w[7:0] : ram_dout16_w[15:8];
 
 reg [7:0] ff_cdout;
-always @(posedge clk108_w) begin
+always_ff @(posedge clk108_w) begin
     //ff_cdout = 'z;
     if (slotsel_w[BIOS_SSLT] && cart_ena_w[BIOS_SSLT]||
         slotsel_w[MM_SSLT] && cart_ena_w[MM_SSLT] ||
-        slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ff_cdout <= ram_dout_w;
+        slotsel_w[MR_SSLT] && cart_ena_w[MR_SSLT]) ff_cdout <= ram_dout_w;        
     if (sram_busreq_w) ff_cdout <= sram_cd_w;
     if (sd_busreq_w) ff_cdout <= sd_cd_w;
 `ifdef SCC
@@ -1475,7 +1495,21 @@ assign int_n = 1'b0;
 assign wait_n = (ff_wait || ~reset_ram_n) ? 1'b1 : 1'b0; 
 assign led = sd_busy_w;
 
-assign  pa_en = 1'b1;
+
+//reg [15:0] last_snd_r;
+//reg [15:0] snd_cooldown_r;
+//
+//always_ff @(posedge clk_sound_w) begin
+//    if (snd_cooldown_r > 0)
+//        snd_cooldown_r <= snd_cooldown_r -1;
+//
+//    if (last_snd_r != sound_sample_sound_w)
+//        snd_cooldown_r <= 16'h8000; // 35280 ticks for 20hz sound
+//    
+//    last_snd_r <= sound_sample_w;
+//end
+
+assign pa_en = 1'b1; //(snd_cooldown_r != 0) ? 1'b1 : 1'b0;
 
 
 endmodule

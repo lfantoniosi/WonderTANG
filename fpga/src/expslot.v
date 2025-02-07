@@ -22,7 +22,7 @@ wire ffff_w;
 assign ffff_w = addr == 16'hffff ? 1 : 0;
 
 wire [7:0]slotreg_w;
-always @(posedge clk or negedge reset_n) begin
+always_ff @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
         ff_slotreg <= 8'b00000000;
         ff_busreq <= 1'b0;

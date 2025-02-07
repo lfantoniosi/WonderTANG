@@ -28,7 +28,7 @@ reg [ 8:0] data_send   = 0; // number of data sent - increase for larger led str
 reg [31:0] clk_count   = 0; // delay control
 reg [23:0] WS2812_data = 0; // WS2812 color data
 
-always@(posedge clk or negedge rst_n)
+always_ff@(posedge clk or negedge rst_n)
     if (rst_n == 0)
         done <= 0;
     else

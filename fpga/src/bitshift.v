@@ -6,7 +6,7 @@ module bitshift
     input [3:0] shift,
     output reg [15:0] dout
 );
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
 
         case(shift)
 

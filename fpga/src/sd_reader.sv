@@ -170,7 +170,7 @@ endtask
 
 
 
-always @ (posedge clk or negedge rstn)
+always_ff @ (posedge clk or negedge rstn)
     if(~rstn) begin
         set_cmd(0,0,0,0);
         clkdiv      <= SLOWCLKDIV;
@@ -313,7 +313,7 @@ reg [3:0] crc_stat;
 reg [9:0] raddr;
 reg [9:0] waddr;
 
-always @ (posedge clk or negedge rstn)
+always_ff @ (posedge clk or negedge rstn)
     if(~rstn) begin
         outen   <= 1'b0;
         outaddr <= 0;

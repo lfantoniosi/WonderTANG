@@ -26,7 +26,7 @@
  "Generate_Post_Place_File" : false,
  "Generate_SDF_File" : false,
  "Generate_VHDL_Post_PNR_Simulation_Model_File" : false,
- "Global_Freq" : "default",
+ "Global_Freq" : "135.000",
  "GwSyn_Loop_Limit" : 2000,
  "HOTBOOT" : false,
  "I2C" : false,

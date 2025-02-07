@@ -17,7 +17,7 @@ module pinfilter
     reg d;
     wire o;
 
-    always @(posedge clk or negedge reset_n) begin
+    always_ff @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
             dpipe <= 2'b11;
             d <= 2'b1;
@@ -49,7 +49,7 @@ module pinfilter2
     reg d;
     wire o;
 
-    always @(posedge clk or negedge reset_n) begin
+    always_ff @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
             dpipe <= 2'b11;
             d <= 2'b1;
@@ -62,5 +62,30 @@ module pinfilter2
     end
 
     assign dout = (reg_clk) ? d : dout;
+
+endmodule
+
+module clk_domain
+#(
+    parameter int WIDTH = 1
+)
+(
+    input clk,
+    input req,
+    input [WIDTH-1:0] i,
+    output [WIDTH-1:0] o
+);
+    reg [WIDTH-1:0] meta;
+    reg [WIDTH-1:0] sync;
+    reg [WIDTH-1:0] out;
+
+    always_ff @(posedge clk) begin
+        if (req == 1'b1) 
+            meta <= i;
+        sync <= meta;
+        out <= sync;
+    end
+
+    assign o = out;
 
 endmodule

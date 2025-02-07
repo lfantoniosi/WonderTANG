@@ -19,7 +19,7 @@ assign HP_WS  = HP_WS_r   ;
 assign HP_DIN = HP_DIN_r  ;
 assign req    = req_r     ;
 //b_cnt
-always@(posedge clk_1p536m or negedge rst_n)
+always_ff@(posedge clk_1p536m or negedge rst_n)
 begin
 if(!rst_n)
     b_cnt    <= 5'd0;
@@ -27,7 +27,7 @@ else
     b_cnt <= b_cnt+1'b1;
 end
 //req_r
-always@(posedge clk_1p536m or negedge rst_n)
+always_ff@(posedge clk_1p536m or negedge rst_n)
 begin
 if(!rst_n)
     req_r <= 1'b0;
@@ -35,7 +35,7 @@ else
     req_r <= (b_cnt == 5'd0) || (b_cnt == 5'd16);//每16个时钟读入一个数据
 end
 //idata_r
-always@(posedge clk_1p536m or negedge rst_n)
+always_ff@(posedge clk_1p536m or negedge rst_n)
 begin
 if(!rst_n)
     begin
@@ -49,7 +49,7 @@ else
     end
 end
 //HP_DIN_r
-always@(posedge clk_1p536m or negedge rst_n)
+always_ff@(posedge clk_1p536m or negedge rst_n)
 begin
 if(!rst_n)
     HP_DIN_r <= 1'b0;
@@ -57,7 +57,7 @@ else
     HP_DIN_r <= idata_r[15];
 end
 //HP_WS_r
-always@(posedge clk_1p536m or negedge rst_n)
+always_ff@(posedge clk_1p536m or negedge rst_n)
 begin
 if(!rst_n)
     HP_WS_r <= 1'b0;

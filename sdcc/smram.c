@@ -36,7 +36,6 @@
 #define RAMAD2	0xF343
 #define RAMAD3	0xF344
 
-
 void bdos() __naked
 {
 	__asm
@@ -127,6 +126,35 @@ void enaslt(uchar slotid, uint addr) __naked
     ret
     __endasm;
 }
+
+void calslt(uchar slotid, uint addr) __naked
+{
+    slotid; addr;
+    __asm
+    push    af
+    push    bc
+    push    de
+    push    hl
+    push    ix
+    push    iy
+
+    push    af
+    pop     iy
+    push    de
+    pop     ix
+    call    #CALSLT
+
+    pop     iy
+    pop     ix
+    pop     hl
+    pop     de
+    pop     bc
+    pop     af
+
+    ret
+    __endasm;
+}
+
 
 uchar rdslt(uchar slotid, uint addr) __naked
 {
@@ -347,6 +375,7 @@ char scc_vol = 9;
 char psg_vol = 9;
 char opll_vol = 9;
 char c;
+bool soft_reset = FALSE;
 
 int main(void)
 {
@@ -389,7 +418,7 @@ int main(void)
     if (found)
     {
         printf("WonderTANG! Super MegaRAM SCC+\n\r");
-        printf("v2.00\n\r");
+        printf("v2.01\n\r");
 
         sslt = 0x80 | (2 << 2) | i;
         paramlen = *((char*)0x80);
@@ -447,6 +476,10 @@ int main(void)
                     else if (to_upper(*params) == 'Y')
                     {
                         presAB = TRUE;
+                    }
+                    else if (to_upper(*params) == 'B')
+                    {
+                        soft_reset = TRUE;
                     }
   /*
                     else if (to_upper(*params) == 'V')
@@ -532,6 +565,7 @@ int main(void)
                 "   2: R800 ROM\n\r"
                 "   3: R800 DRAM\n\r\n\r"
                 " /Y:  Preserve AB header\n\r\n\r"
+                " /B:  Soft-reset after loading\n\r\n\r"
         );
         return 0;
     }
@@ -567,7 +601,7 @@ int main(void)
     *t = 0;
     handle = dos2_open(0, filename);
 
-    MEGA_PORT1 = TYPE_K4;
+    MEGA_PORT1 = TYPE_K4; //(megaram_type == TYPE_K5) ? TYPE_K5 : TYPE_K4;
 
     if (handle)
     {
@@ -588,8 +622,6 @@ int main(void)
                     *((uchar*)(0x8000)) = 0;
                 romsize += bytes_read;
                 memcpy((void*)0x4000, (void*)0x8000, bytes_read);
-                if (page == 0)
-                    romstart = *((uint*)0x8002);
                 MEGA_PORT0 = 0; // enable paging
                 printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
 
@@ -608,8 +640,8 @@ int main(void)
     MEGA_PORT1 = megaram_type;
     
     enaslt(sslt, 0x4000);
-    romstart = 0x4002;
-    if (romstart > 0x7fff)
+    romstart = *((uint*)0x4002);
+    if (romstart > (uint)0x7fff)
     {
         enaslt(sslt, 0x8000);
         page2 = TRUE;
@@ -646,19 +678,31 @@ int main(void)
             break;
     }
 
-    if (page2 == TRUE)
-        memcpy((void*)0xC000, &runROM_page2, ((uint)&runROM_page2_end - (uint)&runROM_page2));
-    else
-        memcpy((void*)0xC000, &runROM_page1, ((uint)&runROM_page1_end - (uint)&runROM_page1));
-    
-    if (cpumode != 0)
-        chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
-    
-
-    printf("\n\rPress any key to proceed...\n\r");
+    printf("\n\rPress any key to proceed [ESC to abort]...\n\r");
     c = getchar();
+    if (c != 0x01b)
+    {
+        if (soft_reset == TRUE)
+        {
+            uchar slotid = *((uchar*)(EXPTBL));
+            calslt(slotid, 0x0000); // soft boot
+        }
 
-    jump(0xC000);
+        if (page2 == TRUE)
+            memcpy((void*)0xC000, &runROM_page2, ((uint)&runROM_page2_end - (uint)&runROM_page2));
+        else
+            memcpy((void*)0xC000, &runROM_page1, ((uint)&runROM_page1_end - (uint)&runROM_page1));
+        
+        if (cpumode != 0)
+            chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
+
+        jump(0xC000);
+    }
+
+    enaslt(*((uchar*)RAMAD1), 0x4000);
+    enaslt(*((uchar*)RAMAD2), 0x8000);
+
+    jump(0x0000);
 
     return 1; // make sdcc happy
 }

@@ -14,7 +14,7 @@ module sd_crc_16(BITVAL, ENABLE, BITSTRB, CLEAR, CRC);
    
    assign inv = BITVAL ^ CRC[15];                   // XOR required?
    
-   always @(posedge BITSTRB or posedge CLEAR) begin
+   always_ff @(posedge BITSTRB or posedge CLEAR) begin
       if (CLEAR) begin
          CRC <= 0;                                  // Init before calculation
       end

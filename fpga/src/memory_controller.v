@@ -59,7 +59,7 @@ sdram #(
     .SDRAM_DQM(SDRAM_DQM)
 );
 
-always @(posedge clk or negedge resetn) begin
+always_ff @(posedge clk or negedge resetn) begin
 
     if (~resetn) begin
         busy <= 1'b1;

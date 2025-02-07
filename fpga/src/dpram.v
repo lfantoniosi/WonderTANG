@@ -18,13 +18,13 @@ parameter int width_a = 8
     output [width_a-1:0] q_b
 );
 
-localparam int array_size = $pow(2,widthad_a);
+localparam int array_size = $rtoi($pow(2.0,$itor(widthad_a)));
 
     reg [width_a-1:0] mem_r[0:array_size-1];
     reg [width_a-1:0] a_r;
     reg [width_a-1:0] b_r;
 
-    always @(posedge clock_a) begin
+    always_ff @(posedge clock_a) begin
     
         if (wren_a || rden_a) 
             if (wren_a) 
@@ -33,7 +33,7 @@ localparam int array_size = $pow(2,widthad_a);
                 a_r <= mem_r[address_a];
     end
 
-    always @(posedge clock_b) begin
+    always_ff @(posedge clock_b) begin
     
         if (wren_b || rden_b) 
             if (wren_b) 

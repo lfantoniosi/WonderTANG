@@ -21,7 +21,7 @@ reg [7:0] ff_cdout;
 reg ff_busreq;
 integer i;
 
-always @(posedge clk or negedge reset_n) begin
+always_ff @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
         for (i=0; i<=3; i=i+1)
             ff_memreg[i] <= 3-i;

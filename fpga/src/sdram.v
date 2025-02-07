@@ -131,7 +131,7 @@ reg [3:0] cycle;        // each operation (config/read/write) are max 7 cycles
 //
 // SDRAM state machine
 //
-always @(posedge clk or negedge resetn) begin
+always_ff @(posedge clk or negedge resetn) begin
 
     if (~resetn) begin
         ff_busy <= 1'b1;
@@ -265,7 +265,7 @@ reg  [14:0]   rst_cnt;
 reg rst_done, rst_done_p1, cfg_busy;
 assign enabled = rst_done;
 
-always @(posedge clk or negedge resetn) begin
+always_ff @(posedge clk or negedge resetn) begin
     if (~resetn) begin
         rst_cnt  <= 15'd0;
         rst_done <= 1'b0;
