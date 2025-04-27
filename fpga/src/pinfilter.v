@@ -2,9 +2,6 @@
 // takes 2 cycles with enabled signal to stabilize a line
 
 module pinfilter
-#(
-    parameter bit REGISTERED = 1'b0
-)
 (
     input clk,
     input reset_n,
@@ -14,7 +11,7 @@ module pinfilter
 );
 
     reg [1:0] dpipe;
-    reg d;
+    reg d, latch;
     wire o;
 
     always @(posedge clk or negedge reset_n) begin
@@ -24,18 +21,19 @@ module pinfilter
         end else begin
             if (ena) begin
                 dpipe <= { dpipe[0], din };
-                d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d;      
+                d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d;
+                latch <= o;      
             end
         end
     end
 
-    assign o = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : o;
+    assign o = (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : latch;
 
-    assign dout = (REGISTERED) ? d : o;
+    assign dout = o;
 
 endmodule
 
-module pinfilter2
+module pinfilter_reg
 (
     input clk,
     input reg_clk,
@@ -46,7 +44,7 @@ module pinfilter2
 );
 
     reg [1:0] dpipe;
-    reg d;
+    reg d, latch;
     wire o;
 
     always @(posedge clk or negedge reset_n) begin
@@ -56,11 +54,12 @@ module pinfilter2
         end else begin
             if (ena) begin
                 dpipe <= { dpipe[0], din };
-                d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d;      
+                d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d; 
+                latch <= dout;     
             end
         end
     end
 
-    assign dout = (reg_clk) ? d : dout;
+    assign dout = (reg_clk) ? d : latch;
 
 endmodule

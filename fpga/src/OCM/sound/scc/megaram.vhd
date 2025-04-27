@@ -59,7 +59,9 @@ entity megaram is
         mapsel  : in    std_logic_vector( 1 downto 0);  -- "-0":SCC+, "01":ASC8K, "11":ASC16K
 
         wavl    : out   std_logic_vector(14 downto 0);
-        wavr    : out   std_logic_vector(14 downto 0)
+        wavr    : out   std_logic_vector(14 downto 0);
+
+        wavemem : out   std_logic
     );
 end megaram;
 
@@ -218,6 +220,7 @@ begin
     -- Mapped I/O port access on B800-BFFFh ... Wave memory
     DecSccB <= '1' when( adr(15 downto 11) = "10111" and SccModeB(5) = '1' and SccBank3(7) = '1' )else '0';
 
+    wavemem <= DecSccA or DecSccB;
     ----------------------------------------------------------------
     -- SCC bank register
     ----------------------------------------------------------------

@@ -79,8 +79,8 @@ module hdmi
     // All outputs below this line stay inside the FPGA
     // They are used (by you) to pick the color each pixel should have
     // i.e. always_ff @(posedge pixel_clk) rgb <= {8'd0, 8'(cx), 8'(cy)};
-    output logic [BIT_WIDTH-1:0] cx = START_X,
-    output logic [BIT_HEIGHT-1:0] cy = START_Y,
+    output logic [BIT_WIDTH-1:0] cx, // = START_X,
+    output logic [BIT_HEIGHT-1:0] cy, // = START_Y,
 
     // The screen is at the upper left corner of the frame.
     // 0,0 = 0,0 in video
@@ -360,7 +360,7 @@ generate
 endgenerate
 
 // All logic below relates to the production and output of the 10-bit TMDS code.
-logic [9:0] tmds_internal [NUM_CHANNELS-1:0] /* verilator public_flat */ ;
+//logic [9:0] tmds_internal [NUM_CHANNELS-1:0] /* verilator public_flat */ ;
 genvar i;
 generate
     // TMDS code production.

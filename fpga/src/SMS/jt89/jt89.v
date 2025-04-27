@@ -46,6 +46,8 @@ wire signed [ 8:0] ch0, ch1, ch2, noise;
 
 assign ready = 1'b1;
 
+(* direct_enable = 1 *) reg cen_16;
+
 jt89_mixer mix(
     .clk    ( clk   ),
     .clk_en ( clk_en), // uses main clock enable
@@ -67,7 +69,6 @@ reg [2:0] ctrl3;
 reg [2:0] regn;
 
 reg [3:0] clk_div;
-(* direct_enable = 1 *) reg cen_16;
 
 always @(negedge clk )
     if( rst ) begin

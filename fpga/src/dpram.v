@@ -18,7 +18,7 @@ parameter int width_a = 8
     output [width_a-1:0] q_b
 );
 
-localparam int array_size = $pow(2,widthad_a);
+localparam int array_size = $rtoi($pow(2.0,$itor(widthad_a)));
 
     reg [width_a-1:0] mem_r[0:array_size-1];
     reg [width_a-1:0] a_r;

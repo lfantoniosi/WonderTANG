@@ -10,7 +10,7 @@ parameter [255*8-1:0] FILENAME = ""
     input enable
 );
 
-localparam int SIZE = $pow(2,ADDR_WIDTH);
+localparam int SIZE = $rtoi($pow(2.0,$itor(ADDR_WIDTH)));
 
 reg [DATA_WIDTH-1:0] mem[0:SIZE-1];
 

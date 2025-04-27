@@ -452,7 +452,7 @@ pinfilter (
 );
 
 wire merq_scc_n_w;
-pinfilter2
+pinfilter_reg
 (
     .clk(clk108_w),
     .reg_clk(clock_w),

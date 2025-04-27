@@ -1,10 +1,10 @@
 ;--------------------------------------------------------
-; File Created by SDCC : free open source ISO C Compiler 
-; Version 4.4.0 #14620 (Linux)
+; File Created by SDCC : free open source ISO C Compiler
+; Version 4.5.0 #15242 (Mac OS X ppc)
 ;--------------------------------------------------------
 	.module smram
-	.optsdcc -mz80
 	
+	.optsdcc -mz80 sdcccall(1)
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
@@ -193,9 +193,8 @@ _putchar::
 	bit	7, d
 	ret	NZ
 ;smram.c:80: bdos_c_write((char)c);
-	ld	c, e
+	ld	a, e
 	push	de
-	ld	a, c
 	call	_bdos_c_write
 	pop	de
 ;smram.c:81: return c;
@@ -223,23 +222,19 @@ _getchar::
 ; Function fputs
 ; ---------------------------------
 _fputs::
-	ex	de, hl
 ;smram.c:95: while(*s != NULL)
 00101$:
-	ld	a, (de)
+	ld	a, (hl)
 	or	a, a
 	ret	Z
 ;smram.c:96: putchar(*s++);
-	inc	de
+	inc	hl
+	ld	c, #0x00
+	push	hl
 	ld	l, a
-;	spillPairReg hl
-;	spillPairReg hl
-	ld	h, #0x00
-;	spillPairReg hl
-;	spillPairReg hl
-	push	de
+	ld	h, c
 	call	_putchar
-	pop	de
+	pop	hl
 ;smram.c:97: }
 	jr	00101$
 ;smram.c:99: char to_upper(char c)
@@ -248,19 +243,13 @@ _fputs::
 ; ---------------------------------
 _to_upper::
 ;smram.c:101: if (c >= 'a' && c <= 'z')
-	ld	c, a
-	sub	a, #0x61
-	jr	C, 00102$
-	ld	a, #0x7a
-	sub	a, c
-	jr	C, 00102$
+	cp	a, #0x61
+	ret	C
+	cp	a, #0x7b
+	ret	NC
 ;smram.c:102: c = c - ('a'-'A');
-	ld	a, c
 	add	a, #0xe0
-	ld	c, a
-00102$:
 ;smram.c:103: return c;
-	ld	a, c
 ;smram.c:104: }
 	ret
 ;smram.c:106: void enaslt(uchar slotid, uint addr) __naked
@@ -397,14 +386,11 @@ _dos2_getenv::
 ; ---------------------------------
 _hexToNum::
 ;smram.c:269: if (h >= '0' && h <='9')
-	ld	c, a
-	sub	a, #0x30
+	cp	a, #0x30
 	jr	C, 00102$
-	ld	a, #0x39
-	sub	a, c
-	jr	C, 00102$
+	cp	a, #0x3a
+	jr	NC, 00102$
 ;smram.c:270: return h-'0';    
-	ld	a, c
 	add	a, #0xd0
 	ret
 00102$:
@@ -483,20 +469,18 @@ _main::
 	rr	c
 	sra	b
 	rr	c
-	ld	a, c
-	ld	(#_curslt), a
+	ld	iy, #_curslt
+	ld	0 (iy), c
 ;smram.c:354: cursslt = (~(*((uchar*)0xFFFF)) & 0x0C) | *((uchar*)EXPTBL+curslt);
 	ld	a, (#0xffff)
 	cpl
 	and	a, #0x0c
 	ld	c, a
-	ld	a, (_curslt+0)
-	add	a, #0xc1
-	ld	e, a
-	ld	a, #0x00
-	adc	a, #0xfc
-	ld	d, a
-	ld	a, (de)
+	ld	l, 0 (iy)
+	ld	h, #0x00
+	ld	de, #0xfcc1
+	add	hl, de
+	ld	a, (hl)
 	or	a, c
 	ld	(_cursslt+0), a
 ;smram.c:356: for(i = 1; i < 4; i++)
@@ -510,12 +494,12 @@ _main::
 	ld	a, (hl)
 	ld	(_slotid+0), a
 ;smram.c:360: if (slotid & 0x80) {    // expanded ?
-	ld	a, (_slotid+0)
+	ld	a, (_slotid)
 	rlca
 	jr	NC, 00226$
 ;smram.c:362: enaslt(i | 0x80, 0x4000); // looking for BIOS, sslot 0
-	ld	a, (_i+0)
-	or	a, #0x80
+	ld	a, (_i)
+	set	7, a
 	ld	de, #0x4000
 	call	_enaslt
 ;smram.c:364: b = *(uchar*)(0x6000); // it might be RAM
@@ -525,41 +509,34 @@ _main::
 	ld	hl, #0x6000
 	ld	(hl), #0x07
 ;smram.c:366: s = "WonderTANG! uSD Driver";
-	ld	iy, #_s
-	ld	0 (iy), #<(___str_0)
-	ld	1 (iy), #>(___str_0)
+	ld	hl, #___str_0
+	ld	(_s), hl
 ;smram.c:367: t = (uchar*)0x4110;
 	ld	hl, #0x4110
 	ld	(_t), hl
 ;smram.c:368: for(int j=0; j<22; j++)
-	ld	bc, #0x0000
+	ld	c, #0x00
 00223$:
 	ld	a, c
 	sub	a, #0x16
-	ld	a, b
-	rla
-	ccf
-	rra
-	sbc	a, #0x80
 	jr	NC, 00105$
 ;smram.c:370: if (*s++ != *t++) break;
 	ld	hl, (_s)
-	ld	e, (hl)
+	ld	b, (hl)
 	ld	hl, (_s)
 	inc	hl
 	ld	(_s), hl
 	ld	hl, (_t)
-	ld	d, (hl)
+	ld	e, (hl)
 	ld	hl, (_t)
 	inc	hl
 	ld	(_t), hl
-	ld	a, e
-	sub	a, d
+	ld	a, b
+	sub	a, e
 	jr	NZ, 00105$
 ;smram.c:372: if (j == 21) 
 	ld	a, c
 	sub	a, #0x15
-	or	a, b
 	jr	NZ, 00224$
 ;smram.c:374: found = TRUE;
 	ld	hl, #_found
@@ -568,15 +545,15 @@ _main::
 	jr	00105$
 00224$:
 ;smram.c:368: for(int j=0; j<22; j++)
-	inc	bc
+	inc	c
 	jr	00223$
 00105$:
 ;smram.c:379: *((uchar*)0x6000) = b; // return whatever was there
 	ld	hl, #0x6000
-	ld	a, (_b+0)
+	ld	a, (_b)
 	ld	(hl), a
 ;smram.c:381: enaslt(curslt | cursslt, 0x4000);
-	ld	a, (_curslt+0)
+	ld	a, (_curslt)
 	ld	hl, #_cursslt
 	or	a, (hl)
 	ld	de, #0x4000
@@ -600,8 +577,8 @@ _main::
 	jp	C, 00225$
 00110$:
 ;smram.c:387: sslt = 0;
-	ld	hl, #_sslt
-	ld	(hl), #0x00
+	xor	a, a
+	ld	(_sslt+0), a
 ;smram.c:389: if (found)
 	ld	a, (_found+0)
 	or	a, a
@@ -616,12 +593,11 @@ _main::
 	call	_printf
 	pop	af
 ;smram.c:394: sslt = 0x80 | (2 << 2) | i;
-	ld	a, (_i+0)
+	ld	a, (_i)
 	or	a, #0x88
 	ld	(_sslt+0), a
 ;smram.c:395: paramlen = *((char*)0x80);
-	ld	hl, #0x0080
-	ld	a, (hl)
+	ld	a, (#0x0080)
 	ld	(_paramlen+0), a
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, #0x0081
@@ -637,13 +613,12 @@ _main::
 	jp	NZ, 00175$
 00228$:
 ;smram.c:398: if (*params != ' ')
-	ld	a, e
-	sub	a, #0x20
-	jp	Z,00230$
 ;smram.c:400: if (*params == '/')
-	ld	a, e
+	ld	a,e
+	cp	a,#0x20
+	jp	Z,00230$
 	sub	a, #0x2f
-	jp	NZ,00168$
+	jp	NZ, 00168$
 ;smram.c:402: params++;
 	ld	hl, (_params)
 	inc	hl
@@ -803,16 +778,13 @@ _main::
 	ld	(_params), hl
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, (_params)
-	ld	c, (hl)
+	ld	a, (hl)
 ;smram.c:482: if (*params >= '0' && *params <= '3')
-	ld	a, c
-	sub	a, #0x30
+	cp	a, #0x30
 	jr	C, 00230$
-	ld	a, #0x33
-	sub	a, c
-	jr	C, 00230$
+	cp	a, #0x34
+	jr	NC, 00230$
 ;smram.c:483: cpumode = *params - '0';
-	ld	a, c
 	ld	hl, #_cpumode
 	add	a, #0xd0
 	ld	(hl), a
@@ -850,17 +822,14 @@ _main::
 00164$:
 ;smram.c:396: for(params = (char*)0x81; *params != 0 || paramlen == 0; ++params, paramlen--)
 	ld	hl, (_params)
-	ld	c, (hl)
+	ld	a, (hl)
 ;smram.c:498: while(*params != 0 && *params != ' ') {
-	ld	a, c
 	or	a, a
 	jr	Z, 00175$
-	ld	a, c
-	sub	a, #0x20
+	cp	a, #0x20
 	jr	Z, 00175$
 ;smram.c:499: *params = to_upper(*params);
 	push	hl
-	ld	a, c
 	call	_to_upper
 	pop	hl
 	ld	(hl), a
@@ -875,8 +844,8 @@ _main::
 	ld	hl, (_params)
 	inc	hl
 	ld	(_params), hl
-	ld	iy, #_paramlen
-	dec	0 (iy)
+	ld	hl, #_paramlen
+	dec	(hl)
 	jp	00229$
 00174$:
 ;smram.c:508: } else megaram_type = TYPE_UNK;
@@ -1047,13 +1016,12 @@ _main::
 	pop	af
 ;smram.c:576: enaslt(sslt, 0x4000);
 	ld	de, #0x4000
-	ld	a, (_sslt+0)
+	ld	a, (_sslt)
 	call	_enaslt
 ;smram.c:577: page = 0;
-	ld	hl, #_page
-	ld	(hl), #0x00
 ;smram.c:578: romsize = 0;
 	xor	a, a
+	ld	(_page+0), a
 	ld	(_romsize+0), a
 	ld	(_romsize+1), a
 	ld	(_romsize+2), a
@@ -1069,10 +1037,10 @@ _main::
 ;smram.c:581: do {
 00197$:
 ;smram.c:583: MEGA_PORT0 = 0; // enable paging
-	ld	a, #0x00
+	xor	a, a
 	out	(_MEGA_PORT0), a
 ;smram.c:584: *((uchar *)0x4000) = page++;
-	ld	a, (_page+0)
+	ld	a, (_page)
 	ld	c, a
 	ld	hl, #_page
 	inc	(hl)
@@ -1085,7 +1053,7 @@ _main::
 	ld	h, #0x20
 	push	hl
 	ld	de, #0x8000
-	ld	a, (_handle+0)
+	ld	a, (_handle)
 	call	_dos2_read
 	ex	de, hl
 	ld	(_bytes_read), hl
@@ -1144,7 +1112,7 @@ _main::
 	ld	(_romstart+1), a
 00196$:
 ;smram.c:593: MEGA_PORT0 = 0; // enable paging
-	ld	a, #0x00
+	xor	a, a
 	out	(_MEGA_PORT0), a
 ;smram.c:594: printf("\b\b\b\b\b\b%04dKB", (uint)(romsize >> 10));
 	ld	hl, (_romsize + 1)
@@ -1171,7 +1139,7 @@ _main::
 	ld	hl, #0x4000
 	ld	(hl), #0x00
 ;smram.c:600: dos2_close(handle);
-	ld	a, (_handle+0)
+	ld	a, (_handle)
 	call	_dos2_close
 	jr	00202$
 00201$:
@@ -1195,7 +1163,7 @@ _main::
 	out	(_MEGA_PORT1), a
 ;smram.c:610: enaslt(sslt, 0x4000);
 	ld	de, #0x4000
-	ld	a, (_sslt+0)
+	ld	a, (_sslt)
 	call	_enaslt
 ;smram.c:611: romstart = 0x4002;
 	ld	hl, #0x4002
@@ -1336,18 +1304,14 @@ _main::
 ;smram.c:655: chgcpu(cpumode == 1 ? Z80_ROM : cpumode == 2 ? R800_ROM : R800_DRAM);
 	ld	a, (_cpumode+0)
 	dec	a
-	jr	NZ, 00239$
-	ld	c, a
-	jr	00240$
-00239$:
+	jr	Z, 00240$
 	ld	a, (_cpumode+0)
 	sub	a, #0x02
-	ld	c, #0x81
+	ld	a, #0x81
 	jr	Z, 00242$
-	ld	c, #0x82
+	ld	a, #0x82
 00242$:
 00240$:
-	ld	a, c
 	call	_chgcpu
 00221$:
 ;smram.c:658: printf("\n\rPress any key to proceed...\n\r");
