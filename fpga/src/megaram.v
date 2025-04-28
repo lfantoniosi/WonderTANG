@@ -68,7 +68,7 @@ always @(posedge clk or negedge reset_n) begin
                     endcase
                 end
             end
-            if (/*~ff_ram_ena &&*/ ~wr_n && cart_ena && addr[15:11] == 5'b10010) begin
+            if (~wr_n && cart_ena && addr[15:11] == 5'b10010) begin
                 ff_scc_ram <= (cdin[5:0] == 6'h3F) ? scc_enable : 0;
             end
         end
@@ -107,13 +107,12 @@ assign page_w = ff_memreg[ page_select_w ];                            // Konami
 
 wire [22:0] page_addr_w;
 assign page_addr_w = (megaram_type == 2'b10) ? { 2'b0, page_w[6:0], addr[13:0] } :
-                     (megaram_type == 2'b01) ? { 3'b0, page_w[5:0], addr[12:0] } :   
                                                { 2'b0, page_w, addr[12:0] };
 assign mem_addr = 23'h420000 + page_addr_w;
 
 assign cart_ena = (addr[15:14] == 2'b01 || addr[15:14] == 2'b10) && ~sltsl_n && ~merq_n && iorq_n ? 1 : 0;
 
-assign busreq = ff_scc_ram && ~sltsl_n && ~merq_scc_n && iorq_n && addr[15:11] == 5'b10011 && ~rd_n ? scc_enable : 0;
-assign scc_req_w = ~sltsl_n && ~merq_scc_n && iorq_n && addr[15:12] == 4'b1001 ? scc_enable : 0;
+assign busreq    = ~sltsl_n && ~merq_scc_n && iorq_n && addr[15:11] == 5'b10011 && ~rd_n ? (scc_enable && ff_scc_ram) : 0;
+assign scc_req_w = ~sltsl_n && ~merq_scc_n && iorq_n ? scc_enable : 0;
 
 endmodule
