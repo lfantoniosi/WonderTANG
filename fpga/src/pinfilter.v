@@ -11,17 +11,15 @@ module pinfilter
 );
 
     reg [1:0] dpipe;
-    reg d, latch;
+    reg latch;
     wire o;
 
     always @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
             dpipe <= 2'b11;
-            d <= 2'b1;
         end else begin
             if (ena) begin
                 dpipe <= { dpipe[0], din };
-                d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d;
                 latch <= o;      
             end
         end
@@ -55,11 +53,13 @@ module pinfilter_reg
             if (ena) begin
                 dpipe <= { dpipe[0], din };
                 d <= (dpipe[1:0] == 2'b00) ? 1'b0 : (dpipe[1:0] == 2'b11) ? 1'b1 : d; 
-                latch <= dout;     
+                latch <= o;     
             end
         end
     end
 
-    assign dout = (reg_clk) ? d : latch;
+    assign o = (reg_clk) ? d : latch;
+
+    assign dout = o;
 
 endmodule

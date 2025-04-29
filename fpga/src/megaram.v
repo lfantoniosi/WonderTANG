@@ -18,7 +18,8 @@ module megaramSCC(
     output [22:0] mem_addr,
     output [14:0] scc_wave, 
     input scc_enable,
-    input [1:0] megaram_type
+    input [1:0] megaram_type,
+    input scc_addr
 );
 
 reg [7:0] ff_memreg[0:3];
@@ -29,14 +30,14 @@ integer i;
 
 wire [1:0] switch_bank_w;
 
-assign switch_bank_w =  megaram_type == 2'b00 ? {addr[14], addr[13]} :
-                        megaram_type == 2'b01 ? {addr[14], addr[13]} :
-                        megaram_type == 2'b10 ? ((addr[15:12] == 4'h6) ? 2'b01 : 2'b10) :
-                                                ((addr[15:11] == 5'b01100) ? 2'b10 :
-                                                 (addr[15:11] == 5'b01101) ? 2'b11 :
-                                                 (addr[15:11] == 5'b01110) ? 2'b00 : 2'b01);
+assign switch_bank_w = megaram_type == 2'b11 ? {~addr[12], addr[11]} :
+                        megaram_type == 2'b10 ? {addr[12], ~addr[12]} : { addr[14], addr[13]};
+                        
 wire [1:0] page_select_w;
 assign page_select_w =  megaram_type == 2'b10 ? {addr[15], addr[14]} : {addr[14], addr[13]};
+assign bank_switch_enable_w = (~scc_addr || addr[12:11] == 2'b10) ? '1 : '0;
+assign scc_bank_enable_w = (addr[15:0] == 16'h9000) ? '1 : '0;
+assign megaram_port_ena_w = (addr[7:0] == 8'h8E && ~iorq_n && m1_n) ? '1 : '0;
 
 always @(posedge clk or negedge reset_n) begin
     if (~reset_n) begin
@@ -46,30 +47,24 @@ always @(posedge clk or negedge reset_n) begin
         ff_scc_ram <= 1'b0;
     end else begin
         if (enable) begin
-            if (~iorq_n && m1_n) begin
-                if (addr[7:0] == 8'h8E) begin
-                    if (wr_n == 0) begin
-                        ff_ram_ena <= 1'b0; // enable rom mode, page selection
-                    end
-                    if (rd_n == 0) begin
-                        ff_ram_ena <= 1'b1; // enable ram mode, disable page selection
-                    end
+            if (megaram_port_ena_w) begin
+                if (wr_n == 0) begin
+                    ff_ram_ena <= 1'b0; // enable rom mode, page selection
+                end
+                if (rd_n == 0) begin
+                    ff_ram_ena <= 1'b1; // enable ram mode, disable page selection
                 end
             end
-            if (~ff_ram_ena) begin 
-                if (wr_n == 0 && cart_ena) begin
+            if (~ff_ram_ena && cart_ena) begin 
+                if (~wr_n) begin
 
-                    case(megaram_type)
-                        2'b00: ff_memreg[ switch_bank_w ] <= cdin & 8'hff; // konami 
-                        2'b01: ff_memreg[ switch_bank_w ] <= cdin & 8'hff; // konami SCC
-                        2'b10: ff_memreg[ switch_bank_w ] <= cdin & 8'hff; // ASCII16
-                        2'b11: ff_memreg[ switch_bank_w ] <= cdin & 8'hff; // ASCII8
+                    if (bank_switch_enable_w)
+                        ff_memreg[ switch_bank_w ] <= cdin;
 
-                    endcase
+                    if (scc_bank_enable_w) begin
+                        ff_scc_ram <= (cdin[5:0] == 6'h3F) ? scc_enable : 0;
+                    end
                 end
-            end
-            if (~wr_n && cart_ena && addr[15:11] == 5'b10010) begin
-                ff_scc_ram <= (cdin[5:0] == 6'h3F) ? scc_enable : 0;
             end
         end
     end

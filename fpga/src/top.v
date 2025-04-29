@@ -177,15 +177,6 @@ wire res_n_w;
     .I(clk_pa)
     );
     assign rst_n_w = ~rst_w;
-/*
-    CLKDIV #(
-        .DIV_MODE(2)
-    )(
-    .HCLKIN(clk108_w),
-    .RESETN(clk108_lock_w),
-    .CLKOUT(clk54)
-    );
-*/
 
     clockdiv2(
         .clk_src(clk108_w),
@@ -374,7 +365,7 @@ pinfilter
     .reset_n(rst_n_w),
     .din(clock),
     .dout(clock3),
-    .ena(ff_dotena)
+    .ena(1)
 );
 
 BUFG (
@@ -1102,6 +1093,7 @@ wire [14:0] scc_wave_w;
 wire megaram_cs_w;
 assign megaram_cs_w = (ram_enabled_w && ~iorq_n_w && m1_n_w && rd_n_w && ~wr_n_w && addr_w[7:0] == 8'h8F) ? 1 : 0;
 reg ff_scc_enable;
+reg ff_scc_addr;
 reg [1:0] ff_megaram_type; // 0 Konami, 1 Konami SCC+, 2 ASCII16, 3 ASCII8
 
 //reg [3:0] ff_scc_vol;
@@ -1112,6 +1104,7 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
     if (~ram_enabled_w) begin
         ff_megaram_type <= 2'b01;
         ff_scc_enable <= '1;
+        ff_scc_addr <= '0;
 
 //        ff_scc_vol <= 4'h0;
 //        ff_psg_vol <= 4'h0;
@@ -1121,21 +1114,30 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
         if (megaram_cs_w) begin
 
             case(cdin_w)
+                8'h00: begin
+                    ff_scc_enable <= 1'b1;
+                    ff_megaram_type <= 2'b01;
+                    ff_scc_addr <= '0;
+                end
                 8'h05: begin
                     ff_scc_enable <= 1'b1;
                     ff_megaram_type <= 2'b01;
+                    ff_scc_addr <= '1;
                 end
                 8'h16: begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b10;
+                    ff_scc_addr <= '0;
                 end
                 8'h08: begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b11;
+                    ff_scc_addr <= '0;
                 end
                 8'h04: begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b00;
+                    ff_scc_addr <= '0;
                 end
             endcase
 /*
@@ -1157,6 +1159,7 @@ end
 
 wire scc_enable_w;
 assign scc_enable_w = ff_scc_enable;
+assign scc_addr_w = ff_scc_addr;
 wire [1:0] megaram_type_w;
 assign megaram_type_w = ff_megaram_type;
 
@@ -1180,7 +1183,8 @@ megaramSCC(
     .cart_ena(cart_ena_w[MR_SSLT]),
     .scc_wave(scc_wave_w),
     .scc_enable(scc_enable_w),
-    .megaram_type(megaram_type_w)
+    .megaram_type(megaram_type_w),
+    .scc_addr(scc_addr_w)
 );
 //////////////// AUDIO
 `ifdef PSG
@@ -1193,13 +1197,6 @@ assign psg_req_w = (ram_enabled_w && iorq_n_w == 0 && m1_n_w == 1 && addr_w[7:1]
 reg [7:0] psg_portb_w = 8'hFF;
 reg [7:0] psg_portb2_w = 8'hFF;
 
-/*
-clockdiv2(
-    .clk_src(clock_w),
-    .reset_n(ram_enabled_w),
-    .clk_div(hclock)
-);
-*/
 clockdivint #(
     .CLK_SRC(108),
     .CLK_DIV(315.0/88.0/2.0)//,

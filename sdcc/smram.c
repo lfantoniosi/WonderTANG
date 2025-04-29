@@ -7,6 +7,7 @@
 #define BDOS_C_WRITE		2
 #define BDOS_C_RAWIO		6
 
+#define TYPE_MSCC 0x00
 #define TYPE_K4  0x04
 #define TYPE_K5  0x05
 #define TYPE_A16 0x16
@@ -324,7 +325,7 @@ void runROM_page2_end() __naked {}
 
 bool found = FALSE;
 char* filename = NULL;
-int megaram_type = TYPE_K5;
+int megaram_type = TYPE_MSCC;
 uchar curslt, cursslt, sslt, b;
 const uchar *s;
 uchar *t;
@@ -389,7 +390,7 @@ int main(void)
     if (found)
     {
         printf("WonderTANG! Super MegaRAM SCC+\n\r");
-        printf("v2.00\n\r");
+        printf("v2.01\n\r");
 
         sslt = 0x80 | (2 << 2) | i;
         paramlen = *((char*)0x80);
@@ -402,6 +403,9 @@ int main(void)
                     params++;
                     if (to_upper(*params) == 'R') {
                         params++;
+                        if (*params == '0')
+                            megaram_type = TYPE_MSCC;
+                        else
                         if (*params == '6')
                             megaram_type = TYPE_K4;
                         else
@@ -517,10 +521,11 @@ int main(void)
     {
         printf("\n\rUSAGE: SMRAM [/Rx /Zx /Y] [romfile]\n\r\n\r"
                 " /Rx: Set MegaROM type\n\r"
-                "   1: ASCII16    (/A16)\n\r"
-                "   3: ASCII8     (/A8)\n\r"
-                "   5: Konami SCC (/K5)\n\r"
-                "   6: Konami     (/K4)\n\r\n\r"
+                "   0: Megaram SCC (default)\n\r"
+                "   1: ASCII16     (/A16)\n\r"
+                "   3: ASCII8      (/A8)\n\r"
+                "   5: Konami SCC  (/K5)\n\r"
+                "   6: Konami      (/K4)\n\r\n\r"
 //                " /Vxy: Set volume for\n\r"
 //                "   S: SCC+\n\r"
 //                "   P: PSG\n\r"
@@ -539,6 +544,9 @@ int main(void)
     printf("\r\nMapper Type: ");
     switch(megaram_type)
     {
+        case TYPE_MSCC:
+                printf("MegaRAM SCC (default)\n\r");
+                break;
         case TYPE_K4:
                 printf("Konami (/R6 or /K4)\n\r");
                 break;
@@ -553,9 +561,9 @@ int main(void)
                 break;
     }
 
-    MEGA_PORT1 = 0xF0 | scc_vol;
-    MEGA_PORT1 = 0xE0 | psg_vol;
-    MEGA_PORT1 = 0xD0 | opll_vol;
+    //MEGA_PORT1 = 0xF0 | scc_vol;
+    //MEGA_PORT1 = 0xE0 | psg_vol;
+    //MEGA_PORT1 = 0xD0 | opll_vol;
 
     if (filename == 0) {        
         if (megaram_type != TYPE_UNK)
