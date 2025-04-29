@@ -1114,11 +1114,6 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
         if (megaram_cs_w) begin
 
             case(cdin_w)
-                8'h00: begin
-                    ff_scc_enable <= 1'b1;
-                    ff_megaram_type <= 2'b01;
-                    ff_scc_addr <= '0;
-                end
                 8'h05: begin
                     ff_scc_enable <= 1'b1;
                     ff_megaram_type <= 2'b01;
@@ -1137,6 +1132,11 @@ always @(posedge clk108_w or negedge ram_enabled_w) begin
                 8'h04: begin
                     ff_scc_enable <= 1'b0;
                     ff_megaram_type <= 2'b00;
+                    ff_scc_addr <= '0;
+                end
+                default: begin
+                    ff_scc_enable <= 1'b1;
+                    ff_megaram_type <= 2'b01;
                     ff_scc_addr <= '0;
                 end
             endcase

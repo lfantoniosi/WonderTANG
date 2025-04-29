@@ -583,11 +583,11 @@ _main::
 	ld	a, (_found+0)
 	or	a, a
 	jp	Z, 00177$
-;smram.c:392: printf("WonderTANG! Super MegaRAM SCC+\n\r");
+;smram.c:392: printf("WonderTANG! Super MegaRAM SCC\n\r");
 	ld	hl, #___str_1
 	push	hl
 	call	_printf
-;smram.c:393: printf("v2.01\n\r");
+;smram.c:393: printf("v2.02\n\r");
 	ld	hl, #___str_2
 	ex	(sp),hl
 	call	_printf
@@ -1342,12 +1342,12 @@ ___str_0:
 	.ascii "WonderTANG! uSD Driver"
 	.db 0x00
 ___str_1:
-	.ascii "WonderTANG! Super MegaRAM SCC+"
+	.ascii "WonderTANG! Super MegaRAM SCC"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00
 ___str_2:
-	.ascii "v2.01"
+	.ascii "v2.02"
 	.db 0x0a
 	.db 0x0d
 	.db 0x00

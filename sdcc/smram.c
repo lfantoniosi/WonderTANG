@@ -389,8 +389,8 @@ int main(void)
 
     if (found)
     {
-        printf("WonderTANG! Super MegaRAM SCC+\n\r");
-        printf("v2.01\n\r");
+        printf("WonderTANG! Super MegaRAM SCC\n\r");
+        printf("v2.02\n\r");
 
         sslt = 0x80 | (2 << 2) | i;
         paramlen = *((char*)0x80);
