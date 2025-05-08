@@ -9,7 +9,7 @@
 		(date "2023-03-01")
 	)
 	(lib_symbols
-		(symbol "Connector_Audio:AudioJack3"
+		(symbol "Connector_Audio:AudioJack3_SwitchTR"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -21,7 +21,7 @@
 					)
 				)
 			)
-			(property "Value" "AudioJack3"
+			(property "Value" "AudioJack3_SwitchTR"
 				(at 0 6.35 0)
 				(effects
 					(font
@@ -47,7 +47,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Audio Jack, 3 Poles (Stereo / TRS)"
+			(property "Description" "Audio Jack, 3 Poles (Stereo / TRS), Switched TR Poles (Normalling)"
 				(at 0 0 0)
 				(effects
 					(font
@@ -74,10 +74,10 @@
 					(hide yes)
 				)
 			)
-			(symbol "AudioJack3_0_1"
+			(symbol "AudioJack3_SwitchTR_0_1"
 				(rectangle
 					(start -5.08 -5.08)
-					(end -6.35 -2.54)
+					(end -6.35 -7.62)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -88,7 +88,31 @@
 				)
 				(polyline
 					(pts
-						(xy 0 -2.54) (xy 0.635 -3.175) (xy 1.27 -2.54) (xy 2.54 -2.54)
+						(xy 0.508 -0.254) (xy 0.762 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.778 -5.334) (xy 2.032 -5.842)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -5.08) (xy 0.635 -5.715) (xy 1.27 -5.08) (xy 2.54 -5.08)
 					)
 					(stroke
 						(width 0.254)
@@ -100,7 +124,31 @@
 				)
 				(polyline
 					(pts
-						(xy -1.905 -2.54) (xy -1.27 -3.175) (xy -0.635 -2.54) (xy -0.635 0) (xy 2.54 0)
+						(xy 2.54 -7.62) (xy 1.778 -7.62) (xy 1.778 -5.334) (xy 1.524 -5.842)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54) (xy 0.508 -2.54) (xy 0.508 -0.254) (xy 0.254 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.905 -5.08) (xy -1.27 -5.715) (xy -0.635 -5.08) (xy -0.635 0) (xy 2.54 0)
 					)
 					(stroke
 						(width 0.254)
@@ -112,7 +160,7 @@
 				)
 				(polyline
 					(pts
-						(xy 2.54 2.54) (xy -2.54 2.54) (xy -2.54 -2.54) (xy -3.175 -3.175) (xy -3.81 -2.54)
+						(xy 2.54 2.54) (xy -2.54 2.54) (xy -2.54 -5.08) (xy -3.175 -5.715) (xy -3.81 -5.08)
 					)
 					(stroke
 						(width 0.254)
@@ -124,7 +172,7 @@
 				)
 				(rectangle
 					(start 2.54 3.81)
-					(end -5.08 -5.08)
+					(end -5.08 -10.16)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -134,7 +182,7 @@
 					)
 				)
 			)
-			(symbol "AudioJack3_1_1"
+			(symbol "AudioJack3_SwitchTR_1_1"
 				(pin passive line
 					(at 5.08 0 180)
 					(length 2.54)
@@ -146,6 +194,24 @@
 						)
 					)
 					(number "R"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "RN"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -172,7 +238,7 @@
 					)
 				)
 				(pin passive line
-					(at 5.08 -2.54 180)
+					(at 5.08 -5.08 180)
 					(length 2.54)
 					(name "~"
 						(effects
@@ -182,6 +248,24 @@
 						)
 					)
 					(number "T"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -7.62 180)
+					(length 2.54)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "TN"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3920,6 +4004,18 @@
 		(color 0 0 0 0)
 		(uuid "b465c665-8881-4475-8ca1-081ceea7c300")
 	)
+	(junction
+		(at 373.38 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b48b8275-e3a5-4daa-aff5-ae5ec23a5b9f")
+	)
+	(junction
+		(at 373.38 102.87)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ee76c55b-6037-41cf-a351-9970cf86e099")
+	)
 	(no_connect
 		(at 327.66 55.88)
 		(uuid "13fdfc42-59fc-4c61-ae4e-96b6363d9f1a")
@@ -4314,6 +4410,16 @@
 	)
 	(wire
 		(pts
+			(xy 375.92 102.87) (xy 373.38 102.87)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "272a610f-38ac-4986-890b-9d88d503edba")
+	)
+	(wire
+		(pts
 			(xy 281.94 42.545) (xy 281.94 44.45)
 		)
 		(stroke
@@ -4391,6 +4497,16 @@
 			(type default)
 		)
 		(uuid "30448565-a0d9-458f-a5c5-84489ab3dc21")
+	)
+	(wire
+		(pts
+			(xy 373.38 100.33) (xy 373.38 102.87)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "327886b3-e3b8-4330-a980-5caeb3792a41")
 	)
 	(wire
 		(pts
@@ -5401,6 +5517,26 @@
 			(type default)
 		)
 		(uuid "bda26f65-b383-4243-b461-dcf8c51fb950")
+	)
+	(wire
+		(pts
+			(xy 375.92 100.33) (xy 373.38 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bdf68526-7aa0-440e-a43d-6fe4f0dc85be")
+	)
+	(wire
+		(pts
+			(xy 373.38 102.87) (xy 373.38 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bf2799c9-be34-4e35-b140-bee7b018300d")
 	)
 	(wire
 		(pts
@@ -11124,17 +11260,16 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Audio:AudioJack3")
+		(lib_id "Connector_Audio:AudioJack3_SwitchTR")
 		(at 381 107.95 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "5676cecc-88f6-4f4d-a98e-7a63626105ee")
 		(property "Reference" "J2"
-			(at 388.62 106.68 0)
+			(at 388.62 103.5049 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11143,7 +11278,7 @@
 			)
 		)
 		(property "Value" "AudioJack3"
-			(at 388.62 109.22 0)
+			(at 388.62 106.0449 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11151,7 +11286,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Tang20K:SJ1-3523N"
+		(property "Footprint" "Connector_Audio:Jack_3.5mm_CUI_SJ1-3525N_Horizontal"
 			(at 381 107.95 0)
 			(effects
 				(font
@@ -11169,7 +11304,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Audio Jack, 3 Poles (Stereo / TRS), Switched TR Poles (Normalling)"
 			(at 381 107.95 0)
 			(effects
 				(font
@@ -11186,6 +11321,12 @@
 		)
 		(pin "T"
 			(uuid "67f78dd7-0014-4d0c-b782-db6e13d708ad")
+		)
+		(pin "TN"
+			(uuid "17c70867-e6b6-4d0d-ac18-29d2fb0ce39b")
+		)
+		(pin "RN"
+			(uuid "9c9bf4c1-b37a-439c-a4ab-30549c39858b")
 		)
 		(instances
 			(project "WonrderTANG"
@@ -11534,7 +11675,7 @@
 				)
 			)
 		)
-		(property "Value" "LED"
+		(property "Value" "uSD"
 			(at 350.8375 124.46 0)
 			(effects
 				(font
@@ -13030,15 +13171,15 @@
 		(fields_autoplaced yes)
 		(uuid "adebba55-1f23-46da-be2a-56b29da75b06")
 		(property "Reference" "J3"
-			(at 344.17 104.775 0)
+			(at 344.17 104.14 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "Conn_02x01"
-			(at 344.17 107.315 0)
+		(property "Value" "AUDIO"
+			(at 344.17 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
