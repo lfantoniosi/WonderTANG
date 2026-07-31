@@ -1,3 +1,19 @@
+# OS and editor metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+*~
+*.swp
+*.swo
+
+# Local history, caches, logs, and backup files
+.history/
+__pycache__/
+*.py[cod]
+*.tmp
+*.bak
+*.orig
+*.log
 
 fpga/impl/pnr/WonderTANG.db
 fpga/impl/pnr/WonderTANG.binx

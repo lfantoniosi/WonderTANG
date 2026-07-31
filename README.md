@@ -1,4 +1,9 @@
 # WonderTANG
+
+# NOTE: New firmware for 2.02b boards at:
+
+https://github.com/lfantoniosi/new-juice
+
 ## TangNano 20K cartridge for MSX computers
 
 This cartridge allows any MSX computer to host a Sipeed Tang Nano 20K. The current fpga core implements:
